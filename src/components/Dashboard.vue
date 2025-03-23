@@ -19,6 +19,10 @@ function toUpperCase(gender) {
 }
 
 function calculateAge(dob) {
+  if (dob === '') {
+    return ''
+  }
+
   const birthDate = new Date(dob);
   const today = new Date();
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PocketBase from "pocketbase";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref} from "vue";
+import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 const name = ref('')
@@ -58,6 +59,12 @@ const isValidName = computed(() => {
   return name.value.trim().length > 0;
 })
 
+const canSave = computed(() => {
+  if (isValidName.value && species.value !== '' && breed.value !== '') {
+    return true;
+  }
+  return false;
+})
 // function capitaliseInput(input: string) {
 //   return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
 // }
@@ -86,8 +93,8 @@ onMounted(async () => {
   // console.log('Locations:', result3);
   importLocationsList.value = result3.items;
 
-  const addPetModal = document.getElementById('addPet')
-  addPetModal.addEventListener('hidden.bs.modal', event => {
+  const addPetModal = document.getElementById('addPet') // Resets form
+  addPetModal.addEventListener('show.bs.modal', event => {
     resetForm()
   })
 })
@@ -104,6 +111,35 @@ function resetForm() {
   isImported.value = false
   importLocation.value = ''
   microchipNumber.value = ''
+}
+
+async function savePet() {
+  try {
+    const updatedPet = {
+      name: name.value,
+      species: species.value,
+      breed: breed.value.id,
+      breedSecondary: breed.value,
+      dob: dob.value,
+      gender: gender.value,
+      isNeutered: isNeutered.value,
+      colour: colour.value,
+      isImported: isImported.value,
+      importLocation: importLocation.value,
+      microchipNumber: microchipNumber.value
+    };
+    // Update pet details in PocketBase
+    //await pb.collection('pets').update(props.petId, updatedPet);
+    await pb.collection('pets').create(updatedPet);
+    alert("Pet details saved successfully!");
+
+    const addPetModal = bootstrap.Modal.getInstance(document.getElementById('addPet'));
+    if (addPetModal) {
+      await addPetModal.hide();
+    }
+  } catch (error) {
+    console.error("Error saving pet:", error);
+  }
 }
 
 </script>
@@ -278,7 +314,9 @@ function resetForm() {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button @click="savePet" type="button" class="btn btn-primary"
+                  :disabled="!canSave">Save changes
+          </button>
         </div>
       </div>
     </div>
