@@ -85,8 +85,26 @@ onMounted(async () => {
   })
   // console.log('Locations:', result3);
   importLocationsList.value = result3.items;
+
+  const addPetModal = document.getElementById('addPet')
+  addPetModal.addEventListener('hidden.bs.modal', event => {
+    resetForm()
+  })
 })
 
+function resetForm() {
+  name.value = ''
+  species.value = ''
+  breed.value = ''
+  breedSecondary.value = ''
+  dob.value = undefined
+  gender.value = ''
+  isNeutered.value = false
+  colour.value = ''
+  isImported.value = false
+  importLocation.value = ''
+  microchipNumber.value = ''
+}
 
 </script>
 
@@ -96,7 +114,8 @@ onMounted(async () => {
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Your new pet details</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
         </div>
         <div class="modal-body">
 
@@ -136,124 +155,124 @@ onMounted(async () => {
             </div>
 
             <!--            breed-->
-
-            <div class="mt-2">
-              <label for="petBreed">Breed <span class="text-muted">(or first breed if mixed)</span></label>
-              <select v-model="breed" id="petBreed" class="form-select"
-                      :class="'form-select ' + (breed === '' ? 'is-invalid' : '')">
-                <option disabled selected value="">Select a breed</option>
-                <option
-                    v-for="breed in filteredBreedsList"
-                    :value="breed"
-                    :key="breed.id">
-                  {{ breed.name }}
-
-                </option>
-              </select>
-              <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                Please choose a breed.
-              </div>
-              <div
-                  v-if="breed && !breed.generic"
-                  class="mt-1">
-                <label for="petSecondaryBreed">Second breed <span class="text-muted">(if mixed)</span></label>
-                <select v-model="breedSecondary" id="petSecondaryBreed" class="form-select">
+            <section v-if="species !== ''">
+              <div class="mt-2">
+                <label for="petBreed">Breed <span class="text-muted">(or first breed if mixed)</span></label>
+                <select v-model="breed" id="petBreed" class="form-select"
+                        :class="'form-select ' + (breed === '' ? 'is-invalid' : '')">
+                  <option disabled selected value="">Select a breed</option>
                   <option
                       v-for="breed in filteredBreedsList"
-                      :value="breed.id"
-                      :key="breed.id"
-                      :disabled="breed.generic">
+                      :value="breed"
+                      :key="breed.id">
                     {{ breed.name }}
 
                   </option>
                 </select>
+                <div id="validationServerUsernameFeedback" class="invalid-feedback">
+                  Please choose a breed.
+                </div>
+                <div
+                    v-if="breed && !breed.generic"
+                    class="mt-1">
+                  <label for="petSecondaryBreed">Second breed <span class="text-muted">(if mixed)</span></label>
+                  <select v-model="breedSecondary" id="petSecondaryBreed" class="form-select">
+                    <option
+                        v-for="breed in filteredBreedsList"
+                        :value="breed.id"
+                        :key="breed.id"
+                        :disabled="breed.generic">
+                      {{ breed.name }}
+
+                    </option>
+                  </select>
+                </div>
               </div>
-            </div>
 
-            <!--            date of birth-->
+              <!--            date of birth-->
 
-            <div class="mt-2">
-              <label for="dob">Date of Birth</label>
-              <input v-model="dob" id="dob" class="d-inline form-control" type="date"/>
-              <div v-if="calculatedAge !== ''">
-                Age: {{ calculatedAge }}
+              <div class="mt-2">
+                <label for="dob">Date of Birth</label>
+                <input v-model="dob" id="dob" class="d-inline form-control" type="date"/>
+                <div v-if="calculatedAge !== ''">
+                  Age: {{ calculatedAge }}
+                </div>
               </div>
-            </div>
 
-            <!--            gender-->
+              <!--            gender-->
 
-            <div class="mt-2">
-              <label for="petGender">Gender</label>
-              <div class="form-check" id="petGender">
-                <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
-                       id="flexRadioDefault1" value="male">
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Male
+              <div class="mt-2">
+                <label for="petGender">Gender</label>
+                <div class="form-check" id="petGender">
+                  <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
+                         id="flexRadioDefault1" value="male">
+                  <label class="form-check-label" for="flexRadioDefault1">
+                    Male
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
+                         id="flexRadioDefault2" value="female">
+                  <label class="form-check-label" for="flexRadioDefault2">
+                    Female
+                  </label>
+                </div>
+              </div>
+
+              <!--            neutered-->
+
+              <div class="form-check mt-4">
+                <input v-model="isNeutered" class="form-check-input" type="checkbox" id="flexCheckDefault3">
+                <label class="form-check-label" for="flexCheckDefault3">
+                  Neutered
                 </label>
               </div>
-              <div class="form-check">
-                <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
-                       id="flexRadioDefault2" value="female">
-                <label class="form-check-label" for="flexRadioDefault2">
-                  Female
+
+              <!--            colour-->
+
+              <div class="mt-4">
+                <label for="petColour">Your pet's colour</label>
+                <input
+                    v-model="colour"
+                    class="form-control"
+                    type="text" id="petColour" placeholder="e.g. Black & White"
+                />
+              </div>
+
+              <!--            imported-->
+
+              <div class="form-check mt-4">
+                <input v-model="isImported"
+                       class="form-check-input" type="checkbox" value="" id="flexCheckDefault4"
+                >
+                <label class="form-check-label" for="flexCheckDefault4">
+                  Imported
                 </label>
               </div>
-            </div>
 
-            <!--            neutered-->
+              <!--            import location-->
 
-            <div class="form-check mt-4">
-              <input v-model="isNeutered" class="form-check-input" type="checkbox" id="flexCheckDefault3">
-              <label class="form-check-label" for="flexCheckDefault3">
-                Neutered
-              </label>
-            </div>
+              <div class="mt-2" v-if="isImported">
+                <label for="importLocation">From where?</label>
+                <select v-model="importLocation" id="importLocation" class="form-select">
+                  <option v-for="importLocation in importLocationsList"
+                          :value="importLocation.id"
+                          :key="importLocation.id">
+                    {{ importLocation.name }}
+                  </option>
+                </select>
+              </div>
 
-            <!--            colour-->
+              <!--            microchip number-->
 
-            <div class="mt-4">
-              <label for="petColour">Your pet's colour</label>
-              <input
-                  v-model="colour"
-                  class="form-control"
-                  type="text" id="petColour" placeholder="e.g. Black & White"
-              />
-            </div>
-
-            <!--            imported-->
-
-            <div class="form-check mt-4">
-              <input v-model="isImported"
-                     class="form-check-input" type="checkbox" value="" id="flexCheckDefault4"
-              >
-              <label class="form-check-label" for="flexCheckDefault4">
-                Imported
-              </label>
-            </div>
-
-            <!--            import location-->
-
-            <div class="mt-2" v-if="isImported">
-              <label for="importLocation">From where?</label>
-              <select v-model="importLocation" id="importLocation" class="form-select">
-                <option v-for="importLocation in importLocationsList"
-                        :value="importLocation.id"
-                        :key="importLocation.id">
-                  {{ importLocation.name }}
-                </option>
-              </select>
-            </div>
-
-            <!--            microchip number-->
-
-            <div class="mt-3">
-              <label for="microchipNumber">Microchip number</label>
-              <input
-                  v-model="microchipNumber"
-                  class="form-control"
-                  type="text" id="microchipNumber"/>
-            </div>
-
+              <div class="mt-3">
+                <label for="microchipNumber">Microchip number</label>
+                <input
+                    v-model="microchipNumber"
+                    class="form-control"
+                    type="text" id="microchipNumber"/>
+              </div>
+            </section>
           </form>
 
         </div>
