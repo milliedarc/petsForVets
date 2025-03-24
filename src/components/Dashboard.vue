@@ -7,13 +7,6 @@ const pb = new PocketBase('http://127.0.0.1:8090');
 
 const pets = ref(); // creates a global vue reactive variable
 
-onMounted(async () => {
-  const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations
-    expand: 'species,breed,breed_secondary'
-  })
-  pets.value = result.items; // assigns content to 'pets'
-})
-
 function toUpperCase(gender) {
   return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
 }
@@ -52,11 +45,22 @@ function displayBreed(pet) {
   return pet.expand.breed.name;
 }
 
+async function fetchPets() {
+  const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations
+    expand: 'species,breed,breed_secondary'
+  })
+  pets.value = result.items; // assigns content to 'pets'
+}
+
+onMounted(async () => {
+  await fetchPets()
+})
+
 </script>
 
 <template>
   <h1>My pets</h1>
-  <AddPet/>
+  <AddPet @savePet="fetchPets"/>
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPet">
     Add new pet
   </button>

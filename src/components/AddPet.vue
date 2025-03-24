@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PocketBase from "pocketbase";
-import { computed, inject, onMounted, ref } from 'vue'
+import {computed, inject, onMounted, ref} from 'vue'
 
 // Inject (aka 'use it here') bootstrap library with the same key as defined in main.js
 // so we can use it later inside the savePet function (and probably other places)
@@ -116,30 +116,33 @@ function resetForm() {
   microchipNumber.value = ''
 }
 
+const emit = defineEmits(['savePet']);
+
 async function savePet() {
   try {
     const updatedPet = {
       name: name.value,
       species: species.value,
       breed: breed.value.id,
-      breedSecondary: breed.value,
-      dob: dob.value,
+      breed_secondary: breed.value,
+      date_of_birth: dob.value,
       gender: gender.value,
-      isNeutered: isNeutered.value,
+      neutered: isNeutered.value,
       colour: colour.value,
-      isImported: isImported.value,
-      importLocation: importLocation.value,
-      microchipNumber: microchipNumber.value
+      imported: isImported.value,
+      imported_from: importLocation.value,
+      microchip_number: microchipNumber.value
     };
     // Update pet details in PocketBase
     //await pb.collection('pets').update(props.petId, updatedPet);
     await pb.collection('pets').create(updatedPet);
     alert("Pet details saved successfully!");
 
-    // Get the modal instance using Boostrap's library and hide it
+    // Get the modal instance using Bootstrap's library and hide it
     const addPetModal = bootstrap.Modal.getInstance(document.getElementById('addPet'));
     if (addPetModal) {
       addPetModal.hide();
+      emit("savePet")
     }
   } catch (error) {
     console.error("Error saving pet:", error);
