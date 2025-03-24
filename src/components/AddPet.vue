@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import PocketBase from "pocketbase";
-import {computed, onMounted, ref} from "vue";
-import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
+import { computed, inject, onMounted, ref } from 'vue'
+
+// Inject (aka 'use it here') bootstrap library with the same key as defined in main.js
+// so we can use it later inside the savePet function (and probably other places)
+const bootstrap = inject('bootstrap');
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 const name = ref('')
@@ -133,9 +136,10 @@ async function savePet() {
     await pb.collection('pets').create(updatedPet);
     alert("Pet details saved successfully!");
 
+    // Get the modal instance using Boostrap's library and hide it
     const addPetModal = bootstrap.Modal.getInstance(document.getElementById('addPet'));
     if (addPetModal) {
-      await addPetModal.hide();
+      addPetModal.hide();
     }
   } catch (error) {
     console.error("Error saving pet:", error);
