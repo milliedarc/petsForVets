@@ -6,6 +6,8 @@ import {computed, inject, onMounted, ref} from 'vue'
 // so we can use it later inside the savePet function (and probably other places)
 const bootstrap = inject('bootstrap');
 
+const petToEdit = defineModel()
+
 const pb = new PocketBase('http://127.0.0.1:8090');
 const name = ref('')
 const species = ref('')
@@ -96,9 +98,14 @@ onMounted(async () => {
   // console.log('Locations:', result3);
   importLocationsList.value = result3.items;
 
-  const addPetModal = document.getElementById('addPet') // Resets form
+  const addPetModal = document.getElementById('petModal') // Resets form
   addPetModal.addEventListener('show.bs.modal', event => {
     resetForm()
+    console.log('Show')
+  })
+  addPetModal.addEventListener('shown.bs.modal', event => {
+    fetchPetToEdit()
+    console.log('Shown:')
   })
 })
 
@@ -139,7 +146,7 @@ async function savePet() {
     alert("Pet details saved successfully!");
 
     // Get the modal instance using Bootstrap's library and hide it
-    const addPetModal = bootstrap.Modal.getInstance(document.getElementById('addPet'));
+    const addPetModal = bootstrap.Modal.getInstance(document.getElementById('petModal'));
     if (addPetModal) {
       addPetModal.hide();
       emit("savePet")
@@ -149,14 +156,33 @@ async function savePet() {
   }
 }
 
+function getDateOnly() {
+  return petToEdit.value.date_of_birth.split('T')[0];
+}
+
+function fetchPetToEdit() {
+  name.value = petToEdit.value.name
+  species.value = petToEdit.value.species
+  breed.value = petToEdit.value.expand.breed
+  breedSecondary.value = petToEdit.value.breed_secondary
+  dob.value = getDateOnly()
+  gender.value = petToEdit.value.gender
+  isNeutered.value = petToEdit.value.neutered
+  colour.value = petToEdit.value.colour
+  isImported.value = petToEdit.value.imported
+  importLocation.value = petToEdit.value.import_location
+  microchipNumber.value = petToEdit.value.microchip_number
+}
+
 </script>
 
 <template>
-  <div class="modal fade" id="addPet" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="petModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Your new pet details</h1>
+          <h1 v-if="petToEdit === undefined" class="modal-title fs-5" id="exampleModalLabel">Your new pet details</h1>
+          <h1 v-else class="modal-title fs-5" id="exampleModalLabel">Edit pet details</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal"
                   aria-label="Close"></button>
         </div>
