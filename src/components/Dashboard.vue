@@ -89,8 +89,10 @@ onMounted(async () => {
       <td>{{ calculateAge(pet.date_of_birth) }}</td>
       <td>{{ toUpperCase(pet.gender) }}</td>
       <td>
-        <button @click="petToEdit = pet" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#petModal">Edit
-          details
+        <button @click="petToEdit = pet"
+                class="btn btn-primary"
+                data-bs-toggle="modal" data-bs-target="#petModal">
+          Edit details
         </button>
       </td>
     </tr>

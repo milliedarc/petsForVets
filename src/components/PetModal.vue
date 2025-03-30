@@ -104,7 +104,9 @@ onMounted(async () => {
     console.log('Show')
   })
   addPetModal.addEventListener('shown.bs.modal', event => {
-    fetchPetToEdit()
+    if (petToEdit.value !== undefined) {
+      fetchPetToEdit()
+    }
     console.log('Shown:')
   })
 })
@@ -131,7 +133,7 @@ async function savePet() {
       name: name.value,
       species: species.value,
       breed: breed.value.id,
-      breed_secondary: breed.value,
+      breed_secondary: breedSecondary.value,
       date_of_birth: dob.value,
       gender: gender.value,
       neutered: isNeutered.value,
