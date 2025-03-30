@@ -40,6 +40,9 @@ function calculateAge(dob) {
 
 function displayBreed(pet) {
   console.log('Pet details:', pet);
+  if (pet.expand.breed === undefined) {
+    return '';
+  }
   if (pet.expand.breed_secondary) {
     return pet.expand.breed.name + ' x ' + pet.expand.breed_secondary.name;
   }
@@ -85,7 +88,13 @@ onMounted(async () => {
       <td></td>
       <td>{{ pet.name }}</td>
       <td>{{ pet.expand.species.name }}</td>
-      <td>{{ displayBreed(pet) }}</td>
+      <td>
+        <span v-if="displayBreed(pet) === ''"
+              class="text-muted">
+          <small>Unknown</small>
+        </span>
+        <span v-else>{{ displayBreed(pet) }}</span>
+      </td>
       <td>{{ calculateAge(pet.date_of_birth) }}</td>
       <td>{{ toUpperCase(pet.gender) }}</td>
       <td>
