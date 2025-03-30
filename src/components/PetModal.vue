@@ -38,7 +38,6 @@ const calculatedAge = computed(() => {
   if (dob.value === undefined) {
     return ''
   }
-
   const birthDate = new Date(dob.value);
   const today = new Date();
 
@@ -132,6 +131,7 @@ async function savePet() {
     const updatedPet = {
       name: name.value,
       species: species.value,
+      // @ts-ignore
       breed: breed.value.id,
       breed_secondary: breedSecondary.value,
       date_of_birth: dob.value,
@@ -142,12 +142,13 @@ async function savePet() {
       imported_from: importLocation.value,
       microchip_number: microchipNumber.value
     };
-    // Update pet details in PocketBase
-    //await pb.collection('pets').update(props.petId, updatedPet);
-    await pb.collection('pets').create(updatedPet);
-    alert("Pet details saved successfully!");
-
+    if (petToEdit.value.id !== undefined) {
+      await pb.collection('pets').update(petToEdit.value.id, updatedPet);
+    } else {
+      await pb.collection('pets').create(updatedPet);
+    }
     // Get the modal instance using Bootstrap's library and hide it
+    // @ts-ignore
     const addPetModal = bootstrap.Modal.getInstance(document.getElementById('petModal'));
     if (addPetModal) {
       addPetModal.hide();
@@ -159,7 +160,10 @@ async function savePet() {
 }
 
 function getDateOnly() {
-  return petToEdit.value.date_of_birth.split('T')[0];
+  if (petToEdit.value.date_of_birth == '') {
+    return undefined;
+  }
+  return petToEdit.value.date_of_birth.split(' ')[0];
 }
 
 function fetchPetToEdit() {
