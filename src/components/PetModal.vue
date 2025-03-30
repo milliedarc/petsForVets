@@ -2,11 +2,38 @@
 import PocketBase from "pocketbase";
 import {computed, inject, onMounted, ref} from 'vue'
 
+interface Breed {
+  id: string;
+  name: string;
+  species: string;
+  generic: boolean;
+}
+
+interface ExpandBreed {
+  breed: Breed;
+}
+
+interface Pet {
+  id: string | undefined;
+  name: string;
+  species: string;
+  breed: string;
+  breed_secondary: string;
+  date_of_birth: string;
+  gender: string;
+  neutered: boolean;
+  colour: string;
+  imported: boolean;
+  imported_from: string;
+  microchip_number: string;
+  expand: ExpandBreed;
+}
+
 // Inject (aka 'use it here') bootstrap library with the same key as defined in main.js
 // so we can use it later inside the savePet function (and probably other places)
 const bootstrap = inject('bootstrap');
 
-const petToEdit = defineModel()
+const petToEdit = defineModel<Pet>()
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 const name = ref('')
@@ -14,7 +41,7 @@ const species = ref('')
 const speciesList = ref()
 const breedsList = ref()
 const breedGroup = ref('')
-const breed = ref('')
+const breed = ref<Breed>()
 const breedSecondary = ref('')
 const dob = ref()
 const gender = ref('')
@@ -72,7 +99,7 @@ const isValidName = computed(() => {
 })
 
 const canSave = computed(() => {
-  if (isValidName.value && species.value !== '' && breed.value !== '') {
+  if (isValidName.value && species.value !== '' && breed.value !== undefined) {
     return true;
   }
   return false;
@@ -122,7 +149,7 @@ function resetForm() {
   name.value = ''
   species.value = ''
   breedGroup.value = ''
-  breed.value = ''
+  breed.value = undefined
   breedSecondary.value = ''
   dob.value = undefined
   gender.value = ''
@@ -140,7 +167,7 @@ async function savePet() {
     const updatedPet = {
       name: name.value,
       species: species.value,
-      // @ts-ignore
+      breed_group: breedGroup.value,
       breed: breed.value.id,
       breed_secondary: breedSecondary.value,
       date_of_birth: dob.value,
@@ -151,7 +178,7 @@ async function savePet() {
       imported_from: importLocation.value,
       microchip_number: microchipNumber.value
     };
-    if (petToEdit.value.id !== undefined) {
+    if (petToEdit.value?.id !== undefined) {
       await pb.collection('pets').update(petToEdit.value.id, updatedPet);
     } else {
       await pb.collection('pets').create(updatedPet);
@@ -185,7 +212,7 @@ function fetchPetToEdit() {
   isNeutered.value = petToEdit.value.neutered
   colour.value = petToEdit.value.colour
   isImported.value = petToEdit.value.imported
-  importLocation.value = petToEdit.value.import_location
+  importLocation.value = petToEdit.value.imported_from
   microchipNumber.value = petToEdit.value.microchip_number
 }
 
@@ -261,7 +288,7 @@ function fetchPetToEdit() {
                 <div class="mt-2">
                   <label for="petBreed">Breed</label>
                   <select v-model="breed" id="petBreed" class="form-select"
-                          :class="'form-select ' + (breed === '' ? 'is-invalid' : '')">
+                          :class="'form-select ' + (breed === undefined ? 'is-invalid' : '')">
                     <option disabled selected value="">Select a breed</option>
                     <option
                         v-for="breed in filteredBreedsList"
