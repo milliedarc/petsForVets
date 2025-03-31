@@ -1,12 +1,24 @@
 <script setup lang="ts">
 import PocketBase from 'pocketbase'
-import {onMounted, ref} from "vue";
+import {inject, nextTick, onMounted, ref} from "vue";
 import PetModal from "@/components/PetModal.vue";
+
+const bootstrap = inject('bootstrap');
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
 const pets = ref<Pet[]>(); // creates a global vue reactive variable
 const petToEdit = ref<Pet>()
+
+function openModal(pet: Pet | undefined) {
+  petToEdit.value = pet;
+
+  nextTick(() => {
+    // @ts-ignore
+    const addPetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('petModal'));
+    addPetModal.show()
+  })
+}
 
 function toUpperCase(gender: string): string {
   return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
@@ -66,8 +78,7 @@ onMounted(async () => {
 <template>
   <h1>My pets</h1>
   <PetModal v-model="petToEdit" @savePet="fetchPets"/>
-  <button @click="petToEdit = undefined" type="button" class="btn btn-primary" data-bs-toggle="modal"
-          data-bs-target="#petModal">
+  <button @click="openModal(undefined)" type="button" class="btn btn-primary ">
     Add new pet
   </button>
   <table class="table table-hover">
@@ -99,9 +110,8 @@ onMounted(async () => {
       <td>{{ calculateAge(pet.date_of_birth) }}</td>
       <td>{{ toUpperCase(pet.gender) }}</td>
       <td>
-        <button @click="petToEdit = pet"
-                class="btn btn-primary"
-                data-bs-toggle="modal" data-bs-target="#petModal">
+        <button @click="openModal(pet)"
+                class="btn btn-primary">
           Edit details
         </button>
       </td>

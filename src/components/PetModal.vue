@@ -108,11 +108,12 @@ onMounted(async () => {
   const addPetModal = document.getElementById('petModal') // Resets form
   addPetModal.addEventListener('show.bs.modal', event => {
     resetForm()
-  })
-  addPetModal.addEventListener('shown.bs.modal', event => {
     if (petToEdit.value !== undefined) {
       fetchPetToEdit()
     }
+  })
+  addPetModal.addEventListener('shown.bs.modal', event => {
+
   })
 })
 
