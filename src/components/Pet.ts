@@ -27,7 +27,7 @@ interface Pet {
     neutered: boolean;
     colour: string;
     imported: boolean;
-    imported_from: string;
+    import_country_code: string;
     microchip_number: string;
     expand: Expand;
 }

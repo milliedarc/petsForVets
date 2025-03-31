@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PocketBase from "pocketbase";
 import {computed, inject, onMounted, ref} from 'vue'
+import countries from './countries.json'
 
 // Inject (aka 'use it here') bootstrap library with the same key as defined in main.js
 // so we can use it later inside the savePet function (and probably other places)
@@ -22,7 +23,6 @@ const isNeutered = ref(false)
 const colour = ref('')
 const isImported = ref(false)
 const importLocation = ref('')
-const importLocationsList = ref()
 const microchipNumber = ref('')
 
 const filteredBreedsList = computed(() => {
@@ -41,6 +41,18 @@ const filteredBreedsList = computed(() => {
       })
     }
 )
+
+const sortedCountries = computed(() => {
+  return countries.countries.toSorted(function (countryA, countryB) {
+    if (countryA.name < countryB.name) {
+      return -1;
+    }
+    if (countryA.name > countryB.name) {
+      return 1;
+    }
+    return 0;
+  });
+})
 
 const calculatedAge = computed(() => {
   if (dob.value === undefined) {
@@ -99,12 +111,6 @@ onMounted(async () => {
   // console.log('Breeds:', result2)
   breedsList.value = result2.items;
 
-  const result3 = await pb.collection('importLocations').getList(1, 20, {
-    sort: 'name'
-  })
-  // console.log('Locations:', result3);
-  importLocationsList.value = result3.items;
-
   const addPetModal = document.getElementById('petModal') // Resets form
   addPetModal.addEventListener('show.bs.modal', event => {
     resetForm()
@@ -147,7 +153,7 @@ async function savePet() {
       neutered: isNeutered.value,
       colour: colour.value,
       imported: isImported.value,
-      imported_from: importLocation.value,
+      import_country_code: importLocation.value,
       microchip_number: microchipNumber.value
     };
     if (petToEdit.value?.id !== undefined) {
@@ -185,7 +191,7 @@ function fetchPetToEdit() {
   isNeutered.value = petToEdit.value.neutered
   colour.value = petToEdit.value.colour
   isImported.value = petToEdit.value.imported
-  importLocation.value = petToEdit.value.imported_from
+  importLocation.value = petToEdit.value.import_country_code
   microchipNumber.value = petToEdit.value.microchip_number
 }
 
@@ -355,10 +361,10 @@ function fetchPetToEdit() {
                 <div class="mt-2" v-if="isImported">
                   <label for="importLocation">From where?</label>
                   <select v-model="importLocation" id="importLocation" class="form-select">
-                    <option v-for="importLocation in importLocationsList"
-                            :value="importLocation.id"
-                            :key="importLocation.id">
-                      {{ importLocation.name }}
+                    <option v-for="country in sortedCountries"
+                            :value="country.country_code"
+                            :key="country.country_code">
+                      {{ country.name }}
                     </option>
                   </select>
                 </div>
