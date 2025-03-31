@@ -2,33 +2,6 @@
 import PocketBase from "pocketbase";
 import {computed, inject, onMounted, ref} from 'vue'
 
-interface Breed {
-  id: string;
-  name: string;
-  species: string;
-  generic: boolean;
-}
-
-interface ExpandBreed {
-  breed: Breed;
-}
-
-interface Pet {
-  id: string | undefined;
-  name: string;
-  species: string;
-  breed: string;
-  breed_secondary: string;
-  date_of_birth: string;
-  gender: string;
-  neutered: boolean;
-  colour: string;
-  imported: boolean;
-  imported_from: string;
-  microchip_number: string;
-  expand: ExpandBreed;
-}
-
 // Inject (aka 'use it here') bootstrap library with the same key as defined in main.js
 // so we can use it later inside the savePet function (and probably other places)
 const bootstrap = inject('bootstrap');
@@ -99,7 +72,7 @@ const isValidName = computed(() => {
 })
 
 const canSave = computed(() => {
-  if (isValidName.value && species.value !== '' && breed.value !== undefined) {
+  if (isValidName.value && species.value !== '') {
     return true;
   }
   return false;
@@ -135,13 +108,11 @@ onMounted(async () => {
   const addPetModal = document.getElementById('petModal') // Resets form
   addPetModal.addEventListener('show.bs.modal', event => {
     resetForm()
-    console.log('Show')
   })
   addPetModal.addEventListener('shown.bs.modal', event => {
     if (petToEdit.value !== undefined) {
       fetchPetToEdit()
     }
-    console.log('Shown:')
   })
 })
 
@@ -168,7 +139,7 @@ async function savePet() {
       name: name.value,
       species: species.value,
       breed_group: breedGroup.value,
-      breed: breed.value.id,
+      breed: breed.value?.id,
       breed_secondary: breedSecondary.value,
       date_of_birth: dob.value,
       gender: gender.value,
@@ -205,6 +176,7 @@ function getDateOnly() {
 function fetchPetToEdit() {
   name.value = petToEdit.value.name
   species.value = petToEdit.value.species
+  breedGroup.value = petToEdit.value.breed_group
   breed.value = petToEdit.value.expand.breed
   breedSecondary.value = petToEdit.value.breed_secondary
   dob.value = getDateOnly()
@@ -287,8 +259,7 @@ function fetchPetToEdit() {
 
                 <div class="mt-2">
                   <label for="petBreed">Breed</label>
-                  <select v-model="breed" id="petBreed" class="form-select"
-                          :class="'form-select ' + (breed === undefined ? 'is-invalid' : '')">
+                  <select v-model="breed" id="petBreed" class="form-select">
                     <option disabled selected value="">Select a breed</option>
                     <option
                         v-for="breed in filteredBreedsList"
@@ -298,9 +269,7 @@ function fetchPetToEdit() {
 
                     </option>
                   </select>
-                  <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                    Please choose a breed.
-                  </div>
+
                   <div
                       v-if="breedGroup === 'crossbreed'"
                       class="mt-1">
@@ -332,8 +301,8 @@ function fetchPetToEdit() {
                 <!--            gender-->
 
                 <div class="mt-2">
-                  <label for="petGender">Gender</label>
-                  <div class="form-check" id="petGender">
+                  <label>Gender</label>
+                  <div class="form-check">
                     <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
                            id="flexRadioDefault1" value="male">
                     <label class="form-check-label" for="flexRadioDefault1">

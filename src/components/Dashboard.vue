@@ -5,14 +5,14 @@ import PetModal from "@/components/PetModal.vue";
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
-const pets = ref(); // creates a global vue reactive variable
-const petToEdit = ref()
+const pets = ref<Pet[]>(); // creates a global vue reactive variable
+const petToEdit = ref<Pet>()
 
-function toUpperCase(gender) {
+function toUpperCase(gender: string): string {
   return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
 }
 
-function calculateAge(dob) {
+function calculateAge(dob: string): string {
   if (dob === '') {
     return ''
   }
@@ -39,7 +39,7 @@ function calculateAge(dob) {
 }
 
 function displayBreed(pet) {
-  console.log('Pet details:', pet);
+  // console.log('Pet details:', pet);
   if (pet.expand.breed === undefined) {
     return '';
   }
@@ -53,6 +53,7 @@ async function fetchPets() {
   const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations
     expand: 'species,breed,breed_secondary'
   })
+  // @ts-ignore
   pets.value = result.items; // assigns content to 'pets'
 }
 

@@ -1,0 +1,33 @@
+interface Breed {
+    id: string;
+    name: string;
+    species: string;
+    generic: boolean;
+}
+
+interface Species {
+    id: string;
+    name: string;
+}
+
+interface Expand {
+    breed: Breed;
+    species: Species;
+}
+
+interface Pet {
+    id: string | undefined;
+    name: string;
+    species: string;
+    breed_group: string;
+    breed: string;
+    breed_secondary: string;
+    date_of_birth: string;
+    gender: string;
+    neutered: boolean;
+    colour: string;
+    imported: boolean;
+    imported_from: string;
+    microchip_number: string;
+    expand: Expand;
+}
