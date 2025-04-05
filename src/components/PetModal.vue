@@ -143,6 +143,7 @@ const emit = defineEmits(['savePet']);
 async function savePet() {
   try {
     const updatedPet = {
+      user: pb.authStore.record.id,
       name: name.value,
       species: species.value,
       breed_group: breedGroup.value,
