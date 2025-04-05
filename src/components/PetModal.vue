@@ -9,6 +9,8 @@ const bootstrap = inject('bootstrap');
 
 const petToEdit = defineModel<Pet>()
 
+const emit = defineEmits(['savePet']);
+
 const pb = new PocketBase('http://127.0.0.1:8090');
 const name = ref('')
 const species = ref('')
@@ -137,8 +139,6 @@ function resetForm() {
   importLocation.value = ''
   microchipNumber.value = ''
 }
-
-const emit = defineEmits(['savePet']);
 
 async function savePet() {
   try {

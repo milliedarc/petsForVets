@@ -2,6 +2,7 @@
 import PocketBase from 'pocketbase'
 import {inject, nextTick, onMounted, ref} from "vue";
 import PetModal from "@/components/PetModal.vue";
+import DeletePetConfirmModal from "@/components/DeletePetConfirmModal.vue";
 
 const bootstrap = inject('bootstrap');
 
@@ -117,6 +118,7 @@ function logOut() {
     <div class="bg-body-tertiary p-5 rounded">
       <h1>My pets</h1>
       <PetModal v-model="petToEdit" @savePet="fetchPets"/>
+      <DeletePetConfirmModal v-model="petToEdit" @deleted="fetchPets"/>
       <button @click="openModal(undefined)" type="button" class="btn btn-primary ">
         Add new pet
       </button>
@@ -129,7 +131,6 @@ function logOut() {
           <th scope="col">Breed</th>
           <th scope="col">Age</th>
           <th scope="col">Gender</th>
-          <th scope="col"></th>
           <th scope="col"></th>
         </tr>
         </thead>
@@ -154,9 +155,11 @@ function logOut() {
                     class="btn btn-primary">
               Edit details
             </button>
-          </td>
-          <td>
-            <button class="btn btn-primary">View</button>
+            <button class="btn btn-secondary ms-2">View</button>
+            <button @click="petToEdit=pet" class="btn btn-danger ms-2"
+                    data-bs-toggle="modal" data-bs-target="#deletePetModal">
+              Delete
+            </button>
           </td>
         </tr>
         </tbody>
