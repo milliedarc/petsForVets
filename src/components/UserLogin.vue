@@ -1,10 +1,13 @@
 <script setup>
 import {ref} from "vue";
 import PocketBase from 'pocketbase'
+import {useRouter} from "vue-router";
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
 const emit = defineEmits(["login"]);
+
+const router = useRouter()
 
 const email = ref("");
 const password = ref("");
@@ -14,13 +17,12 @@ async function login() {
   try {
     const userData = await pb.collection('users').authWithPassword(email.value, password.value);
     hasLoginError.value = false;
-    emit("login", userData);
+    await router.push('/')
     console.log(userData);
   } catch (error) {
     hasLoginError.value = true;
     console.log(error);
   }
-  console.log('Logged in', email.value, password.value);
 }
 
 </script>

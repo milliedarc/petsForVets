@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Pet from "./Pet.js"
+import Pet from './Pet'
 import PocketBase from 'pocketbase';
 import {inject} from "vue";
 

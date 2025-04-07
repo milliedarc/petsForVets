@@ -3,10 +3,13 @@ import PocketBase from 'pocketbase'
 import {inject, nextTick, onMounted, ref} from "vue";
 import PetModal from "@/components/PetModal.vue";
 import DeletePetConfirmModal from "@/components/DeletePetConfirmModal.vue";
+import {useRouter} from "vue-router";
 
 const bootstrap = inject('bootstrap');
 
 const pb = new PocketBase('http://127.0.0.1:8090');
+
+const router = useRouter()
 
 const pets = ref<Pet[]>(); // creates a global vue reactive variable
 const petToEdit = ref<Pet>()
@@ -70,6 +73,10 @@ async function fetchPets() {
   pets.value = result.items; // assigns content to 'pets'
 }
 
+function goToPetView(pet: Pet) {
+  router.push(`/pets/${pet.id}`);
+}
+
 onMounted(async () => {
   await fetchPets()
 })
@@ -103,7 +110,7 @@ function logOut() {
           </li>
         </ul>
         <div class="me-4 text-white">
-          {{ pb.authStore.record.name }}
+          {{ pb.authStore.record?.name }}
         </div>
         <!--        <form class="d-flex" role="search">-->
         <!--          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">-->
@@ -155,7 +162,9 @@ function logOut() {
                     class="btn btn-primary">
               Edit details
             </button>
-            <button class="btn btn-secondary ms-2">View</button>
+            <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">
+              View
+            </button>
             <button @click="petToEdit=pet" class="btn btn-danger ms-2"
                     data-bs-toggle="modal" data-bs-target="#deletePetModal">
               Delete
