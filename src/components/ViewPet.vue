@@ -8,7 +8,7 @@ const pb = new PocketBase('http://127.0.0.1:8090');
 
 const pet = ref<Pet | undefined>(undefined);
 const petNotFound = ref(false)
-
+const isLoading = ref(true)
 const route = useRoute()
 
 async function fetchPet() {
@@ -25,18 +25,22 @@ onMounted(async () => {
     await fetchPet()
   } catch (error) {
     petNotFound.value = true
+  } finally {
+    isLoading.value = false
   }
 })
 
 </script>
 
 <template>
-  <div v-if="petNotFound">
-    <h1>Pet not found</h1>
-  </div>
-  <div v-else>
-    <h1>View & edit your pet {{ route.params.id }}</h1>
-    <h2> {{ pet?.name }}</h2>
+  <div v-if="!isLoading">
+    <div v-if="petNotFound">
+      <h1>Pet not found</h1>
+    </div>
+    <div v-else>
+      <h1>View & edit your pet {{ route.params.id }}</h1>
+      <h2> {{ pet?.name }}</h2>
+    </div>
   </div>
 </template>
 
