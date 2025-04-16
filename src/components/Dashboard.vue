@@ -85,7 +85,6 @@ onMounted(async () => {
 </script>
 
 <template>
-
   <main class="container">
     <div class="bg-body-tertiary p-5 rounded">
       <h1 class="mb-4">My pets</h1>
@@ -95,7 +94,7 @@ onMounted(async () => {
            :key="pet.id"
            class="card mb-3">
         <div class="card-body">
-          <div class="d-flex">
+          <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex">
               <div><img
                   src="https://www.creativefabrica.com/wp-content/uploads/2021/01/26/Cat-Icon-Graphics-8071439-1.jpg"
@@ -109,9 +108,8 @@ onMounted(async () => {
               </div>
             </div>
             <div>
-              <button @click="openModal(pet)"
-                      class="btn btn-primary">
-                Edit details
+              <button @click="openModal(pet)" class="btn btn-link" style="color: black"><i
+                  class="pi pi-pencil me-2"></i><span class="fw-bold">Edit</span>
               </button>
               <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">
                 View
@@ -127,7 +125,7 @@ onMounted(async () => {
       <div class="d-grid gap-2">
 
         <button @click="openModal(undefined)" type="button" class="btn btn-outline-dark">
-          Add new pet
+          Add new pet <i class="pi pi-plus ms-2" style="font-size: .7rem"></i>
         </button>
       </div>
 
