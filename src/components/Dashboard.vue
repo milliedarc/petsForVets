@@ -51,7 +51,7 @@ function calculateAge(dob: string): string {
     months += 12;
   }
 
-  return `${years}y ${months}m`;
+  return `${years} years ${months} months`;
 }
 
 function displayBreed(pet) {
@@ -81,98 +81,101 @@ onMounted(async () => {
   await fetchPets()
 })
 
-function logOut() {
-  pb.authStore.clear()
-  location.reload()
-}
 
 </script>
 
 <template>
 
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Pets for Vets</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-              aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-          </li>
-        </ul>
-        <div class="me-4 text-white">
-          {{ pb.authStore.record?.name }}
-        </div>
-        <!--        <form class="d-flex" role="search">-->
-        <!--          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">-->
-        <!--          <button class="btn btn-outline-success" type="submit">Search</button>-->
-        <!--        </form>-->
-        <button class="btn btn-outline-light" @click="logOut">Log out</button>
-      </div>
-    </div>
-  </nav>
-
   <main class="container">
     <div class="bg-body-tertiary p-5 rounded">
-      <h1>My pets</h1>
+      <h1 class="mb-4">My pets</h1>
       <PetModal v-model="petToEdit" @savePet="fetchPets"/>
       <DeletePetConfirmModal v-model="petToEdit" @deleted="fetchPets"/>
-      <button @click="openModal(undefined)" type="button" class="btn btn-primary ">
-        Add new pet
-      </button>
-      <table class="table table-hover">
-        <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Name</th>
-          <th scope="col">Species</th>
-          <th scope="col">Breed</th>
-          <th scope="col">Age</th>
-          <th scope="col">Gender</th>
-          <th scope="col"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr
-            v-for="pet in pets"
-            :key="pet.id">
-          <td></td>
-          <td>{{ pet.name }}</td>
-          <td>{{ pet.expand.species.name }}</td>
-          <td>
-        <span v-if="displayBreed(pet) === ''"
-              class="text-muted">
-          <small>Unknown</small>
-        </span>
-            <span v-else>{{ displayBreed(pet) }}</span>
-          </td>
-          <td>{{ calculateAge(pet.date_of_birth) }}</td>
-          <td>{{ toUpperCase(pet.gender) }}</td>
-          <td>
-            <button @click="openModal(pet)"
-                    class="btn btn-primary">
-              Edit details
-            </button>
-            <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">
-              View
-            </button>
-            <button @click="petToEdit=pet" class="btn btn-danger ms-2"
-                    data-bs-toggle="modal" data-bs-target="#deletePetModal">
-              Delete
-            </button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+      <div v-for="pet in pets"
+           :key="pet.id"
+           class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="d-flex">
+              <div><img
+                  src="https://www.creativefabrica.com/wp-content/uploads/2021/01/26/Cat-Icon-Graphics-8071439-1.jpg"
+                  class="rounded-circle"
+                  style="width: 100px;"
+                  alt="Avatar"/>
+              </div>
+              <div class="ms-4">
+                <h5>{{ pet.name }}</h5>
+                <p> {{ calculateAge(pet.date_of_birth) }}</p>
+              </div>
+            </div>
+            <div>
+              <button @click="openModal(pet)"
+                      class="btn btn-primary">
+                Edit details
+              </button>
+              <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">
+                View
+              </button>
+              <button @click="petToEdit=pet" class="btn btn-danger ms-2"
+                      data-bs-toggle="modal" data-bs-target="#deletePetModal">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-grid gap-2">
+
+        <button @click="openModal(undefined)" type="button" class="btn btn-outline-dark">
+          Add new pet
+        </button>
+      </div>
+
+      <!--      <table class="table table-hover">-->
+      <!--        <thead>-->
+      <!--        <tr>-->
+      <!--          <th scope="col">#</th>-->
+      <!--          <th scope="col">Name</th>-->
+      <!--          <th scope="col">Species</th>-->
+      <!--          <th scope="col">Breed</th>-->
+      <!--          <th scope="col">Age</th>-->
+      <!--          <th scope="col">Gender</th>-->
+      <!--          <th scope="col"></th>-->
+      <!--        </tr>-->
+      <!--        </thead>-->
+      <!--        <tbody>-->
+      <!--        <tr-->
+      <!--            v-for="pet in pets"-->
+      <!--            :key="pet.id">-->
+      <!--          <td></td>-->
+      <!--          <td>{{ pet.name }}</td>-->
+      <!--          <td>{{ pet.expand.species.name }}</td>-->
+      <!--          <td>-->
+      <!--        <span v-if="displayBreed(pet) === ''"-->
+      <!--              class="text-muted">-->
+      <!--          <small>Unknown</small>-->
+      <!--        </span>-->
+      <!--            <span v-else>{{ displayBreed(pet) }}</span>-->
+      <!--          </td>-->
+      <!--          <td>{{ calculateAge(pet.date_of_birth) }}</td>-->
+      <!--          <td>{{ toUpperCase(pet.gender) }}</td>-->
+      <!--          <td>-->
+      <!--            <button @click="openModal(pet)"-->
+      <!--                    class="btn btn-primary">-->
+      <!--              Edit details-->
+      <!--            </button>-->
+      <!--            <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">-->
+      <!--              View-->
+      <!--            </button>-->
+      <!--            <button @click="petToEdit=pet" class="btn btn-danger ms-2"-->
+      <!--                    data-bs-toggle="modal" data-bs-target="#deletePetModal">-->
+      <!--              Delete-->
+      <!--            </button>-->
+      <!--          </td>-->
+      <!--        </tr>-->
+      <!--        </tbody>-->
+      <!--      </table>-->
+
     </div>
   </main>
 
