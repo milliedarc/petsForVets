@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {useRoute} from "vue-router";
 import PocketBase from "pocketbase";
-import {onMounted, ref, computed} from "vue";
+import {onMounted, ref, computed, watch} from "vue";
 import countries from '../components/countries.json'
 import PetNameFormatted from "@/components/PetDetails/PetNameFormatted.vue";
 import PetTypes from "@/components/PetDetails/PetTypes.vue";
+import PetTypeIds from "@/components/PetDetails/PetTypeIds";
 
 const route = useRoute()
 
@@ -18,7 +19,7 @@ const petTypes = ref([])
 const species = ref('')
 const speciesList = ref()
 const breedsList = ref()
-// const breedGroup = ref('')
+const breedGroup = ref('')
 const breed = ref<Breed>()
 // const breedSecondary = ref('')
 const dob = ref()
@@ -30,6 +31,53 @@ const importLocation = ref('')
 const microchipNumber = ref('')
 
 const pb = new PocketBase('http://127.0.0.1:8090');
+
+const filteredSpeciesList = computed(() => {
+  if (speciesList.value === undefined) {
+    return []
+  }
+  return speciesList.value.filter((species) => {
+    if (petType.value === species.pet_type) {
+      return true;
+    }
+    return false;
+  })
+})
+
+const isValidSelectedSpecies = computed(() => {
+  for (const oneSpecies of filteredSpeciesList.value) {
+    if (oneSpecies.id === species.value) {
+      return true
+    }
+  }
+  return false
+})
+
+const isValidSelectedBreed = computed(() => {
+  for (const oneBreed of filteredBreedsList.value) {
+    if (oneBreed.id === breed.value.id) {
+      return true
+    }
+  }
+  return false
+})
+
+const filteredBreedsList = computed(() => {
+      if (breedsList.value === undefined) {
+        return []
+      }
+      return breedsList.value.filter((breed) => {
+        if (breed.species === species.value) {
+          return true;
+        }
+        return false;
+      })
+    }
+)
+
+// watch(species, () => {
+//   console.log("value", species.value);
+// })
 
 async function fetchPet() {
   const result = await pb.collection('pets').getOne(route.params.id as string, {
@@ -107,7 +155,7 @@ onMounted(async () => {
             <section class="mt-4">
               <p>My pet's name is:</p>
               <FloatLabel variant="on">
-                <InputText v-model="name" id="petName"/>
+                <InputText v-model="name" id="petName" class="myInput"/>
                 <label for="petName">Pet name *</label>
               </FloatLabel>
               <Message v-if="name === ''" severity="error" size="small" variant="simple">
@@ -121,7 +169,33 @@ onMounted(async () => {
                 is a:
               </p>
               <PetTypes v-model="petType"/>
+            </section>
 
+            <section class="mt-4">
+              <div v-if="petType === PetTypeIds.smallAnimalId || petType === PetTypeIds.reptileId">
+                <p>What species is
+                  <PetNameFormatted :name="name"/>
+                  <span>?</span>
+                </p>
+                <div class="mt-4">
+
+                  <FloatLabel variant="on">
+                    <Select v-model="species" inputId="species"
+                            :options="filteredSpeciesList"
+                            optionLabel="name"
+                            optionValue="id"
+                            editable
+                            class="myInput"
+                            :invalid="!isValidSelectedSpecies"
+                    />
+                    <label for="species">Species</label>
+                  </FloatLabel>
+                  <Message
+                      v-if="!isValidSelectedSpecies" severity="error" size="small" variant="simple">
+                    Please choose a valid species from the list
+                  </Message>
+                </div>
+              </div>
 
             </section>
 
@@ -131,6 +205,25 @@ onMounted(async () => {
                   <PetNameFormatted :name="name"/>
                   <span>?</span>
                 </p>
+
+                <div class="mt-4">
+
+                  <FloatLabel variant="on">
+                    <Select v-model="breed.id" inputId="breed"
+                            :options="filteredBreedsList"
+                            optionLabel="name"
+                            optionValue="id"
+                            editable
+                            class="myInput"
+                            :invalid="!isValidSelectedSpecies"/>
+                    <label for="species">Species</label>
+                  </FloatLabel>
+                  <Message
+                      v-if="!isValidSelectedBreed" severity="error" size="small" variant="simple">
+                    Please choose a valid breed or select <span class="fw-bold">Cross / Mixed Breed</span> if unknown
+                  </Message>
+                </div>
+
               </div>
             </section>
           </div>
@@ -141,5 +234,9 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+
+.myInput {
+  width: 300px;
+}
 
 </style>

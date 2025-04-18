@@ -1,26 +1,27 @@
 <script setup>
 import {computed, ref} from "vue";
+import PetTypeIds from "@/components/PetDetails/PetTypeIds.js";
 
 const petTypes = [
   {
     icon: ['fadl', 'cat'],
     title: 'Cat',
-    id: 'kxiat7hgd9d7t04'
+    id: PetTypeIds.catId,
   },
   {
     icon: ['fadl', 'dog'],
     title: 'Dog',
-    id: 'ds68m4ltt54b83b'
+    id: PetTypeIds.dogId,
   },
   {
     icon: ['fadl', 'rabbit'],
-    title: 'Small furry',
-    id: '9sc981tg86690t0'
+    title: 'Small Animal',
+    id: PetTypeIds.smallAnimalId,
   },
   {
     icon: ['fadl', 'turtle'],
     title: 'Reptile',
-    id: '43a455h8l2x0ch7'
+    id: PetTypeIds.reptileId,
   }
 ]
 
