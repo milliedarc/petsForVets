@@ -6,12 +6,30 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import 'primeicons/primeicons.css'
 
+/* import the fontawesome core */
+import {library} from '@fortawesome/fontawesome-svg-core'
+
+/* import font awesome icon component */
+import {FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText} from '@fortawesome/vue-fontawesome'
+
+/* import specific icons */
+import {fadr} from '@fortawesome/duotone-regular-svg-icons'
+import {fadl} from '@fortawesome/duotone-light-svg-icons'
+import {fas} from '@fortawesome/pro-solid-svg-icons'
+
+/* add icons to the library */
+library.add(fadr, fadl, fas)
+
 
 import {router} from './router/router.js'
 
 const app = createApp(App);
 
 app.provide('bootstrap', bootstrap);
+
+app.component('font-awesome-icon', FontAwesomeIcon)
+app.component('font-awesome-layers', FontAwesomeLayers)
+app.component('font-awesome-layer-text', FontAwesomeLayersText)
 
 app.use(router);
 app.use(PrimeVue, {

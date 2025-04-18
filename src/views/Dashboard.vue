@@ -104,7 +104,9 @@ onMounted(async () => {
               </div>
               <div class="ms-4">
                 <h5>{{ pet.name }}</h5>
-                <p> {{ calculateAge(pet.date_of_birth) }}</p>
+                <div>
+                  <div class="mb-2">{{ calculateAge(pet.date_of_birth) }}</div>
+                </div>
               </div>
             </div>
             <div>

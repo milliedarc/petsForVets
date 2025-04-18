@@ -1,14 +1,19 @@
 <script setup>
 import {ref} from "vue";
 import MyAvatar from "@/components/MyAvatar.vue";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 const emit = defineEmits(['logout']);
 const props = defineProps(['user'])
 
 const items = ref([
   {
     label: 'Home',
-    icon: 'pi pi-home'
+    icon: 'pi pi-home',
+    command: () => {
+      router.push('/')
+    }
   },
   {
     label: 'Features',

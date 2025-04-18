@@ -9,7 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/duotone-light-svg-icons": "^6.7.2",
+    "@fortawesome/duotone-regular-svg-icons": "^6.7.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/pro-solid-svg-icons": "^6.7.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
     "@primeuix/themes": "^1.0.3",
+    "@primevue/forms": "^4.3.3",
     "bootstrap": "^5.3.3",
     "pocketbase": "^0.25.2",
     "primeicons": "^7.0.0",

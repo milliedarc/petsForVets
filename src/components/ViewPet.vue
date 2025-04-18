@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// imports, consts, models, props, emits, refs, computed, watchers, functions, hooks
+// imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 import {useRoute} from "vue-router";
 import PocketBase from "pocketbase";
 import {onMounted, ref, computed, inject} from "vue";
@@ -8,11 +8,11 @@ import countries from './countries.json'
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
-const petToEdit = defineModel<Pet>()
+// const petToEdit = defineModel<Pet>()
 
 const emit = defineEmits(['savePet']);
 
-const pet = ref<Pet | undefined>(undefined);
+const petToEdit = ref<Pet | undefined>(undefined);
 
 const petNotFound = ref(false)
 const isLoading = ref(true)
@@ -103,11 +103,12 @@ async function fetchPet() {
     expand: 'species,breed,breed_secondary'
   })
   // @ts-ignore
-  pet.value = result; // assigns content to 'pets'
+  petToEdit.value = result; // assigns content to 'pets'
   console.log(result)
 }
 
 onMounted(async () => {
+  // console.log('onMounted')
   const result = await pb.collection('species').getList(1, 20, {
     sort: 'name'
   });
@@ -119,6 +120,15 @@ onMounted(async () => {
   })
   // console.log('Breeds:', result2)
   breedsList.value = result2.items;
+
+  try {
+    await fetchPet()
+    fetchPetToEdit()
+  } catch (e) {
+    petNotFound.value = true;
+  } finally {
+    isLoading.value = false;
+  }
 })
 
 function resetForm() {
@@ -190,202 +200,202 @@ function fetchPetToEdit() {
 </script>
 
 <template>
+  <main class="container">
+    <div class="row justify-content-center">
+      <div class="col-8">
 
-  <div v-if="!isLoading">
-    <div v-if="petNotFound">
-      <h1>Pet not found</h1>
-    </div>
-    <div v-else>
-      <h1>View & edit your pet</h1>
-      <h2> {{ pet?.name }}</h2>
-    </div>
-  </div>
+        <div v-if="!isLoading">
+          <div v-if="petNotFound">
+            <h1>Pet not found</h1>
+          </div>
+          <div v-else>
+            <div class="my-3">
+              <h2 v-if="petToEdit === undefined">Your new pet details</h2>
+              <h2 v-else>Edit pet details</h2>
+            </div>
+            <form>
+              <!--             name-->
+              <div class="mt-1">
+                <label for="petName">Your pet's name</label>
+                <input v-model.trim="name"
+                       autofocus
+                       :class="'form-control ' + (!isValidName ? 'is-invalid' : '')"
+                       type="text" id="petName" placeholder="e.g. Toby"
 
-  <h1 v-if="petToEdit === undefined">Your new pet details</h1>
-  <h1 v-else>Edit pet details</h1>
-  <button type="button" class="btn-close"
-          aria-label="Close"></button>
+                       required/>
+                <div v-if="!isValidName"
+                     id="validationServerUsernameFeedback" class="invalid-feedback">
+                  Please choose a name for your pet.
+                </div>
+              </div>
 
-  <form>
-    <!--             name-->
-    <div class="mt-1">
-      <label for="petName">Your pet's name</label>
-      <input v-model.trim="name"
-             autofocus
-             :class="'form-control ' + (!isValidName ? 'is-invalid' : '')"
-             type="text" id="petName" placeholder="e.g. Toby"
+              <!--            species-->
 
-             required/>
-      <div v-if="!isValidName"
-           id="validationServerUsernameFeedback" class="invalid-feedback">
-        Please choose a name for your pet.
+              <div class="mt-2">
+                <label for="petSpecies" class="mt-2">Species</label>
+                <select v-model="species" id="petSpecies"
+                        :class="'form-select ' + (species === '' ? 'is-invalid' : '')">
+                  <option disabled selected value="">Select a species</option>
+                  <option
+                      v-for="specie in speciesList"
+                      :value="specie.id"
+                      :key="specie.id">
+                    {{ specie.name }}
+                  </option>
+                </select>
+                <div id="validationServerUsernameFeedback" class="invalid-feedback">
+                  Please choose a species.
+                </div>
+              </div>
+
+
+              <section v-if="species !== ''">
+
+                <!--            breed group-->
+
+                <div class="mt-2">
+                  <label for="petBreedGroup">Breed Group</label>
+                  <select v-model="breedGroup" id="petBreedGroup" class="form-select">
+                    <option disabled selected value="">Select a breed group</option>
+                    <option value="generic">Generic</option>
+                    <option value="pedigree">Pedigree</option>
+                    <option value="crossbreed">Crossbreed</option>
+                  </select>
+                </div>
+
+
+                <section v-if="breedGroup !== ''" class="mt-2">
+
+                  <!--            breed -->
+
+                  <div class="mt-2">
+                    <label for="petBreed">Breed</label>
+                    <select v-model="breed" id="petBreed" class="form-select">
+                      <option disabled selected value="">Select a breed</option>
+                      <option
+                          v-for="breed in filteredBreedsList"
+                          :value="breed"
+                          :key="breed.id">
+                        {{ breed.name }}
+
+                      </option>
+                    </select>
+
+                    <div
+                        v-if="breedGroup === 'crossbreed'"
+                        class="mt-1">
+                      <label for="petSecondaryBreed">Second breed</label>
+                      <select v-model="breedSecondary" id="petSecondaryBreed" class="form-select">
+                        <option
+                            v-for="breed in filteredBreedsList"
+                            :value="breed.id"
+                            :key="breed.id"
+                            :disabled="breed.generic">
+                          {{ breed.name }}
+
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+
+                  <!--            date of birth-->
+
+                  <div class="mt-2">
+                    <label for="dob">Date of Birth</label>
+                    <input v-model="dob" id="dob" class="d-inline form-control" type="date"/>
+                    <div v-if="calculatedAge !== ''">
+                      Age: {{ calculatedAge }}
+                    </div>
+                  </div>
+
+                  <!--            gender-->
+
+                  <div class="mt-2">
+                    <label>Gender</label>
+                    <div class="form-check">
+                      <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
+                             id="flexRadioDefault1" value="male">
+                      <label class="form-check-label" for="flexRadioDefault1">
+                        Male
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
+                             id="flexRadioDefault2" value="female">
+                      <label class="form-check-label" for="flexRadioDefault2">
+                        Female
+                      </label>
+                    </div>
+                  </div>
+
+                  <!--            neutered-->
+
+                  <div class="form-check mt-4">
+                    <input v-model="isNeutered" class="form-check-input" type="checkbox" id="flexCheckDefault3">
+                    <label class="form-check-label" for="flexCheckDefault3">
+                      Neutered
+                    </label>
+                  </div>
+
+                  <!--            colour-->
+
+                  <div class="mt-4">
+                    <label for="petColour">Your pet's colour</label>
+                    <input
+                        v-model="colour"
+                        class="form-control"
+                        type="text" id="petColour" placeholder="e.g. Black & White"
+                    />
+                  </div>
+
+                  <!--            imported-->
+
+                  <div class="form-check mt-4">
+                    <input v-model="isImported"
+                           class="form-check-input" type="checkbox" value="" id="flexCheckDefault4"
+                    >
+                    <label class="form-check-label" for="flexCheckDefault4">
+                      Imported
+                    </label>
+                  </div>
+
+                  <!--            import location-->
+
+                  <div class="mt-2" v-if="isImported">
+                    <label for="importLocation">From where?</label>
+                    <select v-model="importLocation" id="importLocation" class="form-select">
+                      <option v-for="country in sortedCountries"
+                              :value="country.country_code"
+                              :key="country.country_code">
+                        {{ country.name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!--            microchip number-->
+
+                  <div class="mt-3">
+                    <label for="microchipNumber">Microchip number</label>
+                    <input
+                        v-model="microchipNumber"
+                        class="form-control"
+                        type="text" id="microchipNumber"/>
+                  </div>
+                </section>
+              </section>
+            </form>
+
+            <div class="d-grid gap-2">
+              <button @click="savePet" type="button" class="btn btn-outline-dark my-4"
+                      :disabled="!canSave">Save changes
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!--            species-->
-
-    <div class="mt-2">
-      <label for="petSpecies" class="mt-2">Species</label>
-      <select v-model="species" id="petSpecies"
-              :class="'form-select ' + (species === '' ? 'is-invalid' : '')">
-        <option disabled selected value="">Select a species</option>
-        <option
-            v-for="specie in speciesList"
-            :value="specie.id"
-            :key="specie.id">
-          {{ specie.name }}
-        </option>
-      </select>
-      <div id="validationServerUsernameFeedback" class="invalid-feedback">
-        Please choose a species.
-      </div>
-    </div>
-
-
-    <section v-if="species !== ''">
-
-      <!--            breed group-->
-
-      <div class="mt-2">
-        <label for="petBreedGroup">Breed Group</label>
-        <select v-model="breedGroup" id="petBreedGroup" class="form-select">
-          <option disabled selected value="">Select a breed group</option>
-          <option value="generic">Generic</option>
-          <option value="pedigree">Pedigree</option>
-          <option value="crossbreed">Crossbreed</option>
-        </select>
-      </div>
-
-
-      <section v-if="breedGroup !== ''" class="mt-2">
-
-        <!--            breed -->
-
-        <div class="mt-2">
-          <label for="petBreed">Breed</label>
-          <select v-model="breed" id="petBreed" class="form-select">
-            <option disabled selected value="">Select a breed</option>
-            <option
-                v-for="breed in filteredBreedsList"
-                :value="breed"
-                :key="breed.id">
-              {{ breed.name }}
-
-            </option>
-          </select>
-
-          <div
-              v-if="breedGroup === 'crossbreed'"
-              class="mt-1">
-            <label for="petSecondaryBreed">Second breed</label>
-            <select v-model="breedSecondary" id="petSecondaryBreed" class="form-select">
-              <option
-                  v-for="breed in filteredBreedsList"
-                  :value="breed.id"
-                  :key="breed.id"
-                  :disabled="breed.generic">
-                {{ breed.name }}
-
-              </option>
-            </select>
-          </div>
-        </div>
-
-
-        <!--            date of birth-->
-
-        <div class="mt-2">
-          <label for="dob">Date of Birth</label>
-          <input v-model="dob" id="dob" class="d-inline form-control" type="date"/>
-          <div v-if="calculatedAge !== ''">
-            Age: {{ calculatedAge }}
-          </div>
-        </div>
-
-        <!--            gender-->
-
-        <div class="mt-2">
-          <label>Gender</label>
-          <div class="form-check">
-            <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
-                   id="flexRadioDefault1" value="male">
-            <label class="form-check-label" for="flexRadioDefault1">
-              Male
-            </label>
-          </div>
-          <div class="form-check">
-            <input v-model="gender" class="form-check-input" type="radio" name="flexRadioDefault"
-                   id="flexRadioDefault2" value="female">
-            <label class="form-check-label" for="flexRadioDefault2">
-              Female
-            </label>
-          </div>
-        </div>
-
-        <!--            neutered-->
-
-        <div class="form-check mt-4">
-          <input v-model="isNeutered" class="form-check-input" type="checkbox" id="flexCheckDefault3">
-          <label class="form-check-label" for="flexCheckDefault3">
-            Neutered
-          </label>
-        </div>
-
-        <!--            colour-->
-
-        <div class="mt-4">
-          <label for="petColour">Your pet's colour</label>
-          <input
-              v-model="colour"
-              class="form-control"
-              type="text" id="petColour" placeholder="e.g. Black & White"
-          />
-        </div>
-
-        <!--            imported-->
-
-        <div class="form-check mt-4">
-          <input v-model="isImported"
-                 class="form-check-input" type="checkbox" value="" id="flexCheckDefault4"
-          >
-          <label class="form-check-label" for="flexCheckDefault4">
-            Imported
-          </label>
-        </div>
-
-        <!--            import location-->
-
-        <div class="mt-2" v-if="isImported">
-          <label for="importLocation">From where?</label>
-          <select v-model="importLocation" id="importLocation" class="form-select">
-            <option v-for="country in sortedCountries"
-                    :value="country.country_code"
-                    :key="country.country_code">
-              {{ country.name }}
-            </option>
-          </select>
-        </div>
-
-        <!--            microchip number-->
-
-        <div class="mt-3">
-          <label for="microchipNumber">Microchip number</label>
-          <input
-              v-model="microchipNumber"
-              class="form-control"
-              type="text" id="microchipNumber"/>
-        </div>
-      </section>
-    </section>
-  </form>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-    <button @click="savePet" type="button" class="btn btn-primary"
-            :disabled="!canSave">Save changes
-    </button>
-  </div>
-
+  </main>
 </template>
 
 <style scoped>
