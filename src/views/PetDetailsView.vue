@@ -13,6 +13,8 @@ const petNotFound = ref(false)
 const isLoading = ref(true)
 
 const name = ref('')
+const petType = ref('')
+const petTypes = ref([])
 const species = ref('')
 const speciesList = ref()
 const breedsList = ref()
@@ -37,6 +39,7 @@ async function fetchPet() {
   console.log(result)
 
   name.value = petToEdit.value.name
+  petType.value = petToEdit.value.expand.species.pet_type
   species.value = petToEdit.value.species
   // breedGroup.value = petToEdit.value.breed_group
   breed.value = petToEdit.value.expand.breed
@@ -71,6 +74,11 @@ onMounted(async () => {
   // console.log('Breeds:', result2)
   breedsList.value = result2.items;
 
+  const result3 = await pb.collection('pet_types').getList(1, 100, {
+    sort: 'name'
+  })
+  petTypes.value = result3.items;
+
   try {
     await fetchPet()
   } catch (e) {
@@ -79,7 +87,6 @@ onMounted(async () => {
     isLoading.value = false;
   }
 })
-
 
 </script>
 
@@ -113,7 +120,7 @@ onMounted(async () => {
                 <PetNameFormatted :name="name"/>
                 is a:
               </p>
-              <PetTypes/>
+              <PetTypes v-model="petType"/>
 
 
             </section>

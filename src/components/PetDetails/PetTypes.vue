@@ -5,38 +5,38 @@ const petTypes = [
   {
     icon: ['fadl', 'cat'],
     title: 'Cat',
-    speciesName: 'Cat'
+    id: 'kxiat7hgd9d7t04'
   },
   {
     icon: ['fadl', 'dog'],
     title: 'Dog',
-    speciesName: 'Dog'
+    id: 'ds68m4ltt54b83b'
   },
   {
     icon: ['fadl', 'rabbit'],
-    title: 'Rabbit',
-    speciesName: 'Rabbit'
+    title: 'Small furry',
+    id: '9sc981tg86690t0'
   },
   {
     icon: ['fadl', 'turtle'],
-    title: 'Exotic',
-    speciesName: 'Exotic'
+    title: 'Reptile',
+    id: '43a455h8l2x0ch7'
   }
 ]
 
 const isExpanded = ref(false)
 
-const petType = defineModel()
+const petTypeId = defineModel()
 
 function isSelected(inPetType) {
-  if (inPetType === petType.value) {
+  if (inPetType === petTypeId.value) {
     return true
   }
   return false
 }
 
 function clickPetType(petT) {
-  petType.value = petT.speciesName;
+  petTypeId.value = petT.id;
   isExpanded.value = false;
 }
 
@@ -50,28 +50,29 @@ function clickPetType(petT) {
 
           v-for="petT in petTypes"
           :key="petT.title">
+        <div v-if="isSelected(petT.id) || isExpanded || petTypeId === ''">
+          <div
+              @click="clickPetType(petT)"
+              :class="{'icon-container':true, 'selected': isSelected(petT.id)}"
+              style="display: flex; flex-direction: column">
 
-        <div v-if="isSelected(petT.speciesName) || isExpanded"
-             @click="clickPetType(petT)"
-             :class="{'icon-container':true, 'selected': isSelected(petT.speciesName)}"
-             style="display: flex; flex-direction: column">
+            <div v-if="isSelected(petT.id)"
+                 style="position: relative; top: -11px; left: 51px;">
+              <font-awesome-layers class="fa-xl">
+                <font-awesome-icon :icon="['fas', 'circle']" style="color: white"/>
+                <font-awesome-icon :icon="['fas', 'circle-check']"
+                                   style="color: seagreen"/>
+              </font-awesome-layers>
+            </div>
 
-          <div v-if="isSelected(petT.speciesName)"
-               style="position: relative; top: 20px; left: 63px;">
-            <font-awesome-layers class="fa-xl">
-              <font-awesome-icon :icon="['fas', 'circle']" style="color: white"/>
-              <font-awesome-icon :icon="['fas', 'circle-check']"
-                                 style="color: seagreen"/>
-            </font-awesome-layers>
+            <font-awesome-icon :icon="petT.icon" size="5x"/>
           </div>
-
-          <font-awesome-icon :icon="petT.icon" size="5x"/>
           <div class="text-center mt-2"> {{ petT.title }}</div>
         </div>
       </template>
     </div>
 
-    <div v-if="isExpanded === false" class="d-flex align-items-center mt-4">
+    <div v-if="isExpanded === false && petTypeId !== ''" class="d-flex align-items-center mt-4">
       <i class="pi pi-angle-down"></i>
       <button @click="isExpanded = true"
               class="btn btn-link px-0" style="color: black">

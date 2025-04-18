@@ -8,6 +8,7 @@ interface Breed {
 interface Species {
     id: string;
     name: string;
+    pet_type: string;
 }
 
 interface Expand {
