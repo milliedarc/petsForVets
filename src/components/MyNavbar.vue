@@ -63,7 +63,8 @@ const items = ref([
 <template>
   <Menubar :model="items">
     <template #start>
-      <h5 class="mb-0">Pets for Vets</h5>
+      <font-awesome-icon :icon="['fadr', 'paw']" class="fa-xl" style="--fa-secondary-color: #d6b6c2"/>
+      <h5 class="mb-0 ms-2">Pets for Vets</h5>
     </template>
     <template #end>
       <MyAvatar @logout="emit('logout')" :user="props.user"/>

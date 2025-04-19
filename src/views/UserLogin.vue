@@ -28,29 +28,37 @@ async function login() {
 </script>
 
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100 w-100">
-    <div class="m-auto p-4 border rounded shadow" style="width: 400px;">
-      <h1 class="text-center">User Login</h1>
-      <form>
-        <div class="row mb-3 d-flex align-items-center">
-          <label for="inputEmail3" class="col-auto col-form-label">Email</label>
-          <div class="col-sm-10 w-100">
-            <input type="email" autofocus class="form-control" id="inputEmail3" v-model="email"/>
-          </div>
+  <div class="vh-100 vw-100" style="background-color: whitesmoke">
+    <div class="d-flex justify-content-center align-items-center vh-100 w-100">
+      <div class="m-auto p-4 border rounded shadow-sm" style="width: 400px; background-color: white">
+        <div class="d-flex justify-content-center align-items-center mb-2">
+          <font-awesome-icon :icon="['fadr', 'paw']" class="fa-4x" style="--fa-secondary-color: #d6b6c2"/>
         </div>
-        <div class="row mb-3 d-flex align-items-center">
-          <label for="inputPassword3" class="col-auto col-form-label">Password</label>
-          <div class="col-sm-10 w-100">
-            <input type="password" class="form-control" id="inputPassword3" v-model="password"/>
+        <h3 class="text-center">Welcome back</h3>
+        <form>
+          <div class="row mb-3 d-flex align-items-center">
+            <label for="inputEmail3" class="col-auto col-form-label">Email</label>
+            <div class="col-sm-10 w-100">
+              <InputText type="email" autofocus class="form-control" id="inputEmail3" v-model="email"/>
+            </div>
           </div>
-          <div class="alert alert-danger text-center mt-4" role="alert" v-if="hasLoginError">
-            Invalid email or password
+          <div class="row mb-4 d-flex align-items-center">
+            <label for="inputPassword3" class="col-auto col-form-label">Password</label>
+            <div class="col-sm-10 w-100">
+              <InputText type="password" class="form-control" id="inputPassword3" v-model="password"/>
+            </div>
+            <div>
+              <Message v-if="hasLoginError" severity="error" icon="pi pi-times-circle" class="mt-4">Invalid email or
+                password
+              </Message>
+            </div>
           </div>
-        </div>
-        <div class="d-flex justify-content-center">
-          <button class="btn btn-primary px-4" @click.prevent="login">Sign in</button>
-        </div>
-      </form>
+          <div class="d-flex justify-content-center">
+            <Button class="btn btn-primary" @click.prevent="login" severity="contrast"><i class="pi pi-user"></i>Sign in
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>

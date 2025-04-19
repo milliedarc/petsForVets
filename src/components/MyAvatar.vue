@@ -45,7 +45,7 @@ const toggle = (event) => {
       Hi, {{ props.user?.name }}
     </div>
     <Avatar @click="toggle" icon="pi pi-user" class="mr-2" size="large"
-            style="background-color: #ece9fc; color: #2a1261; cursor: pointer"
+            style="background-color: #d6b6c2; color: #2a1261; cursor: pointer"
             shape="circle"/>
     <Menu ref="menu" id="overlay_menu" :model="menuItems" :popup="true"/>
   </div>
