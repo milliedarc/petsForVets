@@ -67,6 +67,10 @@ function goToPetView(pet: Pet) {
   router.push(`/pets/${pet.id}`);
 }
 
+function goToPetViewAdd() {
+  router.push('/pets/add');
+}
+
 onMounted(async () => {
   await fetchPets()
 })
@@ -78,8 +82,6 @@ onMounted(async () => {
   <main class="container">
     <div class="bg-body-tertiary p-5 rounded">
       <h1 class="mb-4">My pets</h1>
-      <PetModal v-model="petToEdit" @savePet="fetchPets"/>
-      <DeletePetConfirmModal v-model="petToEdit" @deleted="fetchPets"/>
       <div v-for="pet in pets"
            :key="pet.id"
            class="card mb-3">
@@ -114,58 +116,14 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <!--      <div class="d-grid gap-2">-->
-
-      <!--        <button @click="openModal(undefined)" type="button" class="btn btn-outline-dark">-->
-      <!--          Add new pet <i class="pi pi-plus ms-2" style="font-size: .7rem"></i>-->
-      <!--        </button>-->
-      <!--      </div>-->
-
-      <!--      <table class="table table-hover">-->
-      <!--        <thead>-->
-      <!--        <tr>-->
-      <!--          <th scope="col">#</th>-->
-      <!--          <th scope="col">Name</th>-->
-      <!--          <th scope="col">Species</th>-->
-      <!--          <th scope="col">Breed</th>-->
-      <!--          <th scope="col">Age</th>-->
-      <!--          <th scope="col">Gender</th>-->
-      <!--          <th scope="col"></th>-->
-      <!--        </tr>-->
-      <!--        </thead>-->
-      <!--        <tbody>-->
-      <!--        <tr-->
-      <!--            v-for="pet in pets"-->
-      <!--            :key="pet.id">-->
-      <!--          <td></td>-->
-      <!--          <td>{{ pet.name }}</td>-->
-      <!--          <td>{{ pet.expand.species.name }}</td>-->
-      <!--          <td>-->
-      <!--        <span v-if="displayBreed(pet) === ''"-->
-      <!--              class="text-muted">-->
-      <!--          <small>Unknown</small>-->
-      <!--        </span>-->
-      <!--            <span v-else>{{ displayBreed(pet) }}</span>-->
-      <!--          </td>-->
-      <!--          <td>{{ calculateAge(pet.date_of_birth) }}</td>-->
-      <!--          <td>{{ toUpperCase(pet.gender) }}</td>-->
-      <!--          <td>-->
-      <!--            <button @click="openModal(pet)"-->
-      <!--                    class="btn btn-primary">-->
-      <!--              Edit details-->
-      <!--            </button>-->
-      <!--            <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">-->
-      <!--              View-->
-      <!--            </button>-->
-      <!--            <button @click="petToEdit=pet" class="btn btn-danger ms-2"-->
-      <!--                    data-bs-toggle="modal" data-bs-target="#deletePetModal">-->
-      <!--              Delete-->
-      <!--            </button>-->
-      <!--          </td>-->
-      <!--        </tr>-->
-      <!--        </tbody>-->
-      <!--      </table>-->
-
+      <div>
+        <Button
+            class="w-100"
+            @click="goToPetViewAdd">
+          Add new pet
+          <i class="pi pi-plus"></i>
+        </Button>
+      </div>
     </div>
   </main>
 

@@ -37,6 +37,7 @@ function logOut() {
 
   <RouterView v-if="showRouter"/>
   <Toast/>
+  <ConfirmDialog/>
 
 </template>
 

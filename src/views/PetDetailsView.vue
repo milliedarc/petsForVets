@@ -7,10 +7,12 @@ import PetNameFormatted from "@/components/PetDetails/PetNameFormatted.vue";
 import PetTypes from "@/components/PetDetails/PetTypes.vue";
 import PetTypeIds from "@/components/PetDetails/PetTypeIds";
 import {useToast} from "primevue/usetoast";
+import {useConfirm} from "primevue/useconfirm";
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast();
+const confirm = useConfirm();
 
 const petToEdit = ref<Pet | undefined>(undefined);
 const petNotFound = ref(false)
@@ -92,6 +94,10 @@ const filteredBreedsList = computed(() => {
     }
 )
 
+const isNewPet = computed(() => {
+  return route.params.id === 'add'
+})
+
 // watch(species, () => {
 //   console.log("value", species.value);
 // })
@@ -153,6 +159,29 @@ function calculateBirthDate(years: number, months: number): Date {
   return birthDate;
 }
 
+function confirmDelete() {
+  confirm.require({
+    message: "Do you want to delete this pet's profile?",
+    header: 'Warning!',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    accept: async () => {
+      await pb.collection('pets').delete(petToEdit.value.id);
+      toast.add({severity: 'info', summary: 'Confirmed', detail: 'Pet profile deleted', life: 3000});
+      await router.push('/');
+    }
+  });
+}
+
 async function savePet() {
   try {
     if (dobTab.value === 'dobAge') {
@@ -205,7 +234,9 @@ onMounted(async () => {
   petTypes.value = result3.items;
 
   try {
-    await fetchPet()
+    if (!isNewPet.value) {
+      await fetchPet()
+    }
   } catch (e) {
     petNotFound.value = true;
   } finally {
@@ -454,10 +485,15 @@ onMounted(async () => {
             <section>
               <Button @click="savePet"
                       :disabled="!canSave"
-                      label="Update details" class="myInput"/>
+                      class="myInput">
+                <span v-if="isNewPet">Save pet</span>
+                <span v-else>Update pet details</span>
+              </Button>
             </section>
             <section>
-              <Button label="Remove pet" variant="text" severity="danger" class="myInput"/>
+              <Button v-if="!isNewPet"
+                      @click="confirmDelete" label="Delete pet profile" variant="text" severity="danger"
+                      class="myInput"/>
             </section>
           </div>
         </div>
