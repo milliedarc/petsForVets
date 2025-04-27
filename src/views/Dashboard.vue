@@ -14,16 +14,6 @@ const router = useRouter()
 const pets = ref<Pet[]>(); // creates a global vue reactive variable
 const petToEdit = ref<Pet>()
 
-function openModal(pet: Pet | undefined) {
-  petToEdit.value = pet;
-
-  nextTick(() => {
-    // @ts-ignore
-    const addPetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('petModal'));
-    addPetModal.show()
-  })
-}
-
 function toUpperCase(gender: string): string {
   return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
 }
@@ -67,7 +57,7 @@ function displayBreed(pet) {
 
 async function fetchPets() {
   const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations
-    expand: 'species,breed,breed_secondary'
+    expand: 'species,breed'
   })
   // @ts-ignore
   pets.value = result.items; // assigns content to 'pets'
@@ -110,26 +100,26 @@ onMounted(async () => {
               </div>
             </div>
             <div>
-              <button @click="openModal(pet)" class="btn btn-link" style="color: black"><i
+              <button @click="goToPetView(pet)" class="btn btn-link" style="color: black"><i
                   class="pi pi-pencil me-2"></i><span class="fw-bold">Edit</span>
               </button>
-              <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">
-                View
-              </button>
-              <button @click="petToEdit=pet" class="btn btn-danger ms-2"
-                      data-bs-toggle="modal" data-bs-target="#deletePetModal">
-                Delete
-              </button>
+              <!--              <button @click="goToPetView(pet)" class="btn btn-secondary ms-2">-->
+              <!--                View-->
+              <!--              </button>-->
+              <!--              <button @click="petToEdit=pet" class="btn btn-danger ms-2"-->
+              <!--                      data-bs-toggle="modal" data-bs-target="#deletePetModal">-->
+              <!--                Delete-->
+              <!--              </button>-->
             </div>
           </div>
         </div>
       </div>
-      <div class="d-grid gap-2">
+      <!--      <div class="d-grid gap-2">-->
 
-        <button @click="openModal(undefined)" type="button" class="btn btn-outline-dark">
-          Add new pet <i class="pi pi-plus ms-2" style="font-size: .7rem"></i>
-        </button>
-      </div>
+      <!--        <button @click="openModal(undefined)" type="button" class="btn btn-outline-dark">-->
+      <!--          Add new pet <i class="pi pi-plus ms-2" style="font-size: .7rem"></i>-->
+      <!--        </button>-->
+      <!--      </div>-->
 
       <!--      <table class="table table-hover">-->
       <!--        <thead>-->

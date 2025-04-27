@@ -37,15 +37,15 @@ async function login() {
         <h3 class="text-center">Welcome back</h3>
         <form>
           <div class="row mb-3 d-flex align-items-center">
-            <label for="inputEmail3" class="col-auto col-form-label">Email</label>
+            <label for="inputEmail" class="col-auto col-form-label">Email</label>
             <div class="col-sm-10 w-100">
-              <InputText type="email" autofocus class="form-control" id="inputEmail3" v-model="email"/>
+              <InputText type="email" autofocus class="form-control" id="inputEmail" v-model="email"/>
             </div>
           </div>
           <div class="row mb-4 d-flex align-items-center">
-            <label for="inputPassword3" class="col-auto col-form-label">Password</label>
+            <label for="inputPassword" class="col-auto col-form-label">Password</label>
             <div class="col-sm-10 w-100">
-              <InputText type="password" class="form-control" id="inputPassword3" v-model="password"/>
+              <InputText type="password" class="form-control" id="inputPassword" v-model="password"/>
             </div>
             <div>
               <Message v-if="hasLoginError" severity="error" icon="pi pi-times-circle" class="mt-4">Invalid email or

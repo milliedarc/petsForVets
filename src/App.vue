@@ -36,6 +36,7 @@ function logOut() {
   </div>
 
   <RouterView v-if="showRouter"/>
+  <Toast/>
 
 </template>
 

@@ -5,6 +5,7 @@ import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle'
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import 'primeicons/primeicons.css'
+import ToastService from 'primevue/toastservice';
 
 /* import the fontawesome core */
 import {library} from '@fortawesome/fontawesome-svg-core'
@@ -40,5 +41,6 @@ app.use(PrimeVue, {
         }
     }
 });
+app.use(ToastService);
 // Mount the app
 app.mount('#app');

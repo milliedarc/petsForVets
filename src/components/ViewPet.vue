@@ -87,6 +87,25 @@ const calculatedAge = computed(() => {
   return `${years}y ${months}m`;
 })
 
+function calculateBirthDate(years, months) {
+  const today = new Date();
+
+  // Clone today's date
+  const birthDate = new Date(today);
+
+  // Subtract years and months
+  birthDate.setFullYear(birthDate.getFullYear() - years);
+  birthDate.setMonth(birthDate.getMonth() - months);
+
+  // Set to the first day of the month
+  birthDate.setDate(1);
+
+  // Set time to 00:00:00
+  birthDate.setHours(0, 0, 0, 0);
+
+  return birthDate;
+}
+
 const isValidName = computed(() => {
   return name.value.trim().length > 0;
 })
@@ -99,7 +118,7 @@ const canSave = computed(() => {
 })
 
 async function fetchPet() {
-  const result = await pb.collection('pets').getOne(route.params.id, {
+  const result = await pb.collection('pets').getOne(route?.params?.id, {
     expand: 'species,breed,breed_secondary'
   })
   // @ts-ignore
