@@ -22,7 +22,6 @@ interface Pet {
     species: string;
     breed_group: string;
     breed: string;
-    breed_secondary: string;
     date_of_birth: string;
     gender: string;
     neutered: boolean;

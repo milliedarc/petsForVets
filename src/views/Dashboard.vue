@@ -88,11 +88,8 @@ onMounted(async () => {
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex">
-              <div><img
-                  src="https://www.creativefabrica.com/wp-content/uploads/2021/01/26/Cat-Icon-Graphics-8071439-1.jpg"
-                  class="rounded-circle"
-                  style="width: 100px;"
-                  alt="Avatar"/>
+              <div>
+                <PetIcon :pet="pet"/>
               </div>
               <div class="ms-4">
                 <h5>{{ pet.name }}</h5>

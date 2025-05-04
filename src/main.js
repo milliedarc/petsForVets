@@ -18,9 +18,11 @@ import {FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText} from '@fortaw
 import {fadr} from '@fortawesome/duotone-regular-svg-icons'
 import {fadl} from '@fortawesome/duotone-light-svg-icons'
 import {fas} from '@fortawesome/pro-solid-svg-icons'
+import {fat} from '@fortawesome/pro-thin-svg-icons'
+import {fal} from '@fortawesome/pro-light-svg-icons'
 
 /* add icons to the library */
-library.add(fadr, fadl, fas)
+library.add(fadr, fadl, fas, fat, fal)
 
 
 import {router} from './router/router.js'

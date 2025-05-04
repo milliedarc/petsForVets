@@ -25,6 +25,9 @@ const species = ref('')
 const speciesList = ref()
 const breedsList = ref()
 const breed = ref<Breed>()
+
+const breedId = ref('')
+
 const dob = ref()
 const years = ref()
 const months = ref()
@@ -74,7 +77,7 @@ const isValidSelectedSpecies = computed(() => {
 
 const isValidSelectedBreed = computed(() => {
   for (const oneBreed of filteredBreedsList.value) {
-    if (oneBreed.id === breed.value.id) {
+    if (oneBreed.id === breedId.value) {
       return true
     }
   }
@@ -86,7 +89,7 @@ const filteredBreedsList = computed(() => {
         return []
       }
       return breedsList.value.filter((breed) => {
-        if (breed.species === species.value) {
+        if (breed.pet_type === petType.value) {
           return true;
         }
         return false;
@@ -98,13 +101,9 @@ const isNewPet = computed(() => {
   return route.params.id === 'add'
 })
 
-// watch(species, () => {
-//   console.log("value", species.value);
-// })
-
 async function fetchPet() {
   const result = await pb.collection('pets').getOne(route.params.id as string, {
-    expand: 'species,breed,breed_secondary'
+    expand: 'species,breed'
   })
   petToEdit.value = result as any; // assigns content to 'pets'
   console.log(result)
@@ -112,7 +111,7 @@ async function fetchPet() {
   name.value = petToEdit.value.name
   petType.value = petToEdit.value.expand.species.pet_type
   species.value = petToEdit.value.species
-  breed.value = petToEdit.value.expand.breed
+  breedId.value = petToEdit.value.breed
   dob.value = getDateOnly()
   gender.value = petToEdit.value.gender
   isNeutered.value = petToEdit.value.neutered
@@ -134,7 +133,7 @@ const isValidName = computed(() => {
 })
 
 const canSave = computed(() => {
-  if (isValidName.value && species.value !== '') {
+  if (isValidName.value && petType.value !== '') {
     return true;
   }
   return false;
@@ -182,16 +181,33 @@ function confirmDelete() {
   });
 }
 
+function findSpeciesByName(speciesName: string): string {
+  const foundSpecies = speciesList.value.find((species) => {
+    return species.name === speciesName;
+  })
+  return foundSpecies.id;
+}
+
 async function savePet() {
   try {
     if (dobTab.value === 'dobAge') {
       dob.value = calculateBirthDate(years.value, months.value)
     }
+
+    let mySpecies = species.value;
+    if (petType.value === PetTypeIds.catId) {
+      mySpecies = findSpeciesByName('Cat')
+    } else if (petType.value === PetTypeIds.dogId) {
+      mySpecies = findSpeciesByName('Dog')
+    }
+
+    console.log('pepe:', mySpecies)
+
     const updatedPet = {
       user: pb.authStore.record.id,
       name: name.value,
-      species: species.value,
-      breed: breed.value?.id,
+      species: mySpecies,
+      breed: breedId.value,
       date_of_birth: dob.value,
       gender: gender.value,
       neutered: isNeutered.value,
@@ -212,6 +228,11 @@ async function savePet() {
     console.error("Error saving pet:", error);
     toast.add({severity: 'error', summary: 'Error', detail: 'Pet details could not be saved', life: 3000});
   }
+}
+
+function resetOnClickPetType() {
+  breedId.value = '';
+  species.value = '';
 }
 
 onMounted(async () => {
@@ -276,7 +297,7 @@ onMounted(async () => {
                 <PetNameFormatted :name="name"/>
                 is a:
               </p>
-              <PetTypes v-model="petType"/>
+              <PetTypes v-model="petType" @petTypeClicked="resetOnClickPetType"/>
             </section>
 
             <section>
@@ -307,7 +328,7 @@ onMounted(async () => {
 
             </section>
 
-            <section v-if="breed">
+            <section v-if="petType === PetTypeIds.catId || petType === PetTypeIds.dogId">
               <div>
                 <p>What breed is
                   <PetNameFormatted :name="name"/>
@@ -317,14 +338,14 @@ onMounted(async () => {
                 <div class="mt-4">
 
                   <FloatLabel variant="on">
-                    <Select v-model="breed.id" inputId="breed"
+                    <Select v-model="breedId" inputId="breed"
                             :options="filteredBreedsList"
                             optionLabel="name"
                             optionValue="id"
                             editable
                             class="myInput"
-                            :invalid="!isValidSelectedSpecies"/>
-                    <label for="species">Species</label>
+                            :invalid="!isValidSelectedBreed"/>
+                    <label for="breed">Breed</label>
                   </FloatLabel>
                   <Message
                       v-if="!isValidSelectedBreed" severity="error" size="small" variant="simple">

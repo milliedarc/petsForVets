@@ -2,6 +2,8 @@
 import {computed, ref} from "vue";
 import PetTypeIds from "@/components/PetDetails/PetTypeIds.js";
 
+const emit = defineEmits(["petTypeClicked"]);
+
 const petTypes = [
   {
     icon: ['fadl', 'cat'],
@@ -39,6 +41,7 @@ function isSelected(inPetType) {
 function clickPetType(petT) {
   petTypeId.value = petT.id;
   isExpanded.value = false;
+  emit("petTypeClicked", petT);
 }
 
 </script>
@@ -48,7 +51,6 @@ function clickPetType(petT) {
     <div class="d-flex gap-4">
 
       <template
-
           v-for="petT in petTypes"
           :key="petT.title">
         <div v-if="isSelected(petT.id) || isExpanded || petTypeId === ''">
