@@ -40,6 +40,7 @@ const importCountryCode = ref('')
 const microchipNumber = ref('')
 const avatar = ref(null)
 const avatarFile = ref(null)
+const avatarUrl = ref(null)
 
 const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
 
@@ -120,6 +121,8 @@ async function fetchPet() {
   isImported.value = petToEdit.value.imported
   importCountryCode.value = petToEdit.value.import_country_code
   microchipNumber.value = petToEdit.value.microchip_number
+  avatarUrl.value = pb.files.getURL(petToEdit.value, petToEdit.value.avatar, {'thumb': '100x250'});
+  console.log('avatar URL:', avatarUrl.value)
 }
 
 function getDateOnly() {
@@ -518,12 +521,28 @@ onMounted(async () => {
             </section>
 
             <section>
+              <div>
+                <p class="mb-0">Upload a picture of
+                  <PetNameFormatted :name="name"/>
+                  <span>:</span>
+                </p>
+                <p class="fw-light" style="font-size: 0.8rem">
+                  You can skip this step and add it later.
+                </p>
+              </div>
+
               <div class="card">
                 <div class="card-body d-flex flex-column align-items-center">
-                  <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
-                              class="p-button-outlined"/>
-                  <img v-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mt-3"
-                       style="max-width: 240px"/>
+                  <div v-if="avatarUrl === ''">
+                    <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
+                                class="p-button-outlined"/>
+                    <img v-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mt-3"
+                         style="max-width: 240px"/>
+                  </div>
+                  <div v-else>
+                    <img :src="avatarUrl" alt="avatar" class="shadow-lg rounded"
+                         style="max-width: 240px"/>
+                  </div>
                 </div>
               </div>
             </section>
