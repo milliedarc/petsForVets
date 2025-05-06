@@ -29,5 +29,6 @@ interface Pet {
     imported: boolean;
     import_country_code: string;
     microchip_number: string;
+    avatar: string;
     expand: Expand;
 }

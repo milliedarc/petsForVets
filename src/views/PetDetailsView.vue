@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// imports, const, models, props, emits, refs, computed, watchers, functions, hooks
+
 import {useRoute, useRouter} from "vue-router";
 import PocketBase from "pocketbase";
 import {onMounted, ref, computed, watch} from "vue";
@@ -8,6 +10,8 @@ import PetTypes from "@/components/PetDetails/PetTypes.vue";
 import PetTypeIds from "@/components/PetDetails/PetTypeIds";
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
+
+const pb = new PocketBase('http://127.0.0.1:8090');
 
 const route = useRoute()
 const router = useRouter()
@@ -24,10 +28,7 @@ const petTypes = ref([])
 const species = ref('')
 const speciesList = ref()
 const breedsList = ref()
-const breed = ref<Breed>()
-
 const breedId = ref('')
-
 const dob = ref()
 const years = ref()
 const months = ref()
@@ -37,10 +38,10 @@ const colour = ref('')
 const isImported = ref(false)
 const importCountryCode = ref('')
 const microchipNumber = ref('')
+const avatar = ref(null)
+const avatarFile = ref(null)
 
 const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
-
-const pb = new PocketBase('http://127.0.0.1:8090');
 
 const sortedCountries = computed(() => {
   return countries.countries.toSorted(function (countryA, countryB) {
@@ -188,6 +189,11 @@ function findSpeciesByName(speciesName: string): string {
   return foundSpecies.id;
 }
 
+function resetOnClickPetType() {
+  breedId.value = '';
+  species.value = '';
+}
+
 async function savePet() {
   try {
     if (dobTab.value === 'dobAge') {
@@ -201,8 +207,6 @@ async function savePet() {
       mySpecies = findSpeciesByName('Dog')
     }
 
-    console.log('pepe:', mySpecies)
-
     const updatedPet = {
       user: pb.authStore.record.id,
       name: name.value,
@@ -214,8 +218,13 @@ async function savePet() {
       colour: colour.value,
       imported: isImported.value,
       import_country_code: importCountryCode.value,
-      microchip_number: microchipNumber.value
+      microchip_number: microchipNumber.value,
+      avatar: undefined
     };
+    if (avatar) {
+      updatedPet.avatar = avatarFile.value;
+    }
+
     if (petToEdit.value?.id !== undefined) {
       await pb.collection('pets').update(petToEdit.value.id, updatedPet);
     } else {
@@ -230,9 +239,15 @@ async function savePet() {
   }
 }
 
-function resetOnClickPetType() {
-  breedId.value = '';
-  species.value = '';
+function onFileSelect(event) {
+  const file = event.files[0];
+  const reader = new FileReader();
+
+  reader.onload = async (e) => {
+    avatar.value = e.target.result;
+  };
+  avatarFile.value = file;
+  reader.readAsDataURL(file);
 }
 
 onMounted(async () => {
@@ -500,7 +515,17 @@ onMounted(async () => {
                   <label for="microchip">Microchip Number</label>
                 </FloatLabel>
               </div>
+            </section>
 
+            <section>
+              <div class="card">
+                <div class="card-body d-flex flex-column align-items-center">
+                  <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
+                              class="p-button-outlined"/>
+                  <img v-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mt-3"
+                       style="max-width: 240px"/>
+                </div>
+              </div>
             </section>
 
             <section>

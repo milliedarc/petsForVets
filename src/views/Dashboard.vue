@@ -1,9 +1,10 @@
 <script setup lang="ts">
+// imports, const, models, props, emits, refs, computed, watchers, functions, hooks
+
 import PocketBase from 'pocketbase'
 import {inject, nextTick, onMounted, ref} from "vue";
-import PetModal from "@/components/PetModal.vue";
-import DeletePetConfirmModal from "@/components/DeletePetConfirmModal.vue";
 import {useRouter} from "vue-router";
+import PetIcon from "@/components/PetIcon.vue";
 
 const bootstrap = inject('bootstrap');
 
