@@ -532,16 +532,14 @@ onMounted(async () => {
               </div>
 
               <div class="card">
-                <div class="card-body d-flex flex-column align-items-center">
-                  <div v-if="avatarUrl === ''">
+                <div class="card-body">
+                  <div class="d-flex flex-column align-items-center">
+                    <img v-if="avatarUrl !== '' && !avatar" :src="avatarUrl" alt="avatar" class="shadow-lg rounded mb-3"
+                         style="max-width: 240px"/>
+                    <img v-else-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mb-3"
+                         style="max-width: 240px"/>
                     <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
                                 class="p-button-outlined"/>
-                    <img v-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mt-3"
-                         style="max-width: 240px"/>
-                  </div>
-                  <div v-else>
-                    <img :src="avatarUrl" alt="avatar" class="shadow-lg rounded"
-                         style="max-width: 240px"/>
                   </div>
                 </div>
               </div>
