@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
-
 import {useRoute, useRouter} from "vue-router";
 import PocketBase from "pocketbase";
 import {onMounted, ref, computed, watch} from "vue";
@@ -11,12 +10,16 @@ import PetTypeIds from "@/components/PetDetails/PetTypeIds";
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
 
+// ********************** CONST **************************
+
 const pb = new PocketBase('http://127.0.0.1:8090');
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast();
 const confirm = useConfirm();
+
+// ********************** REF **************************
 
 const petToEdit = ref<Pet | undefined>(undefined);
 const petNotFound = ref(false)
@@ -41,8 +44,11 @@ const microchipNumber = ref('')
 const avatar = ref(null)
 const avatarFile = ref(null)
 const avatarUrl = ref(null)
+const deleteAvatarFlag = ref(false)
 
 const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
+
+// ********************** COMPUTED **************************
 
 const sortedCountries = computed(() => {
   return countries.countries.toSorted(function (countryA, countryB) {
@@ -99,9 +105,26 @@ const filteredBreedsList = computed(() => {
     }
 )
 
+const isValidName = computed(() => {
+  return name.value.trim().length > 0;
+})
+
+const canSave = computed(() => {
+  if (isValidName.value && petType.value !== '') {
+    return true;
+  }
+  return false;
+})
+
 const isNewPet = computed(() => {
   return route.params.id === 'add'
 })
+
+const hasAvatarUrl = computed(() => {
+  return avatarUrl.value !== null && avatarUrl.value !== '' && !avatar.value
+})
+
+// ********************** FUNCTIONS **************************
 
 async function fetchPet() {
   const result = await pb.collection('pets').getOne(route.params.id as string, {
@@ -131,17 +154,6 @@ function getDateOnly() {
   }
   return petToEdit.value.date_of_birth.split(' ')[0];
 }
-
-const isValidName = computed(() => {
-  return name.value.trim().length > 0;
-})
-
-const canSave = computed(() => {
-  if (isValidName.value && petType.value !== '') {
-    return true;
-  }
-  return false;
-})
 
 function calculateBirthDate(years: number, months: number): Date {
   const today = new Date();
@@ -224,7 +236,7 @@ async function savePet() {
       microchip_number: microchipNumber.value,
       avatar: undefined
     };
-    if (avatar) {
+    if (avatar.value || deleteAvatarFlag.value === true) {
       updatedPet.avatar = avatarFile.value;
     }
 
@@ -251,7 +263,17 @@ function onFileSelect(event) {
   };
   avatarFile.value = file;
   reader.readAsDataURL(file);
+  deleteAvatarFlag.value = false;
 }
+
+function deletePetAvatar() {
+  avatarUrl.value = ''
+  avatarFile.value = null;
+  deleteAvatarFlag.value = true;
+  avatar.value = null;
+}
+
+// ********************** LIFECYCLE HOOKS **************************
 
 onMounted(async () => {
   // console.log('onMounted')
@@ -534,10 +556,18 @@ onMounted(async () => {
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex flex-column align-items-center">
-                    <img v-if="avatarUrl !== '' && !avatar" :src="avatarUrl" alt="avatar" class="shadow-lg rounded mb-3"
-                         style="max-width: 240px"/>
-                    <img v-else-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mb-3"
-                         style="max-width: 240px"/>
+                    <div style="position: relative">
+                      <img v-if="hasAvatarUrl" :src="avatarUrl" alt="avatar"
+                           class="shadow-lg rounded mb-3"
+                           style="max-width: 240px"/>
+                      <img v-else-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mb-3"
+                           style="max-width: 240px"/>
+                      <Button v-if="hasAvatarUrl || avatar" icon="pi pi-times"
+                              @click="deletePetAvatar"
+                              severity="danger" size="small" rounded
+                              aria-label="Cancel"
+                              style="position: absolute; top: -15px; right: -15px;"/>
+                    </div>
                     <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
                                 class="p-button-outlined"/>
                   </div>
