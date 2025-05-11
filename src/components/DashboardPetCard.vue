@@ -1,0 +1,98 @@
+<script setup lang="ts">
+import {ref} from "vue";
+import PetIcon from "@/components/PetIcon.vue";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
+
+const props = defineProps<{
+  pet: Pet
+}>();
+
+const menu = ref();
+const items = ref([
+  {
+    label: 'Options',
+    items: [
+      {
+        label: 'Refresh',
+        icon: 'pi pi-refresh'
+      },
+      {
+        label: 'Export',
+        icon: 'pi pi-upload'
+      }
+    ]
+  }
+]);
+
+const toggle = (event) => {
+  menu.value.toggle(event);
+};
+
+function calculateAge(dob: string): string {
+  if (dob === '') {
+    return ''
+  }
+
+  const birthDate = new Date(dob);
+  const today = new Date();
+
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  // Adjust if birthday hasn't occurred yet this month
+  if (dayDiff < 0) {
+    months--;
+  }
+
+  // Adjust if month difference is negative
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  return `${years} years ${months} months`;
+}
+
+function goToPetView() {
+  router.push(`/pets/${props.pet.id}`);
+}
+
+</script>
+
+<template>
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+          <div>
+            <PetIcon :pet="pet"/>
+          </div>
+          <div class="ms-4">
+            <h5>{{ pet.name }}</h5>
+            <div>
+              <div class="mb-2">{{ calculateAge(pet.date_of_birth) }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <button @click="goToPetView" class="btn btn-link" style="color: black"><i
+              class="pi pi-pencil me-2"></i><span class="fw-bold">Edit</span>
+          </button>
+          <div>
+            <Button type="button" icon="pi pi-ellipsis-v" @click="toggle" size="small" severity="secondary"
+                    aria-haspopup="true"
+                    aria-controls="overlay_menu"/>
+            <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+
+</style>
