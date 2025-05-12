@@ -10,7 +10,12 @@ const emit = defineEmits([
 ])
 
 const createdAt = computed(() => {
-  return props.prescriptionRequest.created.split(' ')[0];
+  const date = new Date(props.prescriptionRequest.created.split(' ')[0]);
+  const today = new Date();
+  if (date.toLocaleDateString() === today.toLocaleDateString()) {
+    return 'Requested today'
+  }
+  return 'Requested on ' + date.toLocaleDateString();
 })
 
 const headerBackgroundStyle = computed(() => {
@@ -36,11 +41,16 @@ const headerBackgroundStyle = computed(() => {
         <div>
           <h6 class="mb-0 fw-bold">{{ props.prescriptionRequest.status }}</h6>
         </div>
-        <Button @click="emit('cancelClicked')" label="Cancel" icon="pi pi-times" size="small" severity="contrast"/>
+        <Button v-if="props.prescriptionRequest.status === 'Pending'"
+                @click="emit('cancelClicked')"
+                label="Cancel"
+                icon="pi pi-times"
+                size="small"
+                severity="contrast"/>
       </div>
     </template>
     <template #title>{{ props.prescriptionRequest.expand.prescription.expand.medicine.name }}</template>
-    <template #subtitle>{{ createdAt }}</template>
+    <template #subtitle> {{ createdAt }}</template>
     <template #footer>
     </template>
   </Card>
