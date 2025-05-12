@@ -12,15 +12,18 @@ const props = defineProps<{
 const menu = ref();
 const items = ref([
   {
-    label: 'Options',
+    label: 'Manage your pet',
     items: [
       {
-        label: 'Refresh',
-        icon: 'pi pi-refresh'
+        label: 'Repeat prescriptions',
+        icon: 'pi pi-cart-plus',
+        command: () => {
+          goToPrescriptionsView()
+        }
       },
       {
-        label: 'Export',
-        icon: 'pi pi-upload'
+        label: 'Appointments',
+        icon: 'pi pi-calendar-clock'
       }
     ]
   }
@@ -58,6 +61,10 @@ function calculateAge(dob: string): string {
 
 function goToPetView() {
   router.push(`/pets/${props.pet.id}`);
+}
+
+function goToPrescriptionsView() {
+  router.push(`/pets/${props.pet.id}/prescriptions`)
 }
 
 </script>

@@ -2,10 +2,10 @@
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 
 import PocketBase from 'pocketbase'
-import {inject, nextTick, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import PetIcon from "@/components/PetIcon.vue";
 import DashboardPetCard from "@/components/DashboardPetCard.vue";
+import PrescriptionsView from "@/views/PrescriptionsView.vue";
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
@@ -14,17 +14,6 @@ const router = useRouter()
 const pets = ref<Pet[]>(); // creates a global vue reactive variable
 const petToEdit = ref<Pet>()
 
-
-function displayBreed(pet) {
-  // console.log('Pet details:', pet);
-  if (pet.expand.breed === undefined) {
-    return '';
-  }
-  if (pet.expand.breed_secondary) {
-    return pet.expand.breed.name + ' x ' + pet.expand.breed_secondary.name;
-  }
-  return pet.expand.breed.name;
-}
 
 async function fetchPets() {
   const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations

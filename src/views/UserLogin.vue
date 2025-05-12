@@ -15,10 +15,9 @@ const hasLoginError = ref(false);
 
 async function login() {
   try {
-    const userData = await pb.collection('users').authWithPassword(email.value, password.value);
+    await pb.collection('users').authWithPassword(email.value, password.value);
     hasLoginError.value = false;
     await router.push('/')
-    console.log(userData);
   } catch (error) {
     hasLoginError.value = true;
     console.log(error);
