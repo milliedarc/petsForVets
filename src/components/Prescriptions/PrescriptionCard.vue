@@ -2,8 +2,13 @@
 
 const props = defineProps<{
   prescription: Prescription,
-  pet: Pet
+  pet: Pet,
+  disabled: boolean,
 }>();
+
+const emit = defineEmits([
+  'requestButtonClick'
+])
 
 </script>
 
@@ -13,7 +18,10 @@ const props = defineProps<{
     <template #subtitle> {{ props.prescription.dosage }}</template>
     <template #footer>
       <div class="d-flex gap-4 mt-1">
-        <Button label="Request" class="w-full"/>
+        <Button @click="emit('requestButtonClick')"
+                label="Request"
+                class="w-full"
+                :disabled="props.disabled"/>
       </div>
     </template>
   </Card>

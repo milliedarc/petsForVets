@@ -2,6 +2,7 @@ interface PrescriptionRequest {
     id: string;
     status: string;
     rejectionReason: string;
+    prescription: string;
     comments: string;
     created: string;
     expand: Expand;

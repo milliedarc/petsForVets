@@ -27,10 +27,45 @@ async function fetchPetId() {
   })
 }
 
+async function fetchPrescriptionRequests() {
+  const result = await pb.collection('prescription_requests').getList(1, 100, {
+    expand: 'pet,prescription,prescription.medicine',
+    filter: pb.filter("pet = {:petId}", {petId: route.params.id})
+  })
+  prescriptionRequests.value = result.items as any;
+  console.log('prescriptionRequests: ', result)
+}
+
+async function makePrescriptionRequest(prescription: Prescription) {
+  await pb.collection('prescription_requests').create({
+    pet: pet.value.id,
+    prescription: prescription.id,
+    status: 'Pending',
+    // comments: ''
+  });
+  await fetchPrescriptionRequests()
+}
+
+async function deletePrescriptionRequest(prescriptionRequest: PrescriptionRequest) {
+  await pb.collection('prescription_requests').delete(prescriptionRequest.id);
+  await fetchPrescriptionRequests()
+}
+
+function isDisabledRequest(prescription: Prescription): boolean {
+  const foundPrescriptionRequest = prescriptionRequests.value.find((prescriptionRequest) => {
+    return prescriptionRequest.prescription === prescription.id;
+  })
+  if (foundPrescriptionRequest) {
+    return true;
+  }
+  return false;
+}
+
 // *********************** LIFECYCLE HOOKS ***********************
 
 onMounted(async () => {
   await fetchPetId()
+
   const result = await pb.collection('prescriptions').getList(1, 100, {
     expand: 'pet,medicine',
     filter: pb.filter("pet = {:petId}", {petId: route.params.id})
@@ -38,12 +73,7 @@ onMounted(async () => {
   prescriptions.value = result.items as any;
   console.log('prescriptions: ', result)
 
-  const result2 = await pb.collection('prescription_requests').getList(1, 100, {
-    expand: 'pet,prescription,prescription.medicine',
-    filter: pb.filter("pet = {:petId}", {petId: route.params.id})
-  })
-  prescriptionRequests.value = result2.items as any;
-  console.log('prescriptionRequests: ', result2)
+  await fetchPrescriptionRequests()
 })
 </script>
 
@@ -62,12 +92,21 @@ onMounted(async () => {
                 v-for="prescription in prescriptions"
                 :key="prescription.id"
                 :prescription="prescription"
-                :pet>
-            </PrescriptionCard>
+                :pet
+                :disabled="isDisabledRequest(prescription)"
+                @requestButtonClick="makePrescriptionRequest(prescription)"
+            />
           </div>
           <div class="col">
             <h4 class="mb-4">Requests</h4>
+            <div v-if="prescriptionRequests.length === 0">
+              <Card class="p-2 text-center">
+                <template #subtitle>No requests yet</template>
+              </Card>
+            </div>
             <PrescriptionRequestCard
+                v-else
+                @cancelClicked="deletePrescriptionRequest(prescriptionRequest)"
                 class="mb-3"
                 v-for="prescriptionRequest in prescriptionRequests"
                 :key="prescriptionRequest.id"

@@ -5,6 +5,10 @@ const props = defineProps<{
   prescriptionRequest: PrescriptionRequest
 }>();
 
+const emit = defineEmits([
+  'cancelClicked'
+])
+
 const createdAt = computed(() => {
   return props.prescriptionRequest.created.split(' ')[0];
 })
@@ -27,9 +31,12 @@ const headerBackgroundStyle = computed(() => {
 <template>
   <Card>
     <template #header>
-      <div class="w-100 p-3"
+      <div class="w-100 p-3 d-flex justify-content-between align-items-center"
            :style="headerBackgroundStyle">
-        <h6 class="mb-0 fw-bold">{{ props.prescriptionRequest.status }}</h6>
+        <div>
+          <h6 class="mb-0 fw-bold">{{ props.prescriptionRequest.status }}</h6>
+        </div>
+        <Button @click="emit('cancelClicked')" label="Cancel" icon="pi pi-times" size="small" severity="contrast"/>
       </div>
     </template>
     <template #title>{{ props.prescriptionRequest.expand.prescription.expand.medicine.name }}</template>
