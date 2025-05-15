@@ -87,6 +87,11 @@ onMounted(async () => {
         <div class="row mt-4">
           <div class="col">
             <h4 class="mb-4">Prescriptions</h4>
+            <div v-if="prescriptions.length === 0">
+              <Card class="p-2 text-center">
+                <template #subtitle>{{ pet.name }} has no repeat prescriptions.</template>
+              </Card>
+            </div>
             <PrescriptionCard
                 class="mb-3"
                 v-for="prescription in prescriptions"
