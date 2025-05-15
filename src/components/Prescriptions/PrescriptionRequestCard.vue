@@ -48,10 +48,16 @@ const headerBackgroundStyle = computed(() => {
                 size="small"
                 severity="contrast"/>
       </div>
+      <div v-if="props.prescriptionRequest.rejection_reason != ''" class="px-2 pt-2">
+        <Message severity="error" size="small">
+          {{ props.prescriptionRequest.rejection_reason }}
+        </Message>
+      </div>
     </template>
     <template #title>{{ props.prescriptionRequest.expand.prescription.expand.medicine.name }}</template>
     <template #subtitle> {{ createdAt }}</template>
     <template #footer>
+
     </template>
   </Card>
 </template>
