@@ -1,10 +1,12 @@
-# petsForVets_v2
+# Pets for Vets
 
-This template should help get you started developing with Vue 3 in Vite.
+A Vue 3 + Vite starter project for the PetsForVets application. This version includes frontend setup and integrates with
+a Pocketbase backend.
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and
+disable Vetur).
 
 ## Customize configuration
 
@@ -27,3 +29,10 @@ npm run dev
 ```sh
 npm run build
 ```
+
+### Backend
+
+This project uses [Pocketbase](https://pocketbase.io/) as the backend. Make sure you have your Pocketbase instance
+running and properly configured
+to handle data for this frontend.
+
