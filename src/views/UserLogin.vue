@@ -52,6 +52,9 @@ async function login() {
               </Message>
             </div>
           </div>
+          <div>
+            <p>Don't have an account? <span class="fw-bold">Register with us</span></p>
+          </div>
           <div class="d-flex justify-content-center">
             <Button class="btn btn-primary" @click.prevent="login" severity="contrast"><i class="pi pi-user"></i>Sign in
             </Button>

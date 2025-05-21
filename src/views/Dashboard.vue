@@ -12,8 +12,6 @@ const pb = new PocketBase('http://127.0.0.1:8090');
 const router = useRouter()
 
 const pets = ref<Pet[]>(); // creates a global vue reactive variable
-const petToEdit = ref<Pet>()
-
 
 async function fetchPets() {
   const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations

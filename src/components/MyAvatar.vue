@@ -1,8 +1,12 @@
 <script setup>
 import {ref} from "vue";
+import {useRouter} from "vue-router";
 
 const props = defineProps(['user'])
 const emit = defineEmits(['logout']);
+
+const router = useRouter();
+
 const menu = ref();
 const menuItems = ref([
   {
@@ -17,9 +21,19 @@ const menuItems = ref([
       //   icon: 'pi pi-upload'
       // },
       {
+        label: 'Personal details',
+        icon: 'pi pi-user',
+        command: () => {
+          goToUserDetails()
+        }
+      },
+      {
         label: 'Settings',
         icon: 'pi pi-cog',
-        shortcut: '⌘+O'
+        shortcut: '⌘+O',
+        command: () => {
+          goToSettings()
+        }
       },
       {
         label: 'Logout',
@@ -36,6 +50,14 @@ const menuItems = ref([
 const toggle = (event) => {
   menu.value.toggle(event);
 };
+
+function goToSettings() {
+  router.push({name: 'Settings'});
+}
+
+function goToUserDetails() {
+  router.push({name: 'UserDetails'});
+}
 
 </script>
 
