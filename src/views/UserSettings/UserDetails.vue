@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
 </script>
 
 <template>
@@ -21,8 +22,7 @@
             </div>
 
             <div class="d-flex justify-content-center">
-              <button class="btn btn-link" style="color: black"><i
-                  class="pi pi-pencil me-2"></i><span class="fw-bold">Edit</span></button>
+              <ButtonPencilEdit/>
             </div>
           </div>
         </div>

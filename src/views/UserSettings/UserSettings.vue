@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
+import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
 
 const router = useRouter();
 
@@ -28,11 +29,7 @@ function goToPasswordChange() {
             </div>
 
             <div class="d-flex justify-content-center">
-              <button @click="goToPasswordChange"
-                      class="btn btn-link" style="color: black">
-                <i class="pi pi-pencil me-2"></i>
-                <span class="fw-bold">Edit</span>
-              </button>
+              <ButtonPencilEdit @click="goToPasswordChange"/>
             </div>
           </div>
         </div>
@@ -53,8 +50,7 @@ function goToPasswordChange() {
             </div>
 
             <div class="d-flex justify-content-center">
-              <button class="btn btn-link" style="color: black"><i
-                  class="pi pi-pencil me-2"></i><span class="fw-bold">Edit</span></button>
+              <ButtonPencilEdit/>
             </div>
           </div>
         </div>
