@@ -20,7 +20,8 @@ const emit = defineEmits([
       <div class="d-flex gap-4 mt-1">
         <Button @click="emit('requestButtonClick')"
                 label="Request"
-                class="w-full"
+                :aria-label="`Request repeat prescription of ${props.prescription.expand.medicine.name} for ${pet.name}`"
+                class="w-100"
                 :disabled="props.disabled"/>
       </div>
     </template>

@@ -47,8 +47,12 @@ async function login() {
               <InputText type="password" class="form-control" id="inputPassword" v-model="password"/>
             </div>
             <div>
-              <Message v-if="hasLoginError" severity="error" icon="pi pi-times-circle" class="mt-4">Invalid email or
-                password
+              <Message v-if="hasLoginError"
+                       severity="error"
+                       icon="pi pi-times-circle"
+                       class="mt-4"
+                       aria-describedby="loginError">
+                Invalid email or password
               </Message>
             </div>
           </div>
@@ -56,7 +60,10 @@ async function login() {
             <p>Don't have an account? <span class="fw-bold">Register with us</span></p>
           </div>
           <div class="d-flex justify-content-center">
-            <Button class="btn btn-primary" @click.prevent="login" severity="contrast"><i class="pi pi-user"></i>Sign in
+            <Button class="btn btn-primary"
+                    @click.prevent="login"
+                    severity="contrast" aria-label="Login">
+              <i class="pi pi-user"></i>Sign in
             </Button>
           </div>
         </form>

@@ -327,7 +327,7 @@ onMounted(async () => {
                 <InputText v-model="name" id="petName" class="myInput"/>
                 <label for="petName">Pet name *</label>
               </FloatLabel>
-              <Message v-if="name === ''" severity="error" size="small" variant="simple">
+              <Message v-if="name === ''" severity="error" size="small" variant="simple" aria-describedby="nameError">
                 Please enter a pet's name to continue
               </Message>
             </section>
@@ -360,7 +360,8 @@ onMounted(async () => {
                     <label for="species">Species</label>
                   </FloatLabel>
                   <Message
-                      v-if="!isValidSelectedSpecies" severity="error" size="small" variant="simple">
+                      v-if="!isValidSelectedSpecies" severity="error" size="small" variant="simple"
+                      aria-describedby="speciesError">
                     Please choose a valid species from the list
                   </Message>
                 </div>
@@ -388,7 +389,8 @@ onMounted(async () => {
                     <label for="breed">Breed</label>
                   </FloatLabel>
                   <Message
-                      v-if="!isValidSelectedBreed" severity="error" size="small" variant="simple">
+                      v-if="!isValidSelectedBreed" severity="error" size="small" variant="simple"
+                      aria-describedby="breedError">
                     Please choose a valid breed or select <span class="fw-bold">Cross / Mixed Breed</span> if unknown
                   </Message>
                 </div>
@@ -557,15 +559,15 @@ onMounted(async () => {
                 <div class="card-body">
                   <div class="d-flex flex-column align-items-center">
                     <div style="position: relative">
-                      <img v-if="hasAvatarUrl" :src="avatarUrl" alt="avatar"
+                      <img v-if="hasAvatarUrl" :src="avatarUrl" :alt="`${name}'s uploaded picture`"
                            class="shadow-lg rounded mb-3"
                            style="max-width: 240px"/>
-                      <img v-else-if="avatar" :src="avatar" alt="Image" class="shadow-lg rounded mb-3"
+                      <img v-else-if="avatar" :src="avatar" alt="Avatar" class="shadow-lg rounded mb-3"
                            style="max-width: 240px"/>
                       <Button v-if="hasAvatarUrl || avatar" icon="pi pi-times"
                               @click="deletePetAvatar"
                               severity="danger" size="small" rounded
-                              aria-label="Cancel"
+                              :aria-label="`Remove uploaded photo of ${name}`"
                               style="position: absolute; top: -15px; right: -15px;"/>
                     </div>
                     <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
@@ -578,15 +580,19 @@ onMounted(async () => {
             <section>
               <Button @click="savePet"
                       :disabled="!canSave"
-                      class="myInput">
+                      class="myInput"
+                      :aria-label="`Save ${name}'s profile`">
                 <span v-if="isNewPet">Save pet</span>
                 <span v-else>Update pet details</span>
               </Button>
             </section>
             <section>
               <Button v-if="!isNewPet"
-                      @click="confirmDelete" label="Delete pet profile" variant="text" severity="danger"
-                      class="myInput"/>
+                      @click="confirmDelete"
+                      label="Delete pet profile"
+                      variant="text" severity="danger"
+                      class="myInput"
+                      :aria-label="`Delete ${name}'s profile`"/>
             </section>
           </div>
         </div>

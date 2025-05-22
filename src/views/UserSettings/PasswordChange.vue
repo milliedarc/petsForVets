@@ -110,12 +110,16 @@ async function savePassword() {
           <template #footer>
             <div class="pt-3 px-3">
               <div class="mb-3 text-center">
-                <Button @click="savePassword" label="Save" class="w-100"
+                <Button @click="savePassword"
+                        label="Save" aria-label="Save password"
+                        class="w-100"
                         :disabled="!isValidPassword"/>
               </div>
               <div class="text-center">
                 <Button
-                    @click="goToSettings" label="Cancel" severity="secondary" outlined class="w-100"/>
+                    @click="goToSettings"
+                    label="Cancel" aria-label="Cancel password change"
+                    severity="secondary" outlined class="w-100"/>
               </div>
             </div>
           </template>
