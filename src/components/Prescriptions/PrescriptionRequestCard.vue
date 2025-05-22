@@ -31,6 +31,7 @@ const headerBackgroundStyle = computed(() => {
   }
   return `background-color: ${colour}`;
 })
+
 </script>
 
 <template>
@@ -44,12 +45,13 @@ const headerBackgroundStyle = computed(() => {
         <Button v-if="props.prescriptionRequest.status === 'Pending'"
                 @click="emit('cancelClicked')"
                 label="Cancel"
+                :aria-label="`Cancel prescription request of ${props.prescriptionRequest.expand.prescription.expand.medicine.name}`"
                 icon="pi pi-times"
                 size="small"
                 severity="contrast"/>
       </div>
       <div v-if="props.prescriptionRequest.rejection_reason != ''" class="px-2 pt-2">
-        <Message severity="error" size="small">
+        <Message severity="error" size="small" aria-label="Prescription rejection reason">
           {{ props.prescriptionRequest.rejection_reason }}
         </Message>
       </div>
