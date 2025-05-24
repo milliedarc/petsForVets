@@ -3,6 +3,7 @@ interface Breed {
     name: string;
     species: string;
     generic: boolean;
+    pet_type: string;
 }
 
 interface Species {

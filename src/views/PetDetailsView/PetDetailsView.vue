@@ -11,6 +11,7 @@ import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
 import PetNameSection from "@/views/PetDetailsView/components/PetNameSection.vue";
 import PetSpeciesSection from "@/views/PetDetailsView/components/PetSpeciesSection.vue";
+import PetBreedSection from "@/views/PetDetailsView/components/PetBreedSection.vue";
 
 // ********************** CONST **************************
 
@@ -63,28 +64,6 @@ const sortedCountries = computed(() => {
     return 0;
   });
 })
-
-const isValidSelectedBreed = computed(() => {
-  for (const oneBreed of filteredBreedsList.value) {
-    if (oneBreed.id === breedId.value) {
-      return true
-    }
-  }
-  return false
-})
-
-const filteredBreedsList = computed(() => {
-      if (breedsList.value === undefined) {
-        return []
-      }
-      return breedsList.value.filter((breed) => {
-        if (breed.pet_type === petType.value) {
-          return true;
-        }
-        return false;
-      })
-    }
-)
 
 const isValidName = computed(() => {
   return name.value.trim().length > 0;
@@ -312,35 +291,13 @@ onMounted(async () => {
               <PetTypes v-model="petType" @petTypeClicked="resetOnClickPetType"/>
             </section>
 
-            <PetSpeciesSection v-model:species="species" :name="name" :petType="petType" :speciesList="speciesList"/>
+            <PetSpeciesSection v-model:species="species" :name="name" :pet-type="petType" :species-list="speciesList"/>
 
-            <section v-if="petType === PetTypeIds.catId || petType === PetTypeIds.dogId">
-              <div>
-                <p>What breed is
-                  <PetNameFormatted :name="name"/>
-                  <span>?</span>
-                </p>
-
-                <div class="mt-4">
-
-                  <FloatLabel variant="on">
-                    <Select v-model="breedId" inputId="breed"
-                            :options="filteredBreedsList"
-                            optionLabel="name"
-                            optionValue="id"
-                            editable
-                            class="myInput"
-                            :invalid="!isValidSelectedBreed"/>
-                    <label for="breed">Breed</label>
-                  </FloatLabel>
-                  <Message
-                      v-if="!isValidSelectedBreed" severity="error" size="small" variant="simple"
-                      aria-describedby="breedError">
-                    Please choose a valid breed or select <span class="fw-bold">Cross / Mixed Breed</span> if unknown
-                  </Message>
-                </div>
-              </div>
-            </section>
+            <PetBreedSection v-if="petType === PetTypeIds.catId || petType === PetTypeIds.dogId"
+                             :name="name"
+                             :pet-type="petType"
+                             :breeds-list="breedsList"
+                             v-model:breed-id="breedId"/>
 
             <section>
               <div>
