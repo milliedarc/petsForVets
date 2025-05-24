@@ -18,7 +18,6 @@ const name = defineModel('name', {
       Please enter a pet's name to continue
     </Message>
   </section>
-
 </template>
 
 <style scoped>
