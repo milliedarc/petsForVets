@@ -9,6 +9,8 @@ import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
 import PetTypeIds from "@/types/PetTypeIds";
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
+import PetNameSection from "@/views/PetDetailsView/components/PetNameSection.vue";
+import PetSpeciesSection from "@/views/PetDetailsView/components/PetSpeciesSection.vue";
 
 // ********************** CONST **************************
 
@@ -60,27 +62,6 @@ const sortedCountries = computed(() => {
     }
     return 0;
   });
-})
-
-const filteredSpeciesList = computed(() => {
-  if (speciesList.value === undefined) {
-    return []
-  }
-  return speciesList.value.filter((species) => {
-    if (petType.value === species.pet_type) {
-      return true;
-    }
-    return false;
-  })
-})
-
-const isValidSelectedSpecies = computed(() => {
-  for (const oneSpecies of filteredSpeciesList.value) {
-    if (oneSpecies.id === species.value) {
-      return true
-    }
-  }
-  return false
 })
 
 const isValidSelectedBreed = computed(() => {
@@ -321,16 +302,7 @@ onMounted(async () => {
               <h4 v-else>Edit pet details</h4>
             </div>
 
-            <section>
-              <p>My pet's name is:</p>
-              <FloatLabel variant="on">
-                <InputText v-model="name" id="petName" class="myInput"/>
-                <label for="petName">Pet name *</label>
-              </FloatLabel>
-              <Message v-if="name === ''" severity="error" size="small" variant="simple" aria-describedby="nameError">
-                Please enter a pet's name to continue
-              </Message>
-            </section>
+            <PetNameSection v-model:name="name"/>
 
             <section>
               <p>
@@ -340,34 +312,7 @@ onMounted(async () => {
               <PetTypes v-model="petType" @petTypeClicked="resetOnClickPetType"/>
             </section>
 
-            <section>
-              <div v-if="petType === PetTypeIds.smallAnimalId || petType === PetTypeIds.reptileId">
-                <p>What species is
-                  <PetNameFormatted :name="name"/>
-                  <span>?</span>
-                </p>
-                <div class="mt-4">
-
-                  <FloatLabel variant="on">
-                    <Select v-model="species" inputId="species"
-                            :options="filteredSpeciesList"
-                            optionLabel="name"
-                            optionValue="id"
-                            editable
-                            class="myInput"
-                            :invalid="!isValidSelectedSpecies"
-                    />
-                    <label for="species">Species</label>
-                  </FloatLabel>
-                  <Message
-                      v-if="!isValidSelectedSpecies" severity="error" size="small" variant="simple"
-                      aria-describedby="speciesError">
-                    Please choose a valid species from the list
-                  </Message>
-                </div>
-              </div>
-
-            </section>
+            <PetSpeciesSection v-model:species="species" :name="name" :petType="petType" :speciesList="speciesList"/>
 
             <section v-if="petType === PetTypeIds.catId || petType === PetTypeIds.dogId">
               <div>
