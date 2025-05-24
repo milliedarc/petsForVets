@@ -9,6 +9,8 @@ const emit = defineEmits([
   'cancelClicked'
 ])
 
+const prescriptionMedicine = props.prescriptionRequest.expand.prescription.expand.medicine.name;
+
 const createdAt = computed(() => {
   const date = new Date(props.prescriptionRequest.created.split(' ')[0]);
   const today = new Date();
@@ -45,7 +47,7 @@ const headerBackgroundStyle = computed(() => {
         <Button v-if="props.prescriptionRequest.status === 'Pending'"
                 @click="emit('cancelClicked')"
                 label="Cancel"
-                :aria-label="`Cancel prescription request of ${props.prescriptionRequest.expand.prescription.expand.medicine.name}`"
+                :aria-label="`Cancel prescription request of ${prescriptionMedicine}`"
                 icon="pi pi-times"
                 size="small"
                 severity="contrast"/>
@@ -56,7 +58,7 @@ const headerBackgroundStyle = computed(() => {
         </Message>
       </div>
     </template>
-    <template #title>{{ props.prescriptionRequest.expand.prescription.expand.medicine.name }}</template>
+    <template #title>{{ prescriptionMedicine }}</template>
     <template #subtitle> {{ createdAt }}</template>
     <template #footer>
 

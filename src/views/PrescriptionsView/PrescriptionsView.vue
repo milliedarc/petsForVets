@@ -2,8 +2,8 @@
 import {computed, onMounted, ref} from "vue";
 import PocketBase from 'pocketbase'
 import {useRoute} from "vue-router";
-import PrescriptionCard from "@/components/Prescriptions/PrescriptionCard.vue";
-import PrescriptionRequestCard from "@/components/Prescriptions/PrescriptionRequestCard.vue";
+import PrescriptionCard from "@/views/PrescriptionsView/components/PrescriptionCard.vue";
+import PrescriptionRequestCard from "@/views/PrescriptionsView/components/PrescriptionRequestCard.vue";
 
 // *********************** CONSTS ***********************
 const pb = new PocketBase('http://127.0.0.1:8090');

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-
 import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
+
 </script>
 
 <template>

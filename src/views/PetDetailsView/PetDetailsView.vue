@@ -3,10 +3,10 @@
 import {useRoute, useRouter} from "vue-router";
 import PocketBase from "pocketbase";
 import {onMounted, ref, computed, watch} from "vue";
-import countries from '../components/countries.json'
-import PetNameFormatted from "@/components/PetDetails/PetNameFormatted.vue";
-import PetTypes from "@/components/PetDetails/PetTypes.vue";
-import PetTypeIds from "@/components/PetDetails/PetTypeIds";
+import countries from '@/types/countries.json'
+import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
+import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
+import PetTypeIds from "@/types/PetTypeIds";
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
 

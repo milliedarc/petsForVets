@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref} from "vue";
-import PetTypeIds from "@/components/PetDetails/PetTypeIds.js";
+import PetTypeIds from "@/types/PetTypeIds.ts";
 
 const emit = defineEmits(["petTypeClicked"]);
 

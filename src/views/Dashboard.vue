@@ -5,7 +5,7 @@ import PocketBase from 'pocketbase'
 import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import DashboardPetCard from "@/components/DashboardPetCard.vue";
-import PrescriptionsView from "@/views/PrescriptionsView.vue";
+import PrescriptionsView from "@/views/PrescriptionsView/PrescriptionsView.vue";
 
 const pb = new PocketBase('http://127.0.0.1:8090');
 
