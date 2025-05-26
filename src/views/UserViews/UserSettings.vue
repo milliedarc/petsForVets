@@ -4,8 +4,8 @@ import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
 
 const router = useRouter();
 
-function goToPasswordChange() {
-  router.push({name: 'PasswordChange'});
+function goToEditPassword() {
+  router.push({name: 'EditPassword'});
 }
 
 </script>
@@ -29,7 +29,7 @@ function goToPasswordChange() {
             </div>
 
             <div class="d-flex justify-content-center">
-              <ButtonPencilEdit @click="goToPasswordChange"/>
+              <ButtonPencilEdit @click="goToEditPassword"/>
             </div>
           </div>
         </div>
@@ -41,7 +41,7 @@ function goToPasswordChange() {
 
             <div class="mt-2">
               <div>
-                <h6 class="fw-bold">Contact Preferences</h6>
+                <h6 class="fw-bold">Contact preferences</h6>
               </div>
               <div class="mt-3">
                 <p>Choose how you would like the staff at your veterinary surgery to contact you, and regarding
