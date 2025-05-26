@@ -9,15 +9,15 @@ import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
 import PetTypeIds from "@/types/PetTypeIds";
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
-import PetNameSection from "@/views/PetDetailsView/components/PetNameSection.vue";
-import PetSpeciesSection from "@/views/PetDetailsView/components/PetSpeciesSection.vue";
-import PetBreedSection from "@/views/PetDetailsView/components/PetBreedSection.vue";
-import PetAgeSection from "@/views/PetDetailsView/components/PetAgeSection.vue";
-import PetGenderSection from "@/views/PetDetailsView/components/PetGenderSection.vue";
-import PetIsNeuteredSection from "@/views/PetDetailsView/components/PetIsNeuteredSection.vue";
-import PetIsImportedSection from "@/views/PetDetailsView/components/PetIsImportedSection.vue";
-import PetColourSection from "@/views/PetDetailsView/components/PetColourSection.vue";
-import PetMicrochipNumberSection from "@/views/PetDetailsView/components/PetMicrochipNumberSection.vue";
+import PetNameSection from "@/views/PetDetailsView/components/sections/PetNameSection.vue";
+import PetSpeciesSection from "@/views/PetDetailsView/components/sections/PetSpeciesSection.vue";
+import PetBreedSection from "@/views/PetDetailsView/components/sections/PetBreedSection.vue";
+import PetAgeSection from "@/views/PetDetailsView/components/sections/PetAgeSection.vue";
+import PetGenderSection from "@/views/PetDetailsView/components/sections/PetGenderSection.vue";
+import PetIsNeuteredSection from "@/views/PetDetailsView/components/sections/PetIsNeuteredSection.vue";
+import PetIsImportedSection from "@/views/PetDetailsView/components/sections/PetIsImportedSection.vue";
+import PetColourSection from "@/views/PetDetailsView/components/sections/PetColourSection.vue";
+import PetMicrochipNumberSection from "@/views/PetDetailsView/components/sections/PetMicrochipNumberSection.vue";
 
 // ********************** CONST **************************
 
