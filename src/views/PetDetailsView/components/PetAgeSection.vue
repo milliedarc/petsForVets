@@ -1,27 +1,40 @@
 <script setup lang="ts">
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
+import {ref} from "vue";
 
 const props = defineProps<{
   name: string
 }>()
 
-const dobTab = defineModel('dobTab', {
-  type: String,
-  default: ''
-})
+const dateOfBirth = defineModel<Date | null>('dateOfBirth', {})
 
-const dob = defineModel('dob', {
-  type: Date
-})
+const years = ref()
+const months = ref()
+const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
 
-const months = defineModel('months', {
-  type: String
-})
+function calculateBirthDate() {
+  const today = new Date();
+  const birthDate = new Date(today);
 
-const years = defineModel('years', {
-  type: String
-})
+  let yearsLocal = 0;
+  if (!isNaN(Number(years.value))) {
+    yearsLocal = Number(years.value);
+  }
 
+  let monthsLocal = 0;
+  if (!isNaN(Number(months.value))) {
+    monthsLocal = Number(months.value);
+  }
+
+  birthDate.setFullYear(birthDate.getFullYear() - yearsLocal);
+  birthDate.setMonth(birthDate.getMonth() - monthsLocal);
+
+  birthDate.setDate(1);
+
+  birthDate.setHours(0, 0, 0, 0);
+
+  dateOfBirth.value = birthDate;
+}
 
 </script>
 
@@ -45,20 +58,29 @@ const years = defineModel('years', {
           <TabPanel value="dobDate">
             <div class="d-flex">
               <label for="dob" class="font-bold block mb-2"></label>
-              <DatePicker v-model="dob" showIcon fluid iconDisplay="input" inputId="dob" class="myInput"/>
+              <DatePicker v-model="dateOfBirth"
+                          showIcon fluid
+                          iconDisplay="input"
+                          inputId="dob"
+                          class="myInput"
+                          dateFormat="dd/mm/yy"/>
             </div>
           </TabPanel>
 
           <TabPanel value="dobAge">
             <div class="d-flex gap-3">
               <FloatLabel variant="on">
-                <InputText type="number" min="0" max="30" id="years" style="width: 150px"
-                           v-model="years"/>
+                <InputText type="number" min="0" id="years" style="width: 150px"
+                           v-model="years"
+                           @blur="calculateBirthDate"
+                />
                 <label for="years">Years *</label>
               </FloatLabel>
               <FloatLabel variant="on">
-                <InputText type="number" min="0" max="11" id="months" style="width: 150px"
-                           v-model="months"/>
+                <InputText type="number" min="0" id="months" style="width: 150px"
+                           v-model="months"
+                           @blur="calculateBirthDate"
+                />
                 <label for="months">Months *</label>
               </FloatLabel>
             </div>

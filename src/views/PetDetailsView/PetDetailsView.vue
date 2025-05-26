@@ -41,9 +41,7 @@ const species = ref('')
 const speciesList = ref()
 const breedsList = ref()
 const breedId = ref('')
-const dob = ref()
-const years = ref()
-const months = ref()
+const dob = ref<Date | null>(null)
 const gender = ref('')
 const isNeutered = ref(false)
 const colour = ref('')
@@ -54,8 +52,6 @@ const avatar = ref(null)
 const avatarFile = ref(null)
 const avatarUrl = ref(null)
 const deleteAvatarFlag = ref(false)
-
-const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
 
 // ********************** COMPUTED **************************
 
@@ -91,7 +87,7 @@ async function fetchPet() {
   petType.value = petToEdit.value.expand.species.pet_type
   species.value = petToEdit.value.species
   breedId.value = petToEdit.value.breed
-  dob.value = getDateOnly()
+  dob.value = getDateOnly(petToEdit.value.date_of_birth)
   gender.value = petToEdit.value.gender
   isNeutered.value = petToEdit.value.neutered
   colour.value = petToEdit.value.colour
@@ -101,26 +97,11 @@ async function fetchPet() {
   avatarUrl.value = pb.files.getURL(petToEdit.value, petToEdit.value.avatar, {'thumb': '100x250'});
 }
 
-function getDateOnly() {
-  if (petToEdit.value.date_of_birth == '') {
-    return undefined;
+function getDateOnly(dateString: string) {
+  if (dateString == '') {
+    return null;
   }
-  return petToEdit.value.date_of_birth.split(' ')[0];
-}
-
-function calculateBirthDate(years: number, months: number): Date {
-  const today = new Date();
-
-  const birthDate = new Date(today);
-
-  birthDate.setFullYear(birthDate.getFullYear() - years);
-  birthDate.setMonth(birthDate.getMonth() - months);
-
-  birthDate.setDate(1);
-
-  birthDate.setHours(0, 0, 0, 0);
-
-  return birthDate;
+  return new Date(dateString.split(' ')[0]);
 }
 
 function confirmDelete() {
@@ -160,10 +141,6 @@ function resetOnClickPetType() {
 
 async function savePet() {
   try {
-    if (dobTab.value === 'dobAge') {
-      dob.value = calculateBirthDate(years.value, months.value)
-    }
-
     let mySpecies = species.value;
     if (petType.value === PetTypeIds.catId) {
       mySpecies = findSpeciesByName('Cat')
@@ -294,10 +271,7 @@ onMounted(async () => {
                              v-model:breed-id="breedId"/>
 
             <PetAgeSection :name="name"
-                           v-model:dob-tab="dobTab"
-                           v-model:dob="dob"
-                           v-model:months="months"
-                           v-model:years="years"/>
+                           v-model:date-of-birth="dob"/>
 
             <PetGenderSection :name="name"
                               v-model:gender="gender"/>
