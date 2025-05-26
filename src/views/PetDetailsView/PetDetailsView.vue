@@ -15,6 +15,7 @@ import PetBreedSection from "@/views/PetDetailsView/components/PetBreedSection.v
 import PetAgeSection from "@/views/PetDetailsView/components/PetAgeSection.vue";
 import PetGenderSection from "@/views/PetDetailsView/components/PetGenderSection.vue";
 import PetIsNeuteredSection from "@/views/PetDetailsView/components/PetIsNeuteredSection.vue";
+import PetIsImportedSection from "@/views/PetDetailsView/components/PetIsImportedSection.vue";
 
 // ********************** CONST **************************
 
@@ -55,18 +56,6 @@ const deleteAvatarFlag = ref(false)
 const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
 
 // ********************** COMPUTED **************************
-
-const sortedCountries = computed(() => {
-  return countries.countries.toSorted(function (countryA, countryB) {
-    if (countryA.name < countryB.name) {
-      return -1;
-    }
-    if (countryA.name > countryB.name) {
-      return 1;
-    }
-    return 0;
-  });
-})
 
 const isValidName = computed(() => {
   return name.value.trim().length > 0;
@@ -328,44 +317,17 @@ onMounted(async () => {
               </div>
             </section>
 
-            <section>
-              <div>
-                <p>Is
-                  <PetNameFormatted :name="name"/>
-                  <span> imported?</span>
-                </p>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <Checkbox v-model="isImported"
-                          binary
-                          inputId="imported" name="imported" value="true"/>
-                <label class="ms-3" for="imported">
-                  Please tick this box if your pet is imported
-                </label>
-              </div>
-
-              <div class="mt-3" v-if="isImported">
-
-                <FloatLabel variant="on">
-                  <Select v-model="importCountryCode" editable inputId="country" :options="sortedCountries"
-                          optionLabel="name"
-                          optionValue="country_code"
-                          class="myInput"/>
-                  <label for="country">Select import country</label>
-                </FloatLabel>
-              </div>
-            </section>
+            <PetIsImportedSection :name="name"
+                                  v-model:is-imported="isImported"
+                                  v-model:import-country-code="importCountryCode"/>
 
             <section>
-
               <div>
                 <p>What's
                   <PetNameFormatted :name="name"/>
                   <span>'s microchip number?</span>
                 </p>
               </div>
-
               <div>
                 <FloatLabel variant="on">
                   <InputText id="microchip" v-model="microchipNumber" class="myInput"/>
