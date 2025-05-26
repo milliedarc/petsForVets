@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
+
 import {useRoute, useRouter} from "vue-router";
 import PocketBase from "pocketbase";
 import {onMounted, ref, computed, watch} from "vue";
-import countries from '@/types/countries.json'
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
 import PetTypeIds from "@/types/PetTypeIds";
@@ -16,6 +16,8 @@ import PetAgeSection from "@/views/PetDetailsView/components/PetAgeSection.vue";
 import PetGenderSection from "@/views/PetDetailsView/components/PetGenderSection.vue";
 import PetIsNeuteredSection from "@/views/PetDetailsView/components/PetIsNeuteredSection.vue";
 import PetIsImportedSection from "@/views/PetDetailsView/components/PetIsImportedSection.vue";
+import PetColourSection from "@/views/PetDetailsView/components/PetColourSection.vue";
+import PetMicrochipNumberSection from "@/views/PetDetailsView/components/PetMicrochipNumberSection.vue";
 
 // ********************** CONST **************************
 
@@ -42,7 +44,7 @@ const breedId = ref('')
 const dob = ref()
 const years = ref()
 const months = ref()
-const gender = ref()
+const gender = ref('')
 const isNeutered = ref(false)
 const colour = ref('')
 const isImported = ref(false)
@@ -97,7 +99,6 @@ async function fetchPet() {
   importCountryCode.value = petToEdit.value.import_country_code
   microchipNumber.value = petToEdit.value.microchip_number
   avatarUrl.value = pb.files.getURL(petToEdit.value, petToEdit.value.avatar, {'thumb': '100x250'});
-  console.log('avatar URL:', avatarUrl.value)
 }
 
 function getDateOnly() {
@@ -110,17 +111,13 @@ function getDateOnly() {
 function calculateBirthDate(years: number, months: number): Date {
   const today = new Date();
 
-  // Clone today's date
   const birthDate = new Date(today);
 
-  // Subtract years and months
   birthDate.setFullYear(birthDate.getFullYear() - years);
   birthDate.setMonth(birthDate.getMonth() - months);
 
-  // Set to the first day of the month
   birthDate.setDate(1);
 
-  // Set time to 00:00:00
   birthDate.setHours(0, 0, 0, 0);
 
   return birthDate;
@@ -188,6 +185,7 @@ async function savePet() {
       microchip_number: microchipNumber.value,
       avatar: undefined
     };
+
     if (avatar.value || deleteAvatarFlag.value === true) {
       updatedPet.avatar = avatarFile.value;
     }
@@ -263,6 +261,7 @@ onMounted(async () => {
   <main class="container-fluid my-5">
     <div class="row justify-content-center">
       <div class="col-8">
+
         <div v-if="!isLoading">
           <div v-if="petNotFound">
             <h4>Pet not found</h4>
@@ -283,7 +282,10 @@ onMounted(async () => {
               <PetTypes v-model="petType" @petTypeClicked="resetOnClickPetType"/>
             </section>
 
-            <PetSpeciesSection v-model:species="species" :name="name" :pet-type="petType" :species-list="speciesList"/>
+            <PetSpeciesSection :name="name"
+                               :pet-type="petType"
+                               :species-list="speciesList"
+                               v-model:species="species"/>
 
             <PetBreedSection v-if="petType === PetTypeIds.catId || petType === PetTypeIds.dogId"
                              :name="name"
@@ -297,44 +299,21 @@ onMounted(async () => {
                            v-model:months="months"
                            v-model:years="years"/>
 
-            <PetGenderSection :name="name" v-model:gender="gender"/>
+            <PetGenderSection :name="name"
+                              v-model:gender="gender"/>
 
-            <PetIsNeuteredSection :name="name" v-model:is-neutered="isNeutered"/>
+            <PetIsNeuteredSection :name="name"
+                                  v-model:is-neutered="isNeutered"/>
 
-            <section>
-              <div>
-                <p>What colour is
-                  <PetNameFormatted :name="name"/>
-                  <span>?</span>
-                </p>
-              </div>
-
-              <div>
-                <FloatLabel class="myInput" variant="on">
-                  <InputText id="colour" v-model="colour" class="myInput"/>
-                  <label for="colour">Colour</label>
-                </FloatLabel>
-              </div>
-            </section>
+            <PetColourSection :name="name"
+                              v-model:colour="colour"/>
 
             <PetIsImportedSection :name="name"
                                   v-model:is-imported="isImported"
                                   v-model:import-country-code="importCountryCode"/>
 
-            <section>
-              <div>
-                <p>What's
-                  <PetNameFormatted :name="name"/>
-                  <span>'s microchip number?</span>
-                </p>
-              </div>
-              <div>
-                <FloatLabel variant="on">
-                  <InputText id="microchip" v-model="microchipNumber" class="myInput"/>
-                  <label for="microchip">Microchip Number</label>
-                </FloatLabel>
-              </div>
-            </section>
+            <PetMicrochipNumberSection :name="name"
+                                       v-model:microchip-number="microchipNumber"/>
 
             <section>
               <div>
