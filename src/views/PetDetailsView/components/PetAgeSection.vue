@@ -8,10 +8,12 @@ const props = defineProps<{
 
 const dateOfBirth = defineModel<Date | null>('dateOfBirth', {})
 
-const years = ref()
-const months = ref()
-const dobTab = ref<'dobDate' | 'dobAge'>('dobDate')
+const years = ref('')
+const months = ref('')
 
+/**
+ * Turns years and months into a date
+ */
 function calculateBirthDate() {
   const today = new Date();
   const birthDate = new Date(today);
@@ -48,7 +50,7 @@ function calculateBirthDate() {
     </div>
     <div>
 
-      <Tabs v-model:value="dobTab" style="width: 350px">
+      <Tabs value="dobDate" style="width: 350px">
         <TabList>
           <Tab value="dobDate">Date of birth</Tab>
           <Tab value="dobAge">Age in years</Tab>
