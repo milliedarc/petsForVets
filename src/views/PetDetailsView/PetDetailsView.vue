@@ -18,6 +18,7 @@ import PetIsNeuteredSection from "@/views/PetDetailsView/components/sections/Pet
 import PetIsImportedSection from "@/views/PetDetailsView/components/sections/PetIsImportedSection.vue";
 import PetColourSection from "@/views/PetDetailsView/components/sections/PetColourSection.vue";
 import PetMicrochipNumberSection from "@/views/PetDetailsView/components/sections/PetMicrochipNumberSection.vue";
+import PetAvatarSection from "@/views/PetDetailsView/components/sections/PetAvatarSection.vue";
 
 // ********************** CONST **************************
 
@@ -48,9 +49,8 @@ const colour = ref('')
 const isImported = ref(false)
 const importCountryCode = ref('')
 const microchipNumber = ref('')
-const avatar = ref(null)
 const avatarFile = ref(null)
-const avatarUrl = ref(null)
+const avatarUrl = ref('')
 const deleteAvatarFlag = ref(false)
 
 // ********************** COMPUTED **************************
@@ -68,10 +68,6 @@ const canSave = computed(() => {
 
 const isNewPet = computed(() => {
   return route.params.id === 'add'
-})
-
-const hasAvatarUrl = computed(() => {
-  return avatarUrl.value !== null && avatarUrl.value !== '' && !avatar.value
 })
 
 // ********************** FUNCTIONS **************************
@@ -163,7 +159,10 @@ async function savePet() {
       avatar: undefined
     };
 
-    if (avatar.value || deleteAvatarFlag.value === true) {
+    if (deleteAvatarFlag.value === true) {
+      updatedPet.avatar = null;
+    }
+    if (avatarFile.value) {
       updatedPet.avatar = avatarFile.value;
     }
 
@@ -179,25 +178,6 @@ async function savePet() {
     console.error("Error saving pet:", error);
     toast.add({severity: 'error', summary: 'Error', detail: 'Pet details could not be saved', life: 3000});
   }
-}
-
-function onFileSelect(event) {
-  const file = event.files[0];
-  const reader = new FileReader();
-
-  reader.onload = async (e) => {
-    avatar.value = e.target.result;
-  };
-  avatarFile.value = file;
-  reader.readAsDataURL(file);
-  deleteAvatarFlag.value = false;
-}
-
-function deletePetAvatar() {
-  avatarUrl.value = ''
-  avatarFile.value = null;
-  deleteAvatarFlag.value = true;
-  avatar.value = null;
 }
 
 // ********************** LIFECYCLE HOOKS **************************
@@ -289,38 +269,10 @@ onMounted(async () => {
             <PetMicrochipNumberSection :name="name"
                                        v-model:microchip-number="microchipNumber"/>
 
-            <section>
-              <div>
-                <p class="mb-0">Upload a picture of
-                  <PetNameFormatted :name="name"/>
-                  <span>:</span>
-                </p>
-                <p class="fw-light" style="font-size: 0.8rem">
-                  You can skip this step and add it later.
-                </p>
-              </div>
-
-              <div class="card">
-                <div class="card-body">
-                  <div class="d-flex flex-column align-items-center">
-                    <div style="position: relative">
-                      <img v-if="hasAvatarUrl" :src="avatarUrl" :alt="`${name}'s uploaded picture`"
-                           class="shadow-lg rounded mb-3"
-                           style="max-width: 240px"/>
-                      <img v-else-if="avatar" :src="avatar" alt="Avatar" class="shadow-lg rounded mb-3"
-                           style="max-width: 240px"/>
-                      <Button v-if="hasAvatarUrl || avatar" icon="pi pi-times"
-                              @click="deletePetAvatar"
-                              severity="danger" size="small" rounded
-                              :aria-label="`Remove uploaded photo of ${name}`"
-                              style="position: absolute; top: -15px; right: -15px;"/>
-                    </div>
-                    <FileUpload mode="basic" @select="onFileSelect" customUpload severity="secondary"
-                                class="p-button-outlined"/>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <PetAvatarSection :name="name"
+                              :avatar-url="avatarUrl"
+                              @file-selected="deleteAvatarFlag = false; avatarFile = $event"
+                              @delete-clicked="deleteAvatarFlag = true; avatarFile = null"/>
 
             <section>
               <Button @click="savePet"
