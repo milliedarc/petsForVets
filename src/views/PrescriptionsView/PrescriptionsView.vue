@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import {pb} from "@/components/Pocketbase"
 import {computed, onMounted, ref} from "vue";
-import PocketBase from 'pocketbase'
 import {useRoute} from "vue-router";
 import PrescriptionCard from "@/views/PrescriptionsView/components/PrescriptionCard.vue";
 import PrescriptionRequestCard from "@/views/PrescriptionsView/components/PrescriptionRequestCard.vue";
 
 // *********************** CONSTS ***********************
-const pb = new PocketBase('http://127.0.0.1:8090');
 const route = useRoute()
 
 // *********************** REFS ***********************

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
-import PocketBase from "pocketbase";
 import {useToast} from "primevue/usetoast";
-
-const pb = new PocketBase('http://127.0.0.1:8090');
+import {pb} from "@/components/Pocketbase"
 
 const router = useRouter();
 const toast = useToast()

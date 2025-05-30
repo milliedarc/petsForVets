@@ -1,9 +1,8 @@
 <script setup lang="ts">
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
-
 import {useRoute, useRouter} from "vue-router";
-import PocketBase from "pocketbase";
-import {onMounted, ref, computed, watch} from "vue";
+import {pb} from "@/components/Pocketbase"
+import {onMounted, ref, computed} from "vue";
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
 import PetTypeIds from "@/types/PetTypeIds";
@@ -21,8 +20,6 @@ import PetMicrochipNumberSection from "@/views/PetDetailsView/components/section
 import PetAvatarSection from "@/views/PetDetailsView/components/sections/PetAvatarSection.vue";
 
 // ********************** CONST **************************
-
-const pb = new PocketBase('http://127.0.0.1:8090');
 
 const route = useRoute()
 const router = useRouter()

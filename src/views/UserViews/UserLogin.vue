@@ -1,9 +1,7 @@
 <script setup>
 import {ref} from "vue";
-import PocketBase from 'pocketbase'
 import {useRouter} from "vue-router";
-
-const pb = new PocketBase('http://127.0.0.1:8090');
+import {pb} from "@/components/Pocketbase"
 
 const emit = defineEmits(["login"]);
 

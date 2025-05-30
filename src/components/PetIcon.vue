@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import PetTypeIds from "@/types/PetTypeIds";
-import PocketBase from "pocketbase";
 import {computed} from "vue";
-
-const pb = new PocketBase('http://127.0.0.1:8090');
+import {pb} from "@/components/Pocketbase"
 
 const props = defineProps<{
   pet: Pet

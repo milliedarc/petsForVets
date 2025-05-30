@@ -24,7 +24,6 @@ import {fal} from '@fortawesome/pro-light-svg-icons'
 /* add icons to the library */
 library.add(fadr, fadl, fas, fat, fal)
 
-
 import {router} from './router/router.js'
 
 const app = createApp(App);

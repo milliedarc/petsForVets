@@ -1,13 +1,9 @@
 <script setup lang="ts">
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
-
-import PocketBase from 'pocketbase'
+import {pb} from "@/components/Pocketbase"
 import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import DashboardPetCard from "@/components/DashboardPetCard.vue";
-import PrescriptionsView from "@/views/PrescriptionsView/PrescriptionsView.vue";
-
-const pb = new PocketBase('http://127.0.0.1:8090');
 
 const router = useRouter()
 

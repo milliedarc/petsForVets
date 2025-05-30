@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import {onBeforeMount, onMounted, ref} from "vue";
 import {useRoute, useRouter} from 'vue-router'
+import {pb} from "@/components/Pocketbase"
 
-import PocketBase from 'pocketbase';
 import MyNavbar from "@/components/MyNavbar.vue";
-
-const pb = new PocketBase('http://127.0.0.1:8090');
 
 const showRouter = ref(false);
 const router = useRouter()
