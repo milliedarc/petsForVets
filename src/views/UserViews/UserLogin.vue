@@ -25,7 +25,7 @@ async function login() {
 </script>
 
 <template>
-  <div class="vh-100 vw-100" style="background-color: whitesmoke">
+  <div style="background-color: whitesmoke">
     <div class="d-flex justify-content-center align-items-center vh-100 w-100">
       <div class="m-auto p-4 border rounded shadow-sm" style="width: 400px; background-color: white">
         <div class="d-flex justify-content-center align-items-center mb-2">
@@ -34,15 +34,19 @@ async function login() {
         <h3 class="text-center">Welcome back</h3>
         <form>
           <div class="row mb-3 d-flex align-items-center">
-            <label for="inputEmail" class="col-auto col-form-label">Email</label>
+            <label for="inputEmail">Email</label>
             <div class="col-sm-10 w-100">
               <InputText type="email" autofocus class="form-control" id="inputEmail" v-model="email"/>
             </div>
           </div>
           <div class="row mb-4 d-flex align-items-center">
-            <label for="inputPassword" class="col-auto col-form-label">Password</label>
+            <label for="inputPassword">Password</label>
             <div class="col-sm-10 w-100">
-              <InputText type="password" class="form-control" id="inputPassword" v-model="password"/>
+              <Password fluid
+                        id="password"
+                        v-model="password"
+                        :feedback="false"
+                        toggleMask/>
             </div>
             <div>
               <Message v-if="hasLoginError"
@@ -54,13 +58,16 @@ async function login() {
               </Message>
             </div>
           </div>
-          <div>
-            <p>Don't have an account? <span class="fw-bold">Register with us</span></p>
+          <div class="text-center">
+            <p>Don't have an account?
+              <RouterLink to="/register">Register with us</RouterLink>
+            </p>
           </div>
           <div class="d-flex justify-content-center">
-            <Button class="btn btn-primary"
-                    @click.prevent="login"
-                    severity="contrast" aria-label="Login">
+            <Button
+                @click.prevent="login"
+                severity="contrast"
+                aria-label="Login">
               <i class="pi pi-user"></i>Sign in
             </Button>
           </div>
