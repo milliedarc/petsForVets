@@ -1,25 +1,21 @@
-<script setup>
-import {ref} from "vue";
+<script setup lang="ts">
+import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
 
-const props = defineProps(['user'])
+const props = defineProps<{
+  user: User
+}>()
+
 const emit = defineEmits(['logout']);
 
 const router = useRouter();
 
 const menu = ref();
-const menuItems = ref([
-  {
+
+const menuItems = computed(() => {
+  return [{
     label: 'Profile',
     items: [
-      // {
-      //   label: 'Refresh',
-      //   icon: 'pi pi-refresh'
-      // },
-      // {
-      //   label: 'Export',
-      //   icon: 'pi pi-upload'
-      // },
       {
         label: 'Personal details',
         icon: 'pi pi-user',
@@ -36,6 +32,14 @@ const menuItems = ref([
         }
       },
       {
+        label: `Switch to ${props.user.app_mode === 'petOwner' ? 'Clinic Team' : 'Pet Owner'} view`,
+        icon: 'pi pi-arrow-right-arrow-left',
+        shortcut: '⌘+1'
+      },
+      {
+        separator: true
+      },
+      {
         label: 'Logout',
         icon: 'pi pi-sign-out',
         shortcut: '⌘+Q',
@@ -45,7 +49,8 @@ const menuItems = ref([
       }
     ]
   }
-]);
+  ]
+})
 
 const toggle = (event) => {
   menu.value.toggle(event);

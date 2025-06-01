@@ -1,11 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import {ref} from "vue";
 import MyAvatar from "@/components/MyAvatar.vue";
 import {useRouter} from "vue-router";
 
 const router = useRouter()
 const emit = defineEmits(['logout']);
-const props = defineProps(['user'])
+const props = defineProps<{
+  user: User
+}>()
 
 const items = ref([
   {

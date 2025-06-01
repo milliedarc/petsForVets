@@ -6,7 +6,7 @@ import {pb} from "@/components/Pocketbase"
 import MyNavbar from "@/components/MyNavbar.vue";
 
 const showRouter = ref(false);
-const router = useRouter()
+const router = useRouter();
 const route = useRoute();
 
 // if successful -> nav to dashboard; if unsuccessful -> stay in login
@@ -38,6 +38,8 @@ const showNavbar = computed(() => {
   </div>
 
   <RouterView v-if="showRouter"/>
+
+  <!--  PrimeVue components to be used in other components -->
   <Toast/>
   <ConfirmDialog/>
 
