@@ -7,6 +7,7 @@ const router = useRouter();
 function goToContactDetails() {
   router.push({name: "EditContactDetails"});
 }
+
 </script>
 
 <template>

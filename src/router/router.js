@@ -8,10 +8,12 @@ import UserSettings from "@/views/UserViews/UserSettings.vue";
 import UserDetails from "@/views/UserViews/UserDetails.vue";
 import EditPassword from "@/views/UserViews/EditPassword.vue";
 import EditContactDetails from "@/views/UserViews/EditContactDetails.vue";
+import UserRegistration from "@/views/UserViews/UserRegistration.vue";
 
 const routes = [
     {path: '/', component: Dashboard, name: 'Dashboard'},
     {path: '/login', component: UserLogin, name: 'UserLogin'},
+    {path: '/register', component: UserRegistration, name: 'UserRegistration'},
     {path: '/pets/:id', component: PetDetailsView, name: 'PetDetails'},
     {path: '/pets/:id/prescriptions', component: PrescriptionsView, name: 'Prescriptions'},
     {path: '/user/settings', component: UserSettings, name: 'Settings'},

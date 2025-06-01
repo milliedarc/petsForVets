@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, ref} from "vue";
+import {computed, onBeforeMount, onMounted, ref} from "vue";
 import {useRoute, useRouter} from 'vue-router'
 import {pb} from "@/components/Pocketbase"
 
@@ -26,10 +26,14 @@ function logOut() {
   location.reload()
 }
 
+const showNavbar = computed(() => {
+  return !(route.name === 'UserLogin' || route.name === 'UserRegistration')
+})
+
 </script>
 
 <template>
-  <div v-if="route.name !== 'UserLogin'" class="card">
+  <div v-if="showNavbar" class="card">
     <MyNavbar :user="pb.authStore.record" @logout="logOut"/>
   </div>
 
@@ -39,6 +43,20 @@ function logOut() {
 
 </template>
 
-<style scoped>
+<style>
+a {
+  text-decoration: none !important;
+}
 
+a:hover {
+  text-decoration: underline !important;
+}
+
+a:visited {
+  text-decoration: none !important;
+}
+
+a, a:visited {
+  color: rgb(132 63 97);
+}
 </style>
