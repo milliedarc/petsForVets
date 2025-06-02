@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, onBeforeMount, ref} from "vue";
-import {useRoute, useRouter} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {pb} from "@/components/Pocketbase"
 
 import MyNavbar from "@/components/MyNavbar.vue";
@@ -24,7 +24,9 @@ onBeforeMount(async () => {
   try {
     await pb.collection("users").authRefresh()
     user.value = pb.authStore.record as any;
-    console.log(user.value)
+    if (user.value.app_mode === 'clinicTeam') {
+      await router.push("/clinic")
+    }
   } catch (error) {
     await router.push("/login")
   } finally {

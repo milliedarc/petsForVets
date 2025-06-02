@@ -16,6 +16,10 @@ const router = useRouter();
 
 const menu = ref();
 
+const switchLabel = computed(() => {
+  return `Switch to ${targetAppMode.value === 'clinicTeam' ? 'Clinic Team' : 'Pet Owner'} view`;
+});
+
 const menuItems = computed(() => {
   return [{
     label: 'Profile',
@@ -36,7 +40,7 @@ const menuItems = computed(() => {
         }
       },
       {
-        label: `Switch to ${targetAppMode.value === 'clinicTeam' ? 'Clinic Team' : 'Pet Owner'} view`,
+        label: switchLabel.value,
         icon: 'pi pi-arrow-right-arrow-left',
         shortcut: '⌘+1',
         command: () => {
@@ -60,7 +64,7 @@ const menuItems = computed(() => {
 })
 
 const targetAppMode = computed(() => {
-  return props.user.app_mode === 'petOwner' ? 'clinicTeam' : 'petOwner'
+  return props.user?.app_mode === 'petOwner' ? 'clinicTeam' : 'petOwner'
 })
 
 const toggle = (event) => {
@@ -84,13 +88,8 @@ async function switchAppMode() {
 
     await pb.collection('users').authRefresh();
 
-    emit("appModeSwitched", newMode);
+    window.location.href = '/'
 
-    if (newMode === 'clinicTeam') {
-      await router.push({name: 'DashboardClinicTeam'});
-    } else {
-      await router.push({name: 'DashboardPetOwner'});
-    }
   } catch (error) {
     console.error("Failed to switch app mode:", error);
   }

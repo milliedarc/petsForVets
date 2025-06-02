@@ -3,6 +3,6 @@ interface User {
     email: string;
     name: string;
     surname: string;
-    app_mode: 'petOwner' | 'clinicTeam' | undefined;
+    app_mode: 'petOwner' | 'clinicTeam' | null;
     veterinary: boolean;
 }

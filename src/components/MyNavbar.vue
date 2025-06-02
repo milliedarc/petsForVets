@@ -7,7 +7,6 @@ const router = useRouter()
 
 const emit = defineEmits<{
   (e: 'logout'): void
-  (e: 'appModeSwitched', newMode: string): void
 }>()
 
 const props = defineProps<{
@@ -19,7 +18,7 @@ const items = ref([
     label: 'Home',
     icon: 'pi pi-home',
     command: () => {
-      goToDashboard()
+      router.push('/')
     }
   },
   {
@@ -64,14 +63,6 @@ const items = ref([
   }
 ]);
 
-function goToDashboard() {
-  if (props.user.app_mode === 'petOwner') {
-    router.push({name: 'DashboardPetOwner'})
-  } else {
-    router.push({name: 'DashboardClinicTeam'})
-  }
-}
-
 </script>
 
 <template>
@@ -81,9 +72,9 @@ function goToDashboard() {
       <h5 class="mb-0 ms-2">Pets for Vets</h5>
     </template>
     <template #end>
-      <MyAvatar @logout="emit('logout')"
-                @app-mode-switched="emit('appModeSwitched', $event)"
-                :user="props.user"/>
+      <MyAvatar
+          @logout="emit('logout')"
+          :user="props.user"/>
     </template>
   </Menubar>
 </template>
