@@ -11,6 +11,8 @@ import EditContactDetails from "@/views/UserViews/EditContactDetails.vue";
 import UserRegistration from "@/views/UserViews/UserRegistration.vue";
 import DashboardClinicTeam from "@/views/DashboardClinicTeam.vue";
 
+// TODO: optimise routes by nesting ?
+
 const routes = [
     {path: '/', component: DashboardPetOwner, name: 'DashboardPetOwner'},
     {path: '/clinic', component: DashboardClinicTeam, name: 'DashboardClinicTeam'},

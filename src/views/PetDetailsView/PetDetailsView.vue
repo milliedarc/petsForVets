@@ -181,22 +181,19 @@ async function savePet() {
 
 onMounted(async () => {
   // console.log('onMounted')
-  const result = await pb.collection('species').getList(1, 20, {
-    sort: 'name'
-  });
-  // console.log('species:', result)
-  speciesList.value = result.items;
+  const promises = [
+    pb.collection('species').getList(1, 20, {
+      sort: 'name'
+    }).then(result => speciesList.value = result.items),
+    pb.collection('breeds').getList(1, 100, {
+      sort: '-generic,name'
+    }).then(result => breedsList.value = result.items),
+    pb.collection('pet_types').getList(1, 100, {
+      sort: 'name'
+    }).then(result => petTypes.value = result.items)
+  ]
 
-  const result2 = await pb.collection('breeds').getList(1, 100, {
-    sort: '-generic,name'
-  })
-  // console.log('Breeds:', result2)
-  breedsList.value = result2.items;
-
-  const result3 = await pb.collection('pet_types').getList(1, 100, {
-    sort: 'name'
-  })
-  petTypes.value = result3.items;
+  await Promise.all(promises)
 
   try {
     if (!isNewPet.value) {
