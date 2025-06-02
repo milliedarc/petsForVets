@@ -1,7 +1,8 @@
 interface User {
     id: number;
-    name: string;
     email: string;
+    name: string;
+    surname: string;
     app_mode: 'petOwner' | 'clinicTeam' | undefined;
     veterinary: boolean;
 }

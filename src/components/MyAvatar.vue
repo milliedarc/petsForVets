@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
+import {pb} from "@/components/Pocketbase";
 
 const props = defineProps<{
   user: User
 }>()
 
-const emit = defineEmits(['logout']);
+const emit = defineEmits<{
+  (e: 'logout'): void
+  (e: 'appModeSwitched', newMode: string): void
+}>()
 
 const router = useRouter();
 
@@ -32,9 +36,12 @@ const menuItems = computed(() => {
         }
       },
       {
-        label: `Switch to ${props.user.app_mode === 'petOwner' ? 'Clinic Team' : 'Pet Owner'} view`,
+        label: `Switch to ${targetAppMode.value === 'clinicTeam' ? 'Clinic Team' : 'Pet Owner'} view`,
         icon: 'pi pi-arrow-right-arrow-left',
-        shortcut: '⌘+1'
+        shortcut: '⌘+1',
+        command: () => {
+          switchAppMode()
+        }
       },
       {
         separator: true
@@ -52,6 +59,10 @@ const menuItems = computed(() => {
   ]
 })
 
+const targetAppMode = computed(() => {
+  return props.user.app_mode === 'petOwner' ? 'clinicTeam' : 'petOwner'
+})
+
 const toggle = (event) => {
   menu.value.toggle(event);
 };
@@ -62,6 +73,27 @@ function goToSettings() {
 
 function goToUserDetails() {
   router.push({name: 'UserDetails'});
+}
+
+async function switchAppMode() {
+  const newMode = targetAppMode.value;
+  try {
+    await pb.collection('users').update(pb.authStore.record.id, {
+      app_mode: newMode
+    });
+
+    await pb.collection('users').authRefresh();
+
+    emit("appModeSwitched", newMode);
+
+    if (newMode === 'clinicTeam') {
+      await router.push({name: 'DashboardClinicTeam'});
+    } else {
+      await router.push({name: 'DashboardPetOwner'});
+    }
+  } catch (error) {
+    console.error("Failed to switch app mode:", error);
+  }
 }
 
 </script>
