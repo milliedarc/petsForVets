@@ -3,19 +3,18 @@ import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {pb} from "@/components/Pocketbase"
 
-const emit = defineEmits(["login"]);
-
 const router = useRouter()
 
 const email = ref("");
 const password = ref("");
 const hasLoginError = ref(false);
 
+// login must be modified so that it routes you to the right dashboard
 async function login() {
   try {
     await pb.collection('users').authWithPassword(email.value, password.value);
     hasLoginError.value = false;
-    await router.push('/')
+    window.location.href = '/'
   } catch (error) {
     hasLoginError.value = true;
     console.log(error);

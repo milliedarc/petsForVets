@@ -6,13 +6,12 @@ import {pb} from "@/components/Pocketbase"
 import MyNavbar from "@/components/MyNavbar.vue";
 
 const showRouter = ref(false);
-const user = ref(pb.authStore.record);
+const user = ref<User | undefined>(undefined);
 
 const router = useRouter();
-const route = useRoute();
 
 const showNavbar = computed(() => {
-  return !(route.name === 'UserLogin' || route.name === 'UserRegistration')
+  return user.value !== undefined
 })
 
 function logOut() {
@@ -20,16 +19,12 @@ function logOut() {
   location.reload()
 }
 
-function handleAppModeSwitched(newMode: string) {
-  user.value = {...user.value, app_mode: newMode}
-  pb.collection("users").authRefresh()
-}
-
 // if successful -> nav to dashboard; if unsuccessful -> stay in login
 onBeforeMount(async () => {
   try {
     await pb.collection("users").authRefresh()
-    // await router.push("/")
+    user.value = pb.authStore.record as any;
+    console.log(user.value)
   } catch (error) {
     await router.push("/login")
   } finally {
@@ -41,7 +36,7 @@ onBeforeMount(async () => {
 
 <template>
   <div v-if="showNavbar" class="card">
-    <MyNavbar :user="user" @logout="logOut" @app-mode-switched="handleAppModeSwitched"/>
+    <MyNavbar :user="user" @logout="logOut"/>
   </div>
 
   <RouterView v-if="showRouter"/>
