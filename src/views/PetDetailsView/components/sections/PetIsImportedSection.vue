@@ -3,6 +3,7 @@
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 import {computed} from "vue";
 import countries from '@/types/countries.json'
+import Country from "@/types/Country";
 
 const props = defineProps<{
   name: string
@@ -13,13 +14,13 @@ const isImported = defineModel('isImported', {
   required: true
 })
 
-const importCountryCode = defineModel('ImportCountryCode', {
+const importCountryCode = defineModel('importCountryCode', {
   type: String,
   required: false
 })
 
 
-const sortedCountries = computed(() => {
+const sortedCountries = computed<Country[]>(() => {
   return countries.countries.toSorted(function (countryA, countryB) {
     if (countryA.name < countryB.name) {
       return -1;

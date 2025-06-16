@@ -22,18 +22,14 @@ const isValidSelectedBreed = computed<boolean>(() => {
   return false
 })
 
-const filteredBreedsList = computed<[]>(() => {
-      if (props.breedsList === undefined) {
-        return []
-      }
-      return props.breedsList.filter((breed) => {
-        if (breed.pet_type === props.petType) {
-          return true;
-        }
-        return false;
-      })
-    }
-)
+const filteredBreedsList = computed<Breed[]>(() => {
+  if (props.breedsList === undefined) {
+    return []
+  }
+  return props.breedsList.filter((breed) => {
+    return breed.pet_type === props.petType;
+  })
+})
 
 </script>
 
