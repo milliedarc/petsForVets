@@ -11,7 +11,7 @@ const emit = defineEmits([
 
 const prescriptionMedicine = props.prescriptionRequest.expand.prescription.expand.medicine.name;
 
-const createdAt = computed(() => {
+const createdAt = computed<string>(() => {
   const date = new Date(props.prescriptionRequest.created.split(' ')[0]);
   const today = new Date();
   if (date.toLocaleDateString() === today.toLocaleDateString()) {
@@ -20,7 +20,7 @@ const createdAt = computed(() => {
   return 'Requested on ' + date.toLocaleDateString();
 })
 
-const headerBackgroundStyle = computed(() => {
+const headerBackgroundStyle = computed<string>(() => {
   let colour = ''
   if (props.prescriptionRequest.status === 'Pending') {
     colour = '#f6c7a3'

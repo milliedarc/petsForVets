@@ -14,15 +14,12 @@ const species = defineModel('species', {
   required: true
 })
 
-const filteredSpeciesList = computed<[]>(() => {
+const filteredSpeciesList = computed<Species[]>(() => {
   if (props.speciesList === undefined) {
     return []
   }
   return props.speciesList.filter((species) => {
-    if (props.petType === species.pet_type) {
-      return true;
-    }
-    return false;
+    return props.petType === species.pet_type;
   })
 })
 
