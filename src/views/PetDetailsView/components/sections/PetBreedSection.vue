@@ -13,7 +13,7 @@ const breedId = defineModel('breedId', {
   required: true
 })
 
-const isValidSelectedBreed = computed(() => {
+const isValidSelectedBreed = computed<boolean>(() => {
   for (const oneBreed of filteredBreedsList.value) {
     if (oneBreed.id === breedId.value) {
       return true
@@ -22,7 +22,7 @@ const isValidSelectedBreed = computed(() => {
   return false
 })
 
-const filteredBreedsList = computed(() => {
+const filteredBreedsList = computed<[]>(() => {
       if (props.breedsList === undefined) {
         return []
       }

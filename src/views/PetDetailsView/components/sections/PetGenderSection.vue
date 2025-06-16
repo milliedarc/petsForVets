@@ -25,11 +25,17 @@ const gender = defineModel('gender', {
 
     <div class="d-flex gap-4">
       <div class="d-flex align-items-center">
-        <RadioButton v-model="gender" inputId="male" name="gender" value="male"/>
+        <RadioButton v-model="gender"
+                     inputId="male"
+                     name="gender"
+                     value="male"/>
         <label class="ms-3" for="male">Male</label>
       </div>
       <div class="d-flex align-items-center">
-        <RadioButton v-model="gender" inputId="female" name="gender" value="female"/>
+        <RadioButton v-model="gender"
+                     inputId="female"
+                     name="gender"
+                     value="female"/>
         <label class="ms-3" for="female">Female</label>
       </div>
     </div>

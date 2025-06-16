@@ -3,7 +3,7 @@ import {computed, ref} from "vue";
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 
 const tempAvatarDisplay = ref(null)
-const deleteAvatarFlag = ref(false)
+const deleteAvatarFlag = ref<boolean>(false)
 const fileUploadRef = ref();
 
 const props = defineProps<{
@@ -13,11 +13,11 @@ const props = defineProps<{
 
 const emit = defineEmits(['deleteClicked', 'fileSelected'])
 
-const hasAvatarUrl = computed(() => {
+const hasAvatarUrl = computed<boolean>(() => {
   return props.avatarUrl !== null && props.avatarUrl !== '' && !tempAvatarDisplay.value
 })
 
-function onFileSelect(event) {
+function onFileSelect(event): void {
   const file = event.files[0];
   const reader = new FileReader();
 
@@ -29,7 +29,7 @@ function onFileSelect(event) {
   emit('fileSelected', file);
 }
 
-function deletePetAvatar() {
+function deletePetAvatar(): void {
   deleteAvatarFlag.value = true;
   tempAvatarDisplay.value = null;
   fileUploadRef.value?.clear(); // This clears the filename and resets input

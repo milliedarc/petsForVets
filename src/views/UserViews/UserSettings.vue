@@ -4,7 +4,7 @@ import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
 
 const router = useRouter();
 
-function goToEditPassword() {
+function goToEditPassword(): void {
   router.push({name: 'EditPassword'});
 }
 

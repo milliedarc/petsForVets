@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {pb} from "@/components/Pocketbase"
-import {computed, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import PrescriptionCard from "@/views/PrescriptionsView/components/PrescriptionCard.vue";
 import PrescriptionRequestCard from "@/views/PrescriptionsView/components/PrescriptionRequestCard.vue";
 
 // *********************** CONSTS ***********************
+
 const route = useRoute()
 
 // *********************** REFS ***********************
@@ -14,19 +15,15 @@ const pet = ref<Pet>();
 const prescriptions = ref<Prescription[]>([])
 const prescriptionRequests = ref<PrescriptionRequest[]>([])
 
-
-// *********************** COMPUTED ***********************
-
-
 // *********************** FUNCTIONS ***********************
 
-async function fetchPetId() {
+async function fetchPetId(): Promise<void> {
   pet.value = await pb.collection('pets').getOne(route.params.id as string, {
     expand: 'species,breed'
   })
 }
 
-async function fetchPrescriptionRequests() {
+async function fetchPrescriptionRequests(): Promise<void> {
   const result = await pb.collection('prescription_requests').getList(1, 100, {
     expand: 'pet,prescription,prescription.medicine',
     filter: pb.filter("pet = {:petId}", {petId: route.params.id})
@@ -35,7 +32,7 @@ async function fetchPrescriptionRequests() {
   console.log('prescriptionRequests: ', result)
 }
 
-async function makePrescriptionRequest(prescription: Prescription) {
+async function makePrescriptionRequest(prescription: Prescription): Promise<void> {
   await pb.collection('prescription_requests').create({
     pet: pet.value.id,
     prescription: prescription.id,
@@ -45,7 +42,7 @@ async function makePrescriptionRequest(prescription: Prescription) {
   await fetchPrescriptionRequests()
 }
 
-async function deletePrescriptionRequest(prescriptionRequest: PrescriptionRequest) {
+async function deletePrescriptionRequest(prescriptionRequest: PrescriptionRequest): Promise<void> {
   await pb.collection('prescription_requests').delete(prescriptionRequest.id);
   await fetchPrescriptionRequests()
 }

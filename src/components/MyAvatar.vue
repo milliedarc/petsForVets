@@ -3,24 +3,33 @@ import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
 import {pb} from "@/components/Pocketbase";
 
+// ****************** REFS *********************
+
+const menu = ref();
+
+// ****************** PROPS *********************
 const props = defineProps<{
   user: User
 }>()
+
+// ****************** EMITS *********************
 
 const emit = defineEmits<{
   (e: 'logout'): void
   (e: 'appModeSwitched', newMode: string): void
 }>()
 
+// ****************** CONST *********************
+
 const router = useRouter();
 
-const menu = ref();
+// ****************** COMPUTED *********************
 
 const switchLabel = computed(() => {
   return `Switch to ${targetAppMode.value === 'clinicTeam' ? 'Clinic Team' : 'Pet Owner'} view`;
 });
 
-const menuItems = computed(() => {
+const menuItems = computed<[{}]>(() => {
   return [{
     label: 'Profile',
     items: [
@@ -71,15 +80,17 @@ const toggle = (event) => {
   menu.value.toggle(event);
 };
 
-function goToSettings() {
+// ****************** FUNCTIONS *********************
+
+function goToSettings(): void {
   router.push({name: 'Settings'});
 }
 
-function goToUserDetails() {
+function goToUserDetails(): void {
   router.push({name: 'UserDetails'});
 }
 
-async function switchAppMode() {
+async function switchAppMode(): Promise<void> {
   const newMode = targetAppMode.value;
   try {
     await pb.collection('users').update(pb.authStore.record.id, {
@@ -102,7 +113,9 @@ async function switchAppMode() {
     <div class="me-3">
       Hi, {{ props.user?.name }}
     </div>
-    <Avatar @click="toggle" icon="pi pi-user" class="mr-2" size="large"
+    <Avatar @click="toggle"
+            icon="pi pi-user"
+            class="mr-2" size="large"
             style="background-color: #d6b6c2; color: #2a1261; cursor: pointer"
             shape="circle"/>
     <Menu ref="menu" id="overlay_menu" :model="menuItems" :popup="true"/>

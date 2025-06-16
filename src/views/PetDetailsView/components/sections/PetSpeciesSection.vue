@@ -14,7 +14,7 @@ const species = defineModel('species', {
   required: true
 })
 
-const filteredSpeciesList = computed(() => {
+const filteredSpeciesList = computed<[]>(() => {
   if (props.speciesList === undefined) {
     return []
   }
@@ -26,7 +26,7 @@ const filteredSpeciesList = computed(() => {
   })
 })
 
-const isValidSelectedSpecies = computed(() => {
+const isValidSelectedSpecies = computed<boolean>(() => {
   for (const oneSpecies of filteredSpeciesList.value) {
     if (oneSpecies.id === species.value) {
       return true

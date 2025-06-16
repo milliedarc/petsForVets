@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
 
-const email = ref("");
-const password = ref("");
-const passwordConfirm = ref("");
+const email = ref<string>("");
+const password = ref<string>("");
+const passwordConfirm = ref<string>("");
 
 const isValidPassword = computed(() => {
   return password.value !== '' && passwordConfirm.value !== '';

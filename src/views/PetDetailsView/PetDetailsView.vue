@@ -29,51 +29,51 @@ const confirm = useConfirm();
 // ********************** REF **************************
 
 const petToEdit = ref<Pet | undefined>(undefined);
-const petNotFound = ref(false)
-const isLoading = ref(true)
+const petNotFound = ref<boolean>(false)
+const isLoading = ref<boolean>(true)
 
-const name = ref('')
-const petType = ref('')
-const petTypes = ref([])
-const species = ref('')
-const speciesList = ref([])
-const breedsList = ref([])
-const breedId = ref('')
+const name = ref<string>('')
+const petType = ref<string>('')
+const petTypes = ref<[]>([])
+const species = ref<string>('')
+const speciesList = ref<[]>([])
+const breedsList = ref<[]>([])
+const breedId = ref<string>('')
 const dob = ref<Date | null>(null)
-const gender = ref('')
-const isNeutered = ref(false)
-const colour = ref('')
-const isImported = ref(false)
-const importCountryCode = ref('')
-const microchipNumber = ref('')
+const gender = ref<string>('')
+const isNeutered = ref<boolean>(false)
+const colour = ref<string>('')
+const isImported = ref<boolean>(false)
+const importCountryCode = ref<string>('')
+const microchipNumber = ref<string>('')
 const avatarFile = ref(null)
-const avatarUrl = ref('')
-const deleteAvatarFlag = ref(false)
+const avatarUrl = ref<string>('')
+const deleteAvatarFlag = ref<boolean>(false)
 
 // ********************** COMPUTED **************************
 
-const isValidName = computed(() => {
+const isValidName = computed<boolean>(() => {
   return name.value.trim().length > 0;
 })
 
-const canSave = computed(() => {
+const canSave = computed<boolean>(() => {
   if (isValidName.value && petType.value !== '') {
     return true;
   }
   return false;
 })
 
-const isNewPet = computed(() => {
+const isNewPet = computed<boolean>(() => {
   return route.params.id === 'add'
 })
 
 // ********************** FUNCTIONS **************************
 
-async function fetchPet() {
+async function fetchPet(): Promise<void> {
   const result = await pb.collection('pets').getOne(route.params.id as string, {
     expand: 'species,breed'
   })
-  petToEdit.value = result as any; // assigns content to 'pets'
+  petToEdit.value = result as any;
   console.log(result)
 
   name.value = petToEdit.value.name
@@ -90,14 +90,14 @@ async function fetchPet() {
   avatarUrl.value = pb.files.getURL(petToEdit.value, petToEdit.value.avatar, {'thumb': '100x250'});
 }
 
-function getDateOnly(dateString: string) {
+function getDateOnly(dateString: string): string {
   if (dateString == '') {
     return null;
   }
   return new Date(dateString.split(' ')[0]);
 }
 
-function confirmDelete() {
+function confirmDelete(): Promise<void> {
   confirm.require({
     message: "Do you want to delete this pet's profile?",
     header: 'Warning!',
@@ -127,12 +127,12 @@ function findSpeciesByName(speciesName: string): string {
   return foundSpecies.id;
 }
 
-function resetOnClickPetType() {
+function resetOnClickPetType(): void {
   breedId.value = '';
   species.value = '';
 }
 
-async function savePet() {
+async function savePet(): Promise<void> {
   try {
     let mySpecies = species.value;
     if (petType.value === PetTypeIds.catId) {

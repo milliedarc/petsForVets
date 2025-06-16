@@ -5,21 +5,20 @@ import {pb} from "@/components/Pocketbase"
 
 import MyNavbar from "@/components/MyNavbar.vue";
 
-const showRouter = ref(false);
+const showRouter = ref<boolean>(false);
 const user = ref<User | undefined>(undefined);
 
 const router = useRouter();
 
-const showNavbar = computed(() => {
+const showNavbar = computed<boolean>(() => {
   return user.value !== undefined
 })
 
-function logOut() {
+function logOut(): void {
   pb.authStore.clear()
   location.reload()
 }
 
-// if successful -> nav to dashboard; if unsuccessful -> stay in login
 onBeforeMount(async () => {
   try {
     await pb.collection("users").authRefresh()

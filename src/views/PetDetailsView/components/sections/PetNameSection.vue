@@ -14,7 +14,11 @@ const name = defineModel('name', {
       <InputText v-model="name" id="petName" class="myInput"/>
       <label for="petName">Pet name *</label>
     </FloatLabel>
-    <Message v-if="name === ''" severity="error" size="small" variant="simple" aria-describedby="nameError">
+    <Message v-if="name === ''"
+             severity="error"
+             size="small"
+             variant="simple"
+             aria-describedby="nameError">
       Please enter a pet's name to continue
     </Message>
   </section>

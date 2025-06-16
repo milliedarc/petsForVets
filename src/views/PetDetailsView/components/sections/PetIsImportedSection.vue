@@ -54,7 +54,10 @@ const sortedCountries = computed(() => {
     <div class="mt-3" v-if="isImported">
 
       <FloatLabel variant="on">
-        <Select v-model="importCountryCode" editable inputId="country" :options="sortedCountries"
+        <Select v-model="importCountryCode"
+                :options="sortedCountries"
+                editable
+                inputId="country"
                 optionLabel="name"
                 optionValue="country_code"
                 class="myInput"/>

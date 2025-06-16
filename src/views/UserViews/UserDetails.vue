@@ -4,7 +4,7 @@ import {useRouter} from "vue-router";
 
 const router = useRouter();
 
-function goToContactDetails() {
+function goToContactDetails(): void {
   router.push({name: "EditContactDetails"});
 }
 

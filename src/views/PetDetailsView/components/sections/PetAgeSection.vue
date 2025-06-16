@@ -8,13 +8,13 @@ const props = defineProps<{
 
 const dateOfBirth = defineModel<Date | null>('dateOfBirth', {})
 
-const years = ref('')
-const months = ref('')
+const years = ref<string>('')
+const months = ref<string>('')
 
 /**
  * Turns years and months into a date
  */
-function calculateBirthDate() {
+function calculateBirthDate(): void {
   const today = new Date();
   const birthDate = new Date(today);
 

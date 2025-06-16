@@ -5,12 +5,11 @@ import {pb} from "@/components/Pocketbase"
 
 const router = useRouter()
 
-const email = ref("");
-const password = ref("");
-const hasLoginError = ref(false);
+const email = ref<string>("");
+const password = ref<string>("");
+const hasLoginError = ref<string>(false);
 
-// login must be modified so that it routes you to the right dashboard
-async function login() {
+async function login(): Promise<void> {
   try {
     await pb.collection('users').authWithPassword(email.value, password.value);
     hasLoginError.value = false;

@@ -4,22 +4,31 @@ import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import {pb} from "@/components/Pocketbase"
 
+// ****************** CONSTS *********************
+
 const router = useRouter();
 const toast = useToast()
 
-const currentPassword = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
+// ****************** REFS *********************
 
-function goToSettings() {
-  router.push({name: 'Settings'})
-}
+const currentPassword = ref<string>("");
+const newPassword = ref<string>("");
+const confirmPassword = ref<string>("");
 
-const isValidPassword = computed(() => {
+// ****************** COMPUTED *********************
+
+
+const isValidPassword = computed<boolean>(() => {
   return currentPassword.value !== '' && newPassword.value !== '' && confirmPassword.value !== '';
 })
 
-async function savePassword() {
+// ****************** FUNCTIONS *********************
+
+function goToSettings(): void {
+  router.push({name: 'Settings'})
+}
+
+async function savePassword(): Promise<void> {
 
   try {
     const updatedPassword = {

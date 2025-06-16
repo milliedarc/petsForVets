@@ -24,8 +24,11 @@ const colour = defineModel('colour', {
     </div>
 
     <div>
-      <FloatLabel class="myInput" variant="on">
-        <InputText id="colour" v-model="colour" class="myInput"/>
+      <FloatLabel class="myInput"
+                  variant="on">
+        <InputText id="colour"
+                   v-model="colour"
+                   class="myInput"/>
         <label for="colour">Colour</label>
       </FloatLabel>
     </div>

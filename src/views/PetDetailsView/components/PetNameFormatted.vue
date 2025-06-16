@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import {computed} from "vue";
 
 const props = defineProps(['name'])
 
-const myPetName = computed(() => {
+const myPetName = computed<string>(() => {
   if (props.name === '') {
     return 'My Pet'
   }

@@ -1,5 +1,5 @@
-<script setup>
-import {computed, ref} from "vue";
+<script setup lang="ts">
+import {ref} from "vue";
 import PetTypeIds from "@/types/PetTypeIds.ts";
 
 const emit = defineEmits(["petTypeClicked"]);
@@ -27,18 +27,18 @@ const petTypes = [
   }
 ]
 
-const isExpanded = ref(false)
+const isExpanded = ref<boolean>(false)
 
 const petTypeId = defineModel()
 
-function isSelected(inPetType) {
+function isSelected(inPetType): boolean {
   if (inPetType === petTypeId.value) {
     return true
   }
   return false
 }
 
-function clickPetType(petT) {
+function clickPetType(petT): void {
   petTypeId.value = petT.id;
   isExpanded.value = false;
   emit("petTypeClicked", petT);
@@ -89,20 +89,20 @@ function clickPetType(petT) {
 <style scoped>
 
 .icon-container {
-  width: 150px; /* Or any fixed size */
+  width: 150px;
   height: 150px;
-  border-radius: 50%; /* Makes it circular */
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f0f0; /* Light gray background */
+  background-color: #f0f0f0;
   transition: transform 0.3s, background-color 0.3s;
   cursor: pointer;
 }
 
 .icon-container:hover {
-  transform: scale(1.05); /* Slight zoom on hover */
-  background-color: #e0e0e0; /* Darker background on hover */
+  transform: scale(1.05);
+  background-color: #e0e0e0;
 }
 
 .icon-container.selected {

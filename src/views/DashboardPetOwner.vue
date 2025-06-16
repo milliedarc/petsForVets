@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 import {pb} from "@/components/Pocketbase"
-import {onBeforeMount, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import DashboardPetCard from "@/components/DashboardPetCard.vue";
 
@@ -10,8 +10,8 @@ const router = useRouter()
 const pets = ref<Pet[]>();
 const isLoading = ref<boolean>(true)
 
-async function fetchPets() {
-  const result = await pb.collection('pets').getList(1, 20, {  // calls pets collection with its relations
+async function fetchPets(): Promise<void> {
+  const result = await pb.collection('pets').getList(1, 20, {
     expand: 'species,breed'
   })
   // @ts-ignore

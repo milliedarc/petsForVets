@@ -4,13 +4,14 @@ import PetIcon from "@/components/PetIcon.vue";
 import {useRouter} from "vue-router";
 import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
 
+// ****************** CONSTS *********************
+
 const router = useRouter()
 
-const props = defineProps<{
-  pet: Pet
-}>();
+// ****************** REFS *********************
 
 const menu = ref();
+
 const items = ref([
   {
     label: 'Manage your pet',
@@ -29,6 +30,14 @@ const items = ref([
     ]
   }
 ]);
+
+// ****************** PROPS *********************
+
+const props = defineProps<{
+  pet: Pet
+}>();
+
+// ****************** FUNCTIONS *********************
 
 const toggle = (event) => {
   menu.value.toggle(event);
@@ -60,11 +69,11 @@ function calculateAge(dob: string): string {
   return `${years} years ${months} months`;
 }
 
-function goToPetView() {
+function goToPetView(): void {
   router.push(`/pets/${props.pet.id}`);
 }
 
-function goToPrescriptionsView() {
+function goToPrescriptionsView(): void {
   router.push(`/pets/${props.pet.id}/prescriptions`)
 }
 
@@ -88,7 +97,11 @@ function goToPrescriptionsView() {
         <div class="d-flex justify-content-center">
           <ButtonPencilEdit @click="goToPetView"/>
           <div>
-            <Button type="button" icon="pi pi-ellipsis-v" @click="toggle" size="small" severity="secondary"
+            <Button type="button"
+                    icon="pi pi-ellipsis-v"
+                    @click="toggle"
+                    size="small"
+                    severity="secondary"
                     aria-haspopup="true"
                     aria-controls="overlay_menu"/>
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"/>

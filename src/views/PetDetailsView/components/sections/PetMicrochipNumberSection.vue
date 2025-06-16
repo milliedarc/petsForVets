@@ -24,7 +24,9 @@ const microchipNumber = defineModel('microchipNumber', {
     </div>
     <div>
       <FloatLabel variant="on">
-        <InputText id="microchip" v-model="microchipNumber" class="myInput"/>
+        <InputText id="microchip"
+                   v-model="microchipNumber"
+                   class="myInput"/>
         <label for="microchip">Microchip Number</label>
       </FloatLabel>
     </div>

@@ -7,7 +7,7 @@ const props = defineProps<{
   pet: Pet
 }>();
 
-const avatarUrl = computed(() => {
+const avatarUrl = computed<string>(() => {
   return pb.files.getURL(props.pet, props.pet.avatar);
 })
 
