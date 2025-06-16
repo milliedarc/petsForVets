@@ -29,13 +29,10 @@ const petTypes = [
 
 const isExpanded = ref<boolean>(false)
 
-const petTypeId = defineModel()
+const petTypeId = defineModel<string>()
 
-function isSelected(inPetType): boolean {
-  if (inPetType === petTypeId.value) {
-    return true
-  }
-  return false
+function isSelected(inPetType: string): boolean {
+  return (inPetType === petTypeId.value)
 }
 
 function clickPetType(petT): void {
