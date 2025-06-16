@@ -34,10 +34,9 @@ const isLoading = ref<boolean>(true)
 
 const name = ref<string>('')
 const petType = ref<string>('')
-const petTypes = ref<[]>([])
 const species = ref<string>('')
-const speciesList = ref<[]>([])
-const breedsList = ref<[]>([])
+const speciesList = ref<Species[]>([])
+const breedsList = ref<Breed[]>([])
 const breedId = ref<string>('')
 const dob = ref<Date | null>(null)
 const gender = ref<string>('')
@@ -46,7 +45,7 @@ const colour = ref<string>('')
 const isImported = ref<boolean>(false)
 const importCountryCode = ref<string>('')
 const microchipNumber = ref<string>('')
-const avatarFile = ref(null)
+const avatarFile = ref<File | null>(null)
 const avatarUrl = ref<string>('')
 const deleteAvatarFlag = ref<boolean>(false)
 
@@ -57,10 +56,7 @@ const isValidName = computed<boolean>(() => {
 })
 
 const canSave = computed<boolean>(() => {
-  if (isValidName.value && petType.value !== '') {
-    return true;
-  }
-  return false;
+  return (isValidName.value && petType.value !== '');
 })
 
 const isNewPet = computed<boolean>(() => {
@@ -90,14 +86,14 @@ async function fetchPet(): Promise<void> {
   avatarUrl.value = pb.files.getURL(petToEdit.value, petToEdit.value.avatar, {'thumb': '100x250'});
 }
 
-function getDateOnly(dateString: string): string {
+function getDateOnly(dateString: string): Date {
   if (dateString == '') {
     return null;
   }
   return new Date(dateString.split(' ')[0]);
 }
 
-function confirmDelete(): Promise<void> {
+function confirmDelete(): void {
   confirm.require({
     message: "Do you want to delete this pet's profile?",
     header: 'Warning!',
@@ -120,11 +116,11 @@ function confirmDelete(): Promise<void> {
   });
 }
 
-function findSpeciesByName(speciesName: string): string {
+function findSpeciesByName(speciesName: string): string | undefined {
   const foundSpecies = speciesList.value.find((species) => {
-    return species.name === speciesName;
+    return species?.name === speciesName;
   })
-  return foundSpecies.id;
+  return foundSpecies?.id;
 }
 
 function resetOnClickPetType(): void {
@@ -184,13 +180,10 @@ onMounted(async () => {
   const promises = [
     pb.collection('species').getList(1, 20, {
       sort: 'name'
-    }).then(result => speciesList.value = result.items),
+    }).then(result => speciesList.value = result.items as any),
     pb.collection('breeds').getList(1, 100, {
       sort: '-generic,name'
-    }).then(result => breedsList.value = result.items),
-    pb.collection('pet_types').getList(1, 100, {
-      sort: 'name'
-    }).then(result => petTypes.value = result.items)
+    }).then(result => breedsList.value = result.items as any),
   ]
 
   await Promise.all(promises)

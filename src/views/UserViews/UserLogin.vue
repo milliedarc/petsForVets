@@ -7,7 +7,7 @@ const router = useRouter()
 
 const email = ref<string>("");
 const password = ref<string>("");
-const hasLoginError = ref<string>(false);
+const hasLoginError = ref<boolean>(false);
 
 async function login(): Promise<void> {
   try {
