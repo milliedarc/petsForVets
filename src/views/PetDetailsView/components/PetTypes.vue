@@ -36,7 +36,7 @@ function isSelected(inPetType: string): boolean {
   return (inPetType === petTypeId.value)
 }
 
-function clickPetType(petT): void {
+function clickPetType(petT: typeof petTypes[number]): void {
   petTypeId.value = petT.id;
   isExpanded.value = false;
   emit("petTypeClicked", petT);

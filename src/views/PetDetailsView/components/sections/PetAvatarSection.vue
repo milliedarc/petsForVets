@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
+import type {FileUploadSelectEvent} from "primevue/fileupload";
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 
-const tempAvatarDisplay = ref(null)
+const tempAvatarDisplay = ref<string | null>(null)
 const deleteAvatarFlag = ref<boolean>(false)
 const fileUploadRef = ref();
 
@@ -17,12 +18,12 @@ const hasAvatarUrl = computed<boolean>(() => {
   return props.avatarUrl !== null && props.avatarUrl !== '' && !tempAvatarDisplay.value
 })
 
-function onFileSelect(event): void {
-  const file = event.files[0];
+function onFileSelect(event: FileUploadSelectEvent): void {
+  const file: File = event.files[0];
   const reader = new FileReader();
 
-  reader.onload = async (e) => {
-    tempAvatarDisplay.value = e.target.result;
+  reader.onload = () => {
+    tempAvatarDisplay.value = reader.result as string;
   };
   reader.readAsDataURL(file);
   deleteAvatarFlag.value = false;

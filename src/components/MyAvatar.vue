@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {User} from "@/types/User";
 import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
 import {pb} from "@/components/Pocketbase";
@@ -76,7 +77,7 @@ const targetAppMode = computed(() => {
   return props.user?.app_mode === 'petOwner' ? 'clinicTeam' : 'petOwner'
 })
 
-const toggle = (event) => {
+const toggle = (event: Event) => {
   menu.value.toggle(event);
 };
 
@@ -93,7 +94,7 @@ function goToUserDetails(): void {
 async function switchAppMode(): Promise<void> {
   const newMode = targetAppMode.value;
   try {
-    await pb.collection('users').update(pb.authStore.record.id, {
+    await pb.collection('users').update(pb.authStore.record!.id, {
       app_mode: newMode
     });
 

@@ -8,7 +8,7 @@ import 'primeicons/primeicons.css'
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 
-import {router} from './router/router.js'
+import {router} from './router/router'
 
 const app = createApp(App);
 

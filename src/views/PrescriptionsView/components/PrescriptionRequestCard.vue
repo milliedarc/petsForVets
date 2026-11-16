@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {PrescriptionRequest} from "@/types/PrescriptionRequest";
 import {computed} from "vue";
 
 const props = defineProps<{

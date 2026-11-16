@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Breed} from "@/types/Pet";
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 import {computed} from "vue";
 

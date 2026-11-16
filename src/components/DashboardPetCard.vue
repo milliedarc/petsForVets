@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Pet} from "@/types/Pet";
 import {ref} from "vue";
 import PetIcon from "@/components/PetIcon.vue";
 import {useRouter} from "vue-router";
@@ -39,7 +40,7 @@ const props = defineProps<{
 
 // ****************** FUNCTIONS *********************
 
-const toggle = (event) => {
+const toggle = (event: Event) => {
   menu.value.toggle(event);
 };
 

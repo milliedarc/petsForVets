@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type {Pet} from "@/types/Pet";
+import type {Prescription} from "@/types/Prescription";
+import type {PrescriptionRequest} from "@/types/PrescriptionRequest";
 import {pb} from "@/components/Pocketbase"
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
@@ -18,23 +21,23 @@ const prescriptionRequests = ref<PrescriptionRequest[]>([])
 // *********************** FUNCTIONS ***********************
 
 async function fetchPetId(): Promise<void> {
-  pet.value = await pb.collection('pets').getOne(route.params.id as string, {
+  pet.value = await pb.collection('pets').getOne<Pet>(route.params.id as string, {
     expand: 'species,breed'
   })
 }
 
 async function fetchPrescriptionRequests(): Promise<void> {
-  const result = await pb.collection('prescription_requests').getList(1, 100, {
+  const result = await pb.collection('prescription_requests').getList<PrescriptionRequest>(1, 100, {
     expand: 'pet,prescription,prescription.medicine',
     filter: pb.filter("pet = {:petId}", {petId: route.params.id})
   })
-  prescriptionRequests.value = result.items as any;
+  prescriptionRequests.value = result.items;
   console.log('prescriptionRequests: ', result)
 }
 
 async function makePrescriptionRequest(prescription: Prescription): Promise<void> {
   await pb.collection('prescription_requests').create({
-    pet: pet.value.id,
+    pet: pet.value?.id,
     prescription: prescription.id,
     status: 'Pending',
     // comments: ''
@@ -62,11 +65,11 @@ function isDisabledRequest(prescription: Prescription): boolean {
 onMounted(async () => {
   await fetchPetId()
 
-  const result = await pb.collection('prescriptions').getList(1, 100, {
+  const result = await pb.collection('prescriptions').getList<Prescription>(1, 100, {
     expand: 'pet,medicine',
     filter: pb.filter("pet = {:petId}", {petId: route.params.id})
   })
-  prescriptions.value = result.items as any;
+  prescriptions.value = result.items;
   console.log('prescriptions: ', result)
 
   await fetchPrescriptionRequests()

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Breed, Pet, Species} from "@/types/Pet";
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 import {useRoute, useRouter} from "vue-router";
 import {pb} from "@/components/Pocketbase"
@@ -66,31 +67,30 @@ const isNewPet = computed<boolean>(() => {
 // ********************** FUNCTIONS **************************
 
 async function fetchPet(): Promise<void> {
-  const result = await pb.collection('pets').getOne(route.params.id as string, {
+  const pet = await pb.collection('pets').getOne<Pet>(route.params.id as string, {
     expand: 'species,breed'
   })
-  petToEdit.value = result as any;
-  console.log(result)
+  petToEdit.value = pet;
 
-  name.value = petToEdit.value.name
-  petType.value = petToEdit.value.expand.species.pet_type
-  species.value = petToEdit.value.species
-  breedId.value = petToEdit.value.breed
-  dob.value = getDateOnly(petToEdit.value.date_of_birth)
-  gender.value = petToEdit.value.gender
-  isNeutered.value = petToEdit.value.neutered
-  colour.value = petToEdit.value.colour
-  isImported.value = petToEdit.value.imported
-  importCountryCode.value = petToEdit.value.import_country_code
-  microchipNumber.value = petToEdit.value.microchip_number
-  avatarUrl.value = pb.files.getURL(petToEdit.value, petToEdit.value.avatar, {'thumb': '100x250'});
+  name.value = pet.name
+  petType.value = pet.expand.species.pet_type
+  species.value = pet.species
+  breedId.value = pet.breed
+  dob.value = getDateOnly(pet.date_of_birth)
+  gender.value = pet.gender
+  isNeutered.value = pet.neutered
+  colour.value = pet.colour
+  isImported.value = pet.imported
+  importCountryCode.value = pet.import_country_code
+  microchipNumber.value = pet.microchip_number
+  avatarUrl.value = pb.files.getURL(pet, pet.avatar, {'thumb': '100x250'});
 }
 
-function getDateOnly(dateString: string): Date {
+function getDateOnly(dateString: string): Date | null {
   if (dateString == '') {
     return null;
   }
-  return new Date(dateString.split(' ')[0]);
+  return new Date(dateString.split(' ')[0]!);
 }
 
 function confirmDelete(): void {
@@ -109,7 +109,11 @@ function confirmDelete(): void {
       severity: 'danger'
     },
     accept: async () => {
-      await pb.collection('pets').delete(petToEdit.value.id);
+      const petId = petToEdit.value?.id;
+      if (!petId) {
+        return;
+      }
+      await pb.collection('pets').delete(petId);
       toast.add({severity: 'info', summary: 'Confirmed', detail: 'Pet profile deleted', life: 3000});
       await router.push('/');
     }
@@ -130,7 +134,7 @@ function resetOnClickPetType(): void {
 
 async function savePet(): Promise<void> {
   try {
-    let mySpecies = species.value;
+    let mySpecies: string | undefined = species.value;
     if (petType.value === PetTypeIds.catId) {
       mySpecies = findSpeciesByName('Cat')
     } else if (petType.value === PetTypeIds.dogId) {
@@ -138,7 +142,7 @@ async function savePet(): Promise<void> {
     }
 
     const updatedPet = {
-      user: pb.authStore.record.id,
+      user: pb.authStore.record!.id,
       name: name.value,
       species: mySpecies,
       breed: breedId.value,
@@ -149,7 +153,7 @@ async function savePet(): Promise<void> {
       imported: isImported.value,
       import_country_code: importCountryCode.value,
       microchip_number: microchipNumber.value,
-      avatar: undefined
+      avatar: undefined as File | null | undefined
     };
 
     if (deleteAvatarFlag.value === true) {
@@ -178,12 +182,12 @@ async function savePet(): Promise<void> {
 onMounted(async () => {
   // console.log('onMounted')
   const promises = [
-    pb.collection('species').getList(1, 20, {
+    pb.collection('species').getList<Species>(1, 20, {
       sort: 'name'
-    }).then(result => speciesList.value = result.items as any),
-    pb.collection('breeds').getList(1, 100, {
+    }).then(result => speciesList.value = result.items),
+    pb.collection('breeds').getList<Breed>(1, 100, {
       sort: '-generic,name'
-    }).then(result => breedsList.value = result.items as any),
+    }).then(result => breedsList.value = result.items),
   ]
 
   await Promise.all(promises)

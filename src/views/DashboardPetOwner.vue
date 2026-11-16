@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Pet} from "@/types/Pet";
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 import {pb} from "@/components/Pocketbase"
 import {onMounted, ref} from "vue";

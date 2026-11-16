@@ -2,6 +2,7 @@
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
+import {ClientResponseError} from "pocketbase";
 import {pb} from "@/components/Pocketbase"
 
 // ****************** CONSTS *********************
@@ -36,14 +37,15 @@ async function savePassword(): Promise<void> {
       password: newPassword.value,
       passwordConfirm: confirmPassword.value
     }
-    await pb.collection('users').update(pb.authStore.record.id, updatedPassword)
+    await pb.collection('users').update(pb.authStore.record!.id, updatedPassword)
     await router.push({name: 'UserLogin'})
     toast.add({severity: 'success', summary: 'Success!', detail: 'Password changed successfully', life: 3000});
 
   } catch (error) {
     let errorMessage = "Password change failed! "
-    const responsePasswordMessage = error?.response?.data?.password?.message;
-    const responseOldPasswordMessage = error?.response?.data?.oldPassword?.message;
+    const responseData = error instanceof ClientResponseError ? error.response?.data : undefined;
+    const responsePasswordMessage: string | undefined = responseData?.password?.message;
+    const responseOldPasswordMessage: string | undefined = responseData?.oldPassword?.message;
 
     if (responsePasswordMessage) {
       errorMessage = errorMessage + responsePasswordMessage;
@@ -53,7 +55,7 @@ async function savePassword(): Promise<void> {
     }
 
     toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 10_000});
-    console.log(error.response.data.password.message);
+    console.error(error);
   }
 }
 

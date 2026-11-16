@@ -1,17 +1,17 @@
-interface Prescription {
-    id: string | undefined;
-    dosage: string;
-    quantity: number;
-    expand: Expand;
-}
+import type {Pet} from "@/types/Pet";
 
-interface Medicine {
+export interface Medicine {
     id: string;
     name: string;
     description: string;
 }
 
-interface Expand {
-    pet: Pet;
-    medicine: Medicine;
+export interface Prescription {
+    id: string | undefined;
+    dosage: string;
+    quantity: number;
+    expand: {
+        pet: Pet;
+        medicine: Medicine;
+    };
 }

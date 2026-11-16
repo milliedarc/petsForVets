@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {computed, onBeforeMount, ref} from "vue";
+import type {User} from "@/types/User";
+import {onBeforeMount, ref} from "vue";
 import {useRouter} from 'vue-router'
 import {pb} from "@/components/Pocketbase"
 
@@ -10,10 +11,6 @@ const user = ref<User | undefined>(undefined);
 
 const router = useRouter();
 
-const showNavbar = computed<boolean>(() => {
-  return user.value !== undefined
-})
-
 function logOut(): void {
   pb.authStore.clear()
   location.reload()
@@ -21,9 +18,9 @@ function logOut(): void {
 
 onBeforeMount(async () => {
   try {
-    await pb.collection("users").authRefresh()
-    user.value = pb.authStore.record as any;
-    if (user.value.app_mode === 'clinicTeam') {
+    const {record} = await pb.collection("users").authRefresh<User>()
+    user.value = record;
+    if (record.app_mode === 'clinicTeam') {
       await router.push("/clinic")
     }
   } catch (error) {
@@ -36,7 +33,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="showNavbar" class="card">
+  <div v-if="user" class="card">
     <MyNavbar :user="user" @logout="logOut"/>
   </div>
 

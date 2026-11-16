@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {Pet} from "@/types/Pet";
 import PetTypeIds from "@/types/PetTypeIds";
 import {computed} from "vue";
 import {pb} from "@/components/Pocketbase"

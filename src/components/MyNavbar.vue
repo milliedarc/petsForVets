@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type {User} from "@/types/User";
 import {ref} from "vue";
 import MyAvatar from "@/components/MyAvatar.vue";
 import {useRouter} from "vue-router";

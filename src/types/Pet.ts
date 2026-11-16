@@ -1,4 +1,4 @@
-interface Breed {
+export interface Breed {
     id: string;
     name: string;
     species: string;
@@ -6,18 +6,13 @@ interface Breed {
     pet_type: string;
 }
 
-interface Species {
+export interface Species {
     id: string;
     name: string;
     pet_type: string;
 }
 
-interface Expand {
-    breed: Breed;
-    species: Species;
-}
-
-interface Pet {
+export interface Pet {
     id: string | undefined;
     name: string;
     species: string;
@@ -31,5 +26,8 @@ interface Pet {
     import_country_code: string;
     microchip_number: string;
     avatar: string;
-    expand: Expand;
+    expand: {
+        breed: Breed;
+        species: Species;
+    };
 }
