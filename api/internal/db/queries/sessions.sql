@@ -17,3 +17,8 @@ WHERE token_hash = $1;
 -- name: DeleteExpiredSessions :exec
 DELETE FROM sessions
 WHERE expires_at <= now();
+
+-- Log a user out everywhere, e.g. after a password change.
+-- name: DeleteUserSessions :exec
+DELETE FROM sessions
+WHERE user_id = $1;

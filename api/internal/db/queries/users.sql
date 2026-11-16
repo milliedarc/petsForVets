@@ -12,3 +12,19 @@ RETURNING id, email, name, surname, app_mode, veterinary;
 SELECT id, email, password_hash, name, surname, app_mode, veterinary
 FROM users
 WHERE email = $1;
+
+-- name: GetUserPasswordHash :one
+SELECT password_hash
+FROM users
+WHERE id = $1;
+
+-- name: UpdateUserPassword :exec
+UPDATE users
+SET password_hash = @password_hash
+WHERE id = @id;
+
+-- name: UpdateUserAppMode :one
+UPDATE users
+SET app_mode = @app_mode
+WHERE id = @id
+RETURNING id, email, name, surname, app_mode, veterinary;

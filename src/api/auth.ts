@@ -17,3 +17,16 @@ export function logout(): Promise<void> {
 export function getCurrentUser(): Promise<User> {
     return api<User>('GET', '/auth/me');
 }
+
+/** Switch between the pet-owner and clinic-team views (clinic team: vets only). */
+export function updateAppMode(appMode: 'petOwner' | 'clinicTeam'): Promise<User> {
+    return api<User>('PUT', '/auth/me/app-mode', {app_mode: appMode});
+}
+
+/** Change password. On success the server logs this user out everywhere. */
+export function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    return api<void>('POST', '/auth/change-password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+    });
+}

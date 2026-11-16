@@ -55,15 +55,12 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email := normaliseEmail(req.Email)
-	switch {
-	case !strings.Contains(email, "@"):
+	if !strings.Contains(email, "@") {
 		writeError(w, http.StatusBadRequest, "a valid email is required")
 		return
-	case len(req.Password) < 8:
-		writeError(w, http.StatusBadRequest, "password must be at least 8 characters")
-		return
-	case len(req.Password) > 72: // bcrypt only looks at the first 72 bytes
-		writeError(w, http.StatusBadRequest, "password must be at most 72 characters")
+	}
+	if problem := checkPasswordRules(req.Password); problem != "" {
+		writeError(w, http.StatusBadRequest, problem)
 		return
 	}
 
@@ -148,7 +145,12 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	// Tell the browser to delete the cookie.
+	s.clearSessionCookie(w)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// clearSessionCookie tells the browser to delete the session cookie.
+func (s *Server) clearSessionCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    "",
@@ -158,7 +160,6 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 		Secure:   s.secureCookie,
 		SameSite: http.SameSiteLaxMode,
 	})
-	w.WriteHeader(http.StatusNoContent)
 }
 
 func (s *Server) handleMe(w http.ResponseWriter, r *http.Request, user User) {
@@ -226,6 +227,18 @@ func (s *Server) requireUser(next authedHandler) http.HandlerFunc {
 
 		next(w, r, User(row))
 	}
+}
+
+// checkPasswordRules returns a message if the password isn't acceptable.
+// Shared by registration and password changes so the rules can't drift apart.
+func checkPasswordRules(password string) string {
+	switch {
+	case len(password) < 8:
+		return "password must be at least 8 characters"
+	case len(password) > 72: // bcrypt only looks at the first 72 bytes
+		return "password must be at most 72 characters"
+	}
+	return ""
 }
 
 func hashToken(token string) []byte {

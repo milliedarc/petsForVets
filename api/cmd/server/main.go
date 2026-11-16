@@ -55,7 +55,7 @@ func run() error {
 		return fmt.Errorf("running migrations: %w", err)
 	}
 
-	server := httpapi.NewServer(db.New(pool), secureCookie)
+	server := httpapi.NewServer(pool, secureCookie)
 	httpServer := &http.Server{
 		Addr:              addr,
 		Handler:           server.Routes(),

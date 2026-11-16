@@ -87,3 +87,67 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 	)
 	return i, err
 }
+
+const getUserPasswordHash = `-- name: GetUserPasswordHash :one
+SELECT password_hash
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) GetUserPasswordHash(ctx context.Context, id uuid.UUID) (string, error) {
+	row := q.db.QueryRow(ctx, getUserPasswordHash, id)
+	var password_hash string
+	err := row.Scan(&password_hash)
+	return password_hash, err
+}
+
+const updateUserAppMode = `-- name: UpdateUserAppMode :one
+UPDATE users
+SET app_mode = $1
+WHERE id = $2
+RETURNING id, email, name, surname, app_mode, veterinary
+`
+
+type UpdateUserAppModeParams struct {
+	AppMode string
+	ID      uuid.UUID
+}
+
+type UpdateUserAppModeRow struct {
+	ID         uuid.UUID
+	Email      string
+	Name       string
+	Surname    string
+	AppMode    string
+	Veterinary bool
+}
+
+func (q *Queries) UpdateUserAppMode(ctx context.Context, arg UpdateUserAppModeParams) (UpdateUserAppModeRow, error) {
+	row := q.db.QueryRow(ctx, updateUserAppMode, arg.AppMode, arg.ID)
+	var i UpdateUserAppModeRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Name,
+		&i.Surname,
+		&i.AppMode,
+		&i.Veterinary,
+	)
+	return i, err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users
+SET password_hash = $1
+WHERE id = $2
+`
+
+type UpdateUserPasswordParams struct {
+	PasswordHash string
+	ID           uuid.UUID
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.db.Exec(ctx, updateUserPassword, arg.PasswordHash, arg.ID)
+	return err
+}

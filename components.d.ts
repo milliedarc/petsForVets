@@ -19,6 +19,7 @@ declare module 'vue' {
     ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     DashboardPetCard: typeof import('./src/components/DashboardPetCard.vue')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
+    FileUpload: typeof import('primevue/fileupload')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']

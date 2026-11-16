@@ -48,6 +48,17 @@ func (q *Queries) DeleteSession(ctx context.Context, tokenHash []byte) error {
 	return err
 }
 
+const deleteUserSessions = `-- name: DeleteUserSessions :exec
+DELETE FROM sessions
+WHERE user_id = $1
+`
+
+// Log a user out everywhere, e.g. after a password change.
+func (q *Queries) DeleteUserSessions(ctx context.Context, userID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUserSessions, userID)
+	return err
+}
+
 const getSessionUser = `-- name: GetSessionUser :one
 SELECT u.id, u.email, u.name, u.surname, u.app_mode, u.veterinary
 FROM sessions s

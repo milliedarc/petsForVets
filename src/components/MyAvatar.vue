@@ -2,7 +2,9 @@
 import type {User} from "@/types/User";
 import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
-import {pb} from "@/components/Pocketbase";
+import {updateAppMode} from "@/api/auth";
+import {useToast} from "primevue/usetoast";
+import {ApiError} from "@/api/client";
 
 // ****************** REFS *********************
 
@@ -23,6 +25,7 @@ const emit = defineEmits<{
 // ****************** CONST *********************
 
 const router = useRouter();
+const toast = useToast();
 
 // ****************** COMPUTED *********************
 
@@ -49,14 +52,15 @@ const menuItems = computed<[{}]>(() => {
           goToSettings()
         }
       },
-      {
+      // Only clinic staff can switch views (the API enforces this too).
+      ...(props.user.veterinary ? [{
         label: switchLabel.value,
         icon: 'pi pi-arrow-right-arrow-left',
         shortcut: '⌘+1',
         command: () => {
           switchAppMode()
         }
-      },
+      }] : []),
       {
         separator: true
       },
@@ -94,16 +98,12 @@ function goToUserDetails(): void {
 async function switchAppMode(): Promise<void> {
   const newMode = targetAppMode.value;
   try {
-    await pb.collection('users').update(pb.authStore.record!.id, {
-      app_mode: newMode
-    });
-
-    await pb.collection('users').authRefresh();
-
-    window.location.href = '/'
-
+    await updateAppMode(newMode);
+    window.location.href = newMode === 'clinicTeam' ? '/clinic' : '/'
   } catch (error) {
     console.error("Failed to switch app mode:", error);
+    const detail = error instanceof ApiError ? error.message : 'Could not switch view';
+    toast.add({severity: 'error', summary: 'Error', detail, life: 5000});
   }
 }
 

@@ -2,9 +2,13 @@
 package httpapi
 
 import (
+	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"petsforvets/api/internal/db"
 )
@@ -12,12 +16,31 @@ import (
 // Server holds what every handler needs. Handlers are methods on it, so they
 // can reach the database through s.queries.
 type Server struct {
+	pool         *pgxpool.Pool // needed to start transactions
 	queries      *db.Queries
 	secureCookie bool // true in production (HTTPS only), false on localhost
 }
 
-func NewServer(queries *db.Queries, secureCookie bool) *Server {
-	return &Server{queries: queries, secureCookie: secureCookie}
+func NewServer(pool *pgxpool.Pool, secureCookie bool) *Server {
+	return &Server{pool: pool, queries: db.New(pool), secureCookie: secureCookie}
+}
+
+// inTx runs fn inside a database transaction: if fn returns an error, every
+// change it made is rolled back; otherwise they're all committed together.
+// The PDO equivalent is beginTransaction() / commit() / rollBack().
+func (s *Server) inTx(ctx context.Context, fn func(q *db.Queries) error) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("beginning transaction: %w", err)
+	}
+	// Rollback after a successful Commit is a harmless no-op, so deferring it
+	// covers every early return and panic.
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	if err := fn(s.queries.WithTx(tx)); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // Routes is the routing table: "METHOD /path" -> handler function.
@@ -30,6 +53,8 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /api/auth/login", s.handleLogin)
 	mux.HandleFunc("POST /api/auth/logout", s.handleLogout)
 	mux.HandleFunc("GET /api/auth/me", s.requireUser(s.handleMe))
+	mux.HandleFunc("PUT /api/auth/me/app-mode", s.requireUser(s.handleUpdateAppMode))
+	mux.HandleFunc("POST /api/auth/change-password", s.requireUser(s.handleChangePassword))
 
 	mux.HandleFunc("GET /api/pets", s.requireUser(s.handleListPets))
 	mux.HandleFunc("POST /api/pets", s.requireUser(s.handleCreatePet))

@@ -11,6 +11,9 @@ const user = ref<User | undefined>(undefined);
 
 const router = useRouter();
 
+/** Pages a logged-out visitor may stay on. */
+const publicRouteNames = ['UserLogin', 'UserRegistration'];
+
 async function logOut(): Promise<void> {
   await logout()
   location.href = '/login'
@@ -24,7 +27,10 @@ onBeforeMount(async () => {
       await router.push("/clinic")
     }
   } catch (error) {
-    await router.push("/login")
+    await router.isReady()
+    if (!publicRouteNames.includes(router.currentRoute.value.name as string)) {
+      await router.push("/login")
+    }
   } finally {
     showRouter.value = true
   }
