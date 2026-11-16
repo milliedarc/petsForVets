@@ -11,7 +11,7 @@ From the repository root:
 ```sh
 colima start              # Docker runtime, once per boot
 docker-compose up -d      # Postgres on localhost:5432
-cd api && go run ./cmd/server   # API on localhost:8080 (applies migrations)
+npm run api               # API on localhost:8080 (applies migrations); keep it running
 npm run dev               # in another terminal: Vue on localhost:5173
 ```
 
@@ -20,6 +20,9 @@ Vite forwards every `/api/...` request to the Go server (see `server.proxy` in
 cookie just works and there is no CORS setup.
 
 A dev account's login is in `.dev-login` at the repo root (git-ignored).
+
+If the app shows "Can't reach the server" (or Vite logs `http proxy error`), the
+API isn't running: start it with `npm run api`.
 
 ## Layout
 

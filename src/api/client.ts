@@ -19,6 +19,11 @@ export async function api<T>(method: Method, path: string, body?: unknown): Prom
     });
 
     if (!response.ok) {
+        // 502/503/504 come from the Vite proxy, not our API: the Go server
+        // isn't running (start it with `npm run api`).
+        if (response.status >= 502 && response.status <= 504) {
+            throw new ApiError(response.status, "Can't reach the server. Is the API running? (npm run api)");
+        }
         // The API sends {"error": "..."}; fall back to the status text otherwise.
         const data = await response.json().catch(() => null);
         throw new ApiError(response.status, data?.error ?? response.statusText);
