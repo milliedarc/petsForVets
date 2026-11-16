@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import type {Breed, Pet, Species} from "@/types/Pet";
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
+import type {Breed, Pet, Species} from "@/types/Pet";
 import {useRoute, useRouter} from "vue-router";
-import {pb} from "@/components/Pocketbase"
 import {onMounted, ref, computed} from "vue";
+import {ApiError} from "@/api/client";
+import {createPet, deletePet, getPet, updatePet, type PetInput} from "@/api/pets";
+import {listBreeds, listSpecies} from "@/api/reference";
+import {parseIsoDate, toIsoDate} from "@/utils/dates";
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
 import PetTypeIds from "@/types/PetTypeIds";
@@ -18,7 +21,6 @@ import PetIsNeuteredSection from "@/views/PetDetailsView/components/sections/Pet
 import PetIsImportedSection from "@/views/PetDetailsView/components/sections/PetIsImportedSection.vue";
 import PetColourSection from "@/views/PetDetailsView/components/sections/PetColourSection.vue";
 import PetMicrochipNumberSection from "@/views/PetDetailsView/components/sections/PetMicrochipNumberSection.vue";
-import PetAvatarSection from "@/views/PetDetailsView/components/sections/PetAvatarSection.vue";
 
 // ********************** CONST **************************
 
@@ -32,6 +34,7 @@ const confirm = useConfirm();
 const petToEdit = ref<Pet | undefined>(undefined);
 const petNotFound = ref<boolean>(false)
 const isLoading = ref<boolean>(true)
+const isSaving = ref<boolean>(false)
 
 const name = ref<string>('')
 const petType = ref<string>('')
@@ -46,9 +49,6 @@ const colour = ref<string>('')
 const isImported = ref<boolean>(false)
 const importCountryCode = ref<string>('')
 const microchipNumber = ref<string>('')
-const avatarFile = ref<File | null>(null)
-const avatarUrl = ref<string>('')
-const deleteAvatarFlag = ref<boolean>(false)
 
 // ********************** COMPUTED **************************
 
@@ -56,8 +56,16 @@ const isValidName = computed<boolean>(() => {
   return name.value.trim().length > 0;
 })
 
+/** Cats and dogs have exactly one species; other pet types pick one from a list. */
+const hasSingleSpecies = computed<boolean>(() => {
+  return petType.value === PetTypeIds.catId || petType.value === PetTypeIds.dogId;
+})
+
 const canSave = computed<boolean>(() => {
-  return (isValidName.value && petType.value !== '');
+  return isValidName.value
+      && petType.value !== ''
+      && (hasSingleSpecies.value || species.value !== '')
+      && !isSaving.value;
 })
 
 const isNewPet = computed<boolean>(() => {
@@ -66,31 +74,26 @@ const isNewPet = computed<boolean>(() => {
 
 // ********************** FUNCTIONS **************************
 
-async function fetchPet(): Promise<void> {
-  const pet = await pb.collection('pets').getOne<Pet>(route.params.id as string, {
-    expand: 'species,breed'
-  })
+async function fetchPet(id: string): Promise<void> {
+  const pet = await getPet(id)
   petToEdit.value = pet;
 
   name.value = pet.name
-  petType.value = pet.expand.species.pet_type
-  species.value = pet.species
-  breedId.value = pet.breed
-  dob.value = getDateOnly(pet.date_of_birth)
+  petType.value = pet.species.pet_type_id
+  species.value = pet.species.id
+  breedId.value = pet.breed?.id ?? ''
+  dob.value = pet.date_of_birth ? parseIsoDate(pet.date_of_birth) : null
   gender.value = pet.gender
   isNeutered.value = pet.neutered
   colour.value = pet.colour
   isImported.value = pet.imported
   importCountryCode.value = pet.import_country_code
   microchipNumber.value = pet.microchip_number
-  avatarUrl.value = pb.files.getURL(pet, pet.avatar, {'thumb': '100x250'});
 }
 
-function getDateOnly(dateString: string): Date | null {
-  if (dateString == '') {
-    return null;
-  }
-  return new Date(dateString.split(' ')[0]!);
+/** The API's error message if there is one, so server-side validation reaches the user. */
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof ApiError ? error.message : fallback;
 }
 
 function confirmDelete(): void {
@@ -109,22 +112,23 @@ function confirmDelete(): void {
       severity: 'danger'
     },
     accept: async () => {
-      const petId = petToEdit.value?.id;
-      if (!petId) {
+      if (!petToEdit.value) {
         return;
       }
-      await pb.collection('pets').delete(petId);
-      toast.add({severity: 'info', summary: 'Confirmed', detail: 'Pet profile deleted', life: 3000});
-      await router.push('/');
+      try {
+        await deletePet(petToEdit.value.id);
+        toast.add({severity: 'info', summary: 'Confirmed', detail: 'Pet profile deleted', life: 3000});
+        await router.push('/');
+      } catch (error) {
+        console.error("Error deleting pet:", error);
+        toast.add({severity: 'error', summary: 'Error', detail: errorMessage(error, 'Pet could not be deleted'), life: 5000});
+      }
     }
   });
 }
 
 function findSpeciesByName(speciesName: string): string | undefined {
-  const foundSpecies = speciesList.value.find((species) => {
-    return species?.name === speciesName;
-  })
-  return foundSpecies?.id;
+  return speciesList.value.find((oneSpecies) => oneSpecies.name === speciesName)?.id;
 }
 
 function resetOnClickPetType(): void {
@@ -133,71 +137,65 @@ function resetOnClickPetType(): void {
 }
 
 async function savePet(): Promise<void> {
+  let speciesId: string | undefined = species.value;
+  if (petType.value === PetTypeIds.catId) {
+    speciesId = findSpeciesByName('Cat')
+  } else if (petType.value === PetTypeIds.dogId) {
+    speciesId = findSpeciesByName('Dog')
+  }
+  if (!speciesId) {
+    toast.add({severity: 'error', summary: 'Error', detail: 'Please choose a species', life: 3000});
+    return;
+  }
+
+  const input: PetInput = {
+    name: name.value,
+    species_id: speciesId,
+    breed_id: hasSingleSpecies.value && breedId.value !== '' ? breedId.value : null,
+    date_of_birth: dob.value ? toIsoDate(dob.value) : null,
+    gender: gender.value,
+    neutered: isNeutered.value,
+    colour: colour.value,
+    imported: isImported.value,
+    import_country_code: importCountryCode.value ?? '',
+    microchip_number: microchipNumber.value,
+  };
+
+  isSaving.value = true;
   try {
-    let mySpecies: string | undefined = species.value;
-    if (petType.value === PetTypeIds.catId) {
-      mySpecies = findSpeciesByName('Cat')
-    } else if (petType.value === PetTypeIds.dogId) {
-      mySpecies = findSpeciesByName('Dog')
-    }
-
-    const updatedPet = {
-      user: pb.authStore.record!.id,
-      name: name.value,
-      species: mySpecies,
-      breed: breedId.value,
-      date_of_birth: dob.value,
-      gender: gender.value,
-      neutered: isNeutered.value,
-      colour: colour.value,
-      imported: isImported.value,
-      import_country_code: importCountryCode.value,
-      microchip_number: microchipNumber.value,
-      avatar: undefined as File | null | undefined
-    };
-
-    if (deleteAvatarFlag.value === true) {
-      updatedPet.avatar = null;
-    }
-    if (avatarFile.value) {
-      updatedPet.avatar = avatarFile.value;
-    }
-
-    if (petToEdit.value?.id !== undefined) {
-      await pb.collection('pets').update(petToEdit.value.id, updatedPet);
+    if (petToEdit.value) {
+      await updatePet(petToEdit.value.id, input);
     } else {
-      await pb.collection('pets').create(updatedPet);
+      await createPet(input);
     }
     await router.push('/');
     toast.add({severity: 'success', summary: 'Success!', detail: 'Pet details saved', life: 3000});
-
   } catch (error) {
     console.error("Error saving pet:", error);
-    toast.add({severity: 'error', summary: 'Error', detail: 'Pet details could not be saved', life: 3000});
+    toast.add({severity: 'error', summary: 'Error', detail: errorMessage(error, 'Pet details could not be saved'), life: 5000});
+  } finally {
+    isSaving.value = false;
   }
 }
 
 // ********************** LIFECYCLE HOOKS **************************
 
 onMounted(async () => {
-  // console.log('onMounted')
-  const promises = [
-    pb.collection('species').getList<Species>(1, 20, {
-      sort: 'name'
-    }).then(result => speciesList.value = result.items),
-    pb.collection('breeds').getList<Breed>(1, 100, {
-      sort: '-generic,name'
-    }).then(result => breedsList.value = result.items),
-  ]
-
-  await Promise.all(promises)
-
   try {
+    const [allSpecies, allBreeds] = await Promise.all([listSpecies(), listBreeds()]);
+    speciesList.value = allSpecies;
+    breedsList.value = allBreeds;
+
     if (!isNewPet.value) {
-      await fetchPet()
+      await fetchPet(route.params.id as string)
     }
-  } catch (e) {
-    petNotFound.value = true;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      petNotFound.value = true;
+    } else {
+      console.error("Error loading pet form:", error);
+      toast.add({severity: 'error', summary: 'Error', detail: errorMessage(error, 'Could not load the pet form'), life: 5000});
+    }
   } finally {
     isLoading.value = false;
   }
@@ -260,10 +258,7 @@ onMounted(async () => {
             <PetMicrochipNumberSection :name="name"
                                        v-model:microchip-number="microchipNumber"/>
 
-            <PetAvatarSection :name="name"
-                              :avatar-url="avatarUrl"
-                              @file-selected="deleteAvatarFlag = false; avatarFile = $event"
-                              @delete-clicked="deleteAvatarFlag = true; avatarFile = null"/>
+            <!-- TODO: PetAvatarSection returns when avatar uploads are ported to the Go API -->
 
             <section>
               <Button @click="savePet"

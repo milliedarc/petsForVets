@@ -22,4 +22,11 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         },
     },
+    server: {
+        // Forward /api/* to the Go server, so the browser sees one origin
+        // and the session cookie is sent automatically.
+        proxy: {
+            '/api': 'http://localhost:8080',
+        },
+    },
 })

@@ -1,6 +1,7 @@
+// Primary keys of the pet_types table (see api/internal/db/migrations).
 export default {
-    catId: 'kxiat7hgd9d7t04',
-    dogId: 'ds68m4ltt54b83b',
-    smallAnimalId: '9sc981tg86690t0',
-    reptileId: '43a455h8l2x0ch7'
+    catId: 'cat',
+    dogId: 'dog',
+    smallAnimalId: 'small_animal',
+    reptileId: 'reptile',
 }

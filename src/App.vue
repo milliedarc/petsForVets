@@ -2,7 +2,7 @@
 import type {User} from "@/types/User";
 import {onBeforeMount, ref} from "vue";
 import {useRouter} from 'vue-router'
-import {pb} from "@/components/Pocketbase"
+import {getCurrentUser, logout} from "@/api/auth";
 
 import MyNavbar from "@/components/MyNavbar.vue";
 
@@ -11,20 +11,26 @@ const user = ref<User | undefined>(undefined);
 
 const router = useRouter();
 
-function logOut(): void {
-  pb.authStore.clear()
-  location.reload()
+/** Pages a logged-out visitor may stay on. */
+const publicRouteNames = ['UserLogin', 'UserRegistration'];
+
+async function logOut(): Promise<void> {
+  await logout()
+  location.href = '/login'
 }
 
 onBeforeMount(async () => {
   try {
-    const {record} = await pb.collection("users").authRefresh<User>()
-    user.value = record;
-    if (record.app_mode === 'clinicTeam') {
+    const currentUser = await getCurrentUser()
+    user.value = currentUser;
+    if (currentUser.app_mode === 'clinicTeam') {
       await router.push("/clinic")
     }
   } catch (error) {
-    await router.push("/login")
+    await router.isReady()
+    if (!publicRouteNames.includes(router.currentRoute.value.name as string)) {
+      await router.push("/login")
+    }
   } finally {
     showRouter.value = true
   }

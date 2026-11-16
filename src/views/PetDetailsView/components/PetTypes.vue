@@ -82,6 +82,7 @@ function clickPetType(petT: typeof petTypes[number]): void {
 <style scoped>
 
 .icon-container {
+  position: relative; /* anchor for .selected-indicator */
   width: 150px;
   height: 150px;
   border-radius: 50%;
@@ -106,8 +107,8 @@ function clickPetType(petT: typeof petTypes[number]): void {
 
 .selected-indicator {
   position: absolute;
-  top: -11px;
-  left: 51px;
+  top: 6px;
+  right: 6px;
   display: flex;
   color: seagreen;
   background-color: white;

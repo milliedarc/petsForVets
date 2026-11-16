@@ -4,6 +4,7 @@ import {ref} from "vue";
 import PetIcon from "@/components/PetIcon.vue";
 import {useRouter} from "vue-router";
 import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
+import {parseIsoDate} from "@/utils/dates";
 
 // ****************** CONSTS *********************
 
@@ -44,12 +45,12 @@ const toggle = (event: Event) => {
   menu.value.toggle(event);
 };
 
-function calculateAge(dob: string): string {
-  if (dob === '') {
+function calculateAge(dob: string | null): string {
+  if (!dob) {
     return ''
   }
 
-  const birthDate = new Date(dob);
+  const birthDate = parseIsoDate(dob);
   const today = new Date();
 
   let years = today.getFullYear() - birthDate.getFullYear();

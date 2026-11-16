@@ -2,8 +2,8 @@
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
-import {ClientResponseError} from "pocketbase";
-import {pb} from "@/components/Pocketbase"
+import {ApiError} from "@/api/client";
+import {changePassword} from "@/api/auth";
 
 // ****************** CONSTS *********************
 
@@ -19,8 +19,14 @@ const confirmPassword = ref<string>("");
 // ****************** COMPUTED *********************
 
 
+const passwordsMatch = computed<boolean>(() => {
+  return newPassword.value === confirmPassword.value;
+})
+
 const isValidPassword = computed<boolean>(() => {
-  return currentPassword.value !== '' && newPassword.value !== '' && confirmPassword.value !== '';
+  return currentPassword.value !== ''
+      && newPassword.value.length >= 8
+      && passwordsMatch.value;
 })
 
 // ****************** FUNCTIONS *********************
@@ -32,29 +38,13 @@ function goToSettings(): void {
 async function savePassword(): Promise<void> {
 
   try {
-    const updatedPassword = {
-      oldPassword: currentPassword.value,
-      password: newPassword.value,
-      passwordConfirm: confirmPassword.value
-    }
-    await pb.collection('users').update(pb.authStore.record!.id, updatedPassword)
-    await router.push({name: 'UserLogin'})
-    toast.add({severity: 'success', summary: 'Success!', detail: 'Password changed successfully', life: 3000});
-
+    await changePassword(currentPassword.value, newPassword.value)
+    // The server has ended every session, including this one. A full page
+    // load (rather than router.push) also clears the navbar's user.
+    window.location.href = '/login'
   } catch (error) {
-    let errorMessage = "Password change failed! "
-    const responseData = error instanceof ClientResponseError ? error.response?.data : undefined;
-    const responsePasswordMessage: string | undefined = responseData?.password?.message;
-    const responseOldPasswordMessage: string | undefined = responseData?.oldPassword?.message;
-
-    if (responsePasswordMessage) {
-      errorMessage = errorMessage + responsePasswordMessage;
-
-    } else if (responseOldPasswordMessage) {
-      errorMessage = errorMessage + responseOldPasswordMessage;
-    }
-
-    toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 10_000});
+    const detail = error instanceof ApiError ? error.message : 'Please try again';
+    toast.add({severity: 'error', summary: 'Password change failed', detail, life: 10_000});
     console.error(error);
   }
 }
@@ -108,6 +98,12 @@ async function savePassword(): Promise<void> {
                             toggleMask
                             :feedback="false"
                   />
+                  <small v-if="newPassword !== '' && newPassword.length < 8" class="text-danger">
+                    The new password must be at least 8 characters.
+                  </small>
+                  <small v-else-if="confirmPassword !== '' && !passwordsMatch" class="text-danger">
+                    The passwords don't match.
+                  </small>
                 </div>
               </div>
               <div class="inputDiv">
