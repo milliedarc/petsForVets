@@ -1,4 +1,4 @@
-import type {Pet} from "@/types/Pet";
+import type {LegacyPet as Pet} from "@/types/Pet";
 import type {Prescription} from "@/types/Prescription";
 import type {User} from "@/types/User";
 

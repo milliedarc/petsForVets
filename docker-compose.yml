@@ -1,0 +1,23 @@
+# Local development database.
+#   Start:  docker-compose up -d
+#   Stop:   docker-compose down          (data is kept in the named volume)
+#   Wipe:   docker-compose down -v       (deletes all data)
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: petsforvets
+      POSTGRES_PASSWORD: petsforvets
+      POSTGRES_DB: petsforvets
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U petsforvets"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+volumes:
+  pgdata:

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {Pet} from "@/types/Pet";
+import type {LegacyPet as Pet} from "@/types/Pet";
 import type {Prescription} from "@/types/Prescription";
 
 const props = defineProps<{

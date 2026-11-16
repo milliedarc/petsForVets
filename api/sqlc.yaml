@@ -1,0 +1,33 @@
+# sqlc reads our schema (the migrations) and our queries, checks the SQL
+# against the schema, and generates type-safe Go functions into internal/db.
+# Regenerate after changing any .sql file:   sqlc generate
+version: "2"
+sql:
+  - engine: postgresql
+    schema: internal/db/migrations
+    queries: internal/db/queries
+    gen:
+      go:
+        package: db
+        out: internal/db
+        sql_package: pgx/v5
+        # Nullable columns become Go pointers (nil = NULL) instead of
+        # wrapper structs, which also serialise nicely to JSON null.
+        emit_pointers_for_null_types: true
+        overrides:
+          - db_type: uuid
+            go_type: github.com/google/uuid.UUID
+          - db_type: uuid
+            nullable: true
+            go_type:
+              import: github.com/google/uuid
+              type: UUID
+              pointer: true
+          - db_type: date
+            nullable: true
+            go_type:
+              import: time
+              type: Time
+              pointer: true
+          - db_type: timestamptz
+            go_type: time.Time

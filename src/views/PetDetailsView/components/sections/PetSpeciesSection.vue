@@ -20,7 +20,7 @@ const filteredSpeciesList = computed<Species[]>(() => {
     return []
   }
   return props.speciesList.filter((species) => {
-    return props.petType === species.pet_type;
+    return props.petType === species.pet_type_id;
   })
 })
 

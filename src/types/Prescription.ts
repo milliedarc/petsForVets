@@ -1,4 +1,4 @@
-import type {Pet} from "@/types/Pet";
+import type {LegacyPet as Pet} from "@/types/Pet";
 
 export interface Medicine {
     id: string;

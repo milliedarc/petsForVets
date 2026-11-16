@@ -28,7 +28,7 @@ const filteredBreedsList = computed<Breed[]>(() => {
     return []
   }
   return props.breedsList.filter((breed) => {
-    return breed.pet_type === props.petType;
+    return breed.pet_type_id === props.petType;
   })
 })
 

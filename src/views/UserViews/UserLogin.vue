@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {useRouter} from "vue-router";
-import {pb} from "@/components/Pocketbase"
+import {login as apiLogin} from "@/api/auth";
 import {PawPrint} from "@lucide/vue";
 
 const router = useRouter()
@@ -12,7 +12,7 @@ const hasLoginError = ref<boolean>(false);
 
 async function login(): Promise<void> {
   try {
-    await pb.collection('users').authWithPassword(email.value, password.value);
+    await apiLogin(email.value, password.value);
     hasLoginError.value = false;
     window.location.href = '/'
   } catch (error) {

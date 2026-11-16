@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {Pet} from "@/types/Pet";
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
-import {pb} from "@/components/Pocketbase"
+import {listPets} from "@/api/pets";
 import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import DashboardPetCard from "@/components/DashboardPetCard.vue";
@@ -12,11 +12,7 @@ const pets = ref<Pet[]>();
 const isLoading = ref<boolean>(true)
 
 async function fetchPets(): Promise<void> {
-  const result = await pb.collection('pets').getList(1, 20, {
-    expand: 'species,breed'
-  })
-  // @ts-ignore
-  pets.value = result.items; // assigns content to 'pets'
+  pets.value = await listPets();
 }
 
 function goToPetViewAdd() {
