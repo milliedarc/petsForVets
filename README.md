@@ -60,8 +60,14 @@ The first start of the API creates the database schema and the reference data
 
 ### Sample data
 
-Prescriptions are normally written by clinic staff (that side of the app isn't
-built yet). To give your account's pets a couple of sample prescriptions, add a
+For a ready-made clinic to click around in (a staff account plus three clients
+with pets, prescriptions and requests; logins at the top of the file):
+
+```sh
+docker-compose exec -T db psql -U petsforvets < api/dev/seed_clinic_demo.sql
+```
+
+To give your own account's pets a couple of sample prescriptions instead, add a
 pet first and then run:
 
 ```sh
@@ -109,7 +115,7 @@ docker-compose.yml       local PostgreSQL
 | Pets: add, view, edit, delete; species and breeds | ✅ |
 | Repeat prescriptions: view, request, cancel | ✅ |
 | Pet photos | ⏳ upload not yet ported to the new API |
-| Clinic team dashboard (review requests, write prescriptions) | 🚧 planned |
+| Clinic team dashboard: request queue, patient search, write prescriptions | ✅ |
 | Contact details and addresses | 🚧 planned |
 | Automated tests | 🚧 planned |
 

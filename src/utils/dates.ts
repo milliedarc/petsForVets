@@ -49,3 +49,30 @@ export function formatAge(dateOfBirth: string | null, today: Date = new Date()):
     }
     return `${plural(years, 'year')}, ${plural(months, 'month')}`;
 }
+
+const relativeFormat = new Intl.RelativeTimeFormat(undefined, {numeric: 'auto'});
+
+/**
+ * How long ago a timestamp was, e.g. "3 hours ago", "yesterday", "5 days ago".
+ * Older than a few weeks falls back to the date itself.
+ */
+export function formatTimeAgo(timestamp: string, now: Date = new Date()): string {
+    const seconds = Math.round((new Date(timestamp).getTime() - now.getTime()) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+
+    if (Math.abs(seconds) < 60) {
+        return 'just now';
+    }
+    if (Math.abs(minutes) < 60) {
+        return relativeFormat.format(minutes, 'minute');
+    }
+    if (Math.abs(hours) < 24) {
+        return relativeFormat.format(hours, 'hour');
+    }
+    if (Math.abs(days) < 28) {
+        return relativeFormat.format(days, 'day');
+    }
+    return new Date(timestamp).toLocaleDateString(undefined, {day: 'numeric', month: 'short', year: 'numeric'});
+}

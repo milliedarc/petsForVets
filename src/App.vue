@@ -56,13 +56,15 @@ async function logOut(): Promise<void> {
         <AppBreadcrumbs/>
       </header>
 
-      <!-- Keyed on the path so going from one pet to another loads the new pet. -->
-      <RouterView :key="$route.fullPath"/>
+      <!-- Keyed on the path so going from one pet to another loads the new pet.
+           (Not fullPath: pages that keep state in ?query=, like the patient
+           search, would be rebuilt on every keystroke.) -->
+      <RouterView :key="$route.path"/>
     </div>
   </div>
 
   <!-- Signed out (sign in, register): no sidebar. -->
-  <RouterView v-else :key="$route.fullPath"/>
+  <RouterView v-else :key="$route.path"/>
 
   <!--  PrimeVue components to be used in other components -->
   <Toast/>

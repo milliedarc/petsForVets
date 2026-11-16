@@ -30,8 +30,10 @@ export default defineConfig({
     server: {
         // Forward /api/* to the Go server, so the browser sees one origin
         // and the session cookie is sent automatically.
+        // API_PROXY_TARGET points it at another API, e.g. a second copy on
+        // another port: API_PROXY_TARGET=http://localhost:8090 npm run dev:web
         proxy: {
-            '/api': 'http://localhost:8080',
+            '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:8080',
         },
     },
 })

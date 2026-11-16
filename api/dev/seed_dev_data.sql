@@ -1,6 +1,6 @@
 -- Development-only sample data: gives every pet of one account two repeat
--- prescriptions, so the prescriptions page has something to show until the
--- clinic side (where staff write prescriptions) exists.
+-- prescriptions, so the prescriptions page has something to show without
+-- writing them from the clinic side first.
 -- Safe to run more than once: pets that already have prescriptions are skipped.
 --
 --   docker-compose exec -T db psql -U petsforvets -v email=you@example.com < api/dev/seed_dev_data.sql

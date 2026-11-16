@@ -17,6 +17,25 @@ type Breed struct {
 	Generic   bool
 }
 
+type ClinicRequestDetail struct {
+	ID              uuid.UUID
+	Status          string
+	Comments        string
+	RejectionReason string
+	CreatedAt       time.Time
+	PrescriptionID  uuid.UUID
+	Dosage          string
+	Quantity        int32
+	MedicineName    string
+	PetID           uuid.UUID
+	PetName         string
+	SpeciesName     string
+	OwnerID         uuid.UUID
+	OwnerName       string
+	OwnerSurname    string
+	OwnerEmail      string
+}
+
 type Medicine struct {
 	ID          uuid.UUID
 	Name        string
@@ -66,12 +85,13 @@ type PetType struct {
 }
 
 type Prescription struct {
-	ID         uuid.UUID
-	PetID      uuid.UUID
-	MedicineID uuid.UUID
-	Dosage     string
-	Quantity   int32
-	CreatedAt  time.Time
+	ID           uuid.UUID
+	PetID        uuid.UUID
+	MedicineID   uuid.UUID
+	Dosage       string
+	Quantity     int32
+	CreatedAt    time.Time
+	PrescribedBy *uuid.UUID
 }
 
 type PrescriptionRequest struct {

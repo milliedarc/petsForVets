@@ -44,6 +44,8 @@ api/
 │       ├── server.go           route table + middleware
 │       ├── auth.go             register / login / logout / sessions
 │       ├── pets.go             pet endpoints
+│       ├── prescriptions.go    an owner's prescriptions and repeat requests
+│       ├── clinic.go           staff-only endpoints (request queue, patients)
 │       └── json.go             small helpers for JSON in/out
 ├── sqlc.yaml                   sqlc settings
 └── go.mod / go.sum             dependencies (like composer.json / composer.lock)
@@ -111,6 +113,10 @@ docker-compose down -v                # wipe the database completely
 - **CSRF**: `http.NewCrossOriginProtection` rejects state-changing requests
   from other sites.
 - **SQL injection**: impossible by construction. All values are parameters.
+- **Owners vs staff**: owner queries always filter on `owner_id` from the
+  session. Clinic queries don't (staff look after every pet), so every
+  `/api/clinic/*` route goes through `requireStaff`, which answers 403 unless
+  `users.veterinary` is true.
 
 ## Endpoints
 
@@ -136,10 +142,29 @@ All except register/login/logout need the session cookie.
 | POST | `/api/prescriptions/{id}/requests` | request a repeat → 201; 409 if one is already open |
 | DELETE | `/api/prescription-requests/{id}` | cancel → 204; 409 unless Pending |
 
+Clinic staff only (403 for everyone else):
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/clinic/summary` | counts: requests by status, patients, clients |
+| GET | `/api/clinic/prescription-requests` | oldest first; optional `?status=Pending` and `?pet_id=...` |
+| PATCH | `/api/clinic/prescription-requests/{id}` | `{status: "Approved" \| "Ready" \| "Rejected", rejection_reason}`; a reason is required to reject; 409 if the request has already moved on |
+| GET | `/api/clinic/pets` | patients with owner and open request count; optional `?search=` (pet, owner, email, microchip) |
+| GET | `/api/clinic/pets/{id}` | one patient |
+| GET | `/api/clinic/pets/{id}/prescriptions` | newest first, with who prescribed each |
+| POST | `/api/clinic/pets/{id}/prescriptions` | `{medicine_id, dosage, quantity}` → 201 |
+| GET | `/api/clinic/medicines` | all medicines |
+
 ## Dev data
 
-Prescriptions are written by clinic staff, and the clinic side doesn't exist
-yet. To give an account's pets some sample prescriptions:
+A demo clinic: a staff account and three clients with pets, prescriptions
+and requests in every status. The logins are listed at the top of the file.
+
+```sh
+docker-compose exec -T db psql -U petsforvets < api/dev/seed_clinic_demo.sql
+```
+
+Or, to give your own account's pets some sample prescriptions:
 
 ```sh
 docker-compose exec -T db psql -U petsforvets -v email=you@example.com < api/dev/seed_dev_data.sql
@@ -156,5 +181,5 @@ PocketBase is fully removed. Everything the app did before runs on this API.
 | Dashboard; pet create, view, edit, delete; species and breeds | ✅ |
 | Prescriptions: view, request repeat, cancel | ✅ |
 | Pet avatars | ⏳ not ported (the upload section is hidden for now) |
-| Clinic team dashboard (approve/reject requests, write prescriptions) | 🆕 never existed; empty page |
+| Clinic team dashboard (approve/reject requests, write prescriptions) | ✅ new |
 | Contact details, addresses, contact preferences | 🆕 never existed; placeholder pages |

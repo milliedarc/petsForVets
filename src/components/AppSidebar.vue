@@ -48,7 +48,13 @@ const isClinicView = computed<boolean>(() => props.user.app_mode === 'clinicTeam
 const mainItems = computed<NavItem[]>(() => {
   if (isClinicView.value) {
     return [
-      {label: 'Clinic dashboard', icon: 'pi pi-briefcase', to: '/clinic', activeFor: ['DashboardClinicTeam']},
+      {label: 'Dashboard', icon: 'pi pi-briefcase', to: {name: 'DashboardClinicTeam'}, activeFor: ['DashboardClinicTeam']},
+      {
+        label: 'Patients',
+        icon: 'pi pi-heart',
+        to: {name: 'ClinicPatients'},
+        activeFor: ['ClinicPatients', 'ClinicPatient'],
+      },
     ];
   }
   return [

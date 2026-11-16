@@ -67,6 +67,16 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /api/prescriptions/{id}/requests", s.requireUser(s.handleCreatePrescriptionRequest))
 	mux.HandleFunc("DELETE /api/prescription-requests/{id}", s.requireUser(s.handleCancelPrescriptionRequest))
 
+	// Clinic staff only (requireStaff also checks users.veterinary).
+	mux.HandleFunc("GET /api/clinic/summary", s.requireStaff(s.handleClinicSummary))
+	mux.HandleFunc("GET /api/clinic/prescription-requests", s.requireStaff(s.handleListClinicRequests))
+	mux.HandleFunc("PATCH /api/clinic/prescription-requests/{id}", s.requireStaff(s.handleUpdateClinicRequest))
+	mux.HandleFunc("GET /api/clinic/pets", s.requireStaff(s.handleListClinicPets))
+	mux.HandleFunc("GET /api/clinic/pets/{id}", s.requireStaff(s.handleGetClinicPet))
+	mux.HandleFunc("GET /api/clinic/pets/{id}/prescriptions", s.requireStaff(s.handleListClinicPetPrescriptions))
+	mux.HandleFunc("POST /api/clinic/pets/{id}/prescriptions", s.requireStaff(s.handleCreatePrescription))
+	mux.HandleFunc("GET /api/clinic/medicines", s.requireStaff(s.handleListMedicines))
+
 	mux.HandleFunc("GET /api/species", s.requireUser(s.handleListSpecies))
 	mux.HandleFunc("GET /api/breeds", s.requireUser(s.handleListBreeds))
 

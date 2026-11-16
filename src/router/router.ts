@@ -29,6 +29,8 @@ declare module 'vue-router' {
 
 const myPets: Crumb = {label: 'My pets', to: '/'};
 const account: Crumb = {label: 'Account'};
+const clinic: Crumb = {label: 'Clinic', to: {name: 'DashboardClinicTeam'}};
+const patients: Crumb = {label: 'Patients', to: {name: 'ClinicPatients'}};
 
 /** The pet's name once a page has loaded it, else a neutral placeholder. */
 function petCrumb(route: RouteLocationNormalizedLoaded, linked: boolean): Crumb {
@@ -46,10 +48,31 @@ const routes: RouteRecordRaw[] = [
         meta: {breadcrumbs: () => [{label: 'My pets'}]},
     },
     {
+        // Child routes inherit meta, so every clinic page is staff-only.
         path: '/clinic',
-        name: 'DashboardClinicTeam',
-        component: () => import('@/views/DashboardClinicTeam.vue'),
-        meta: {clinicOnly: true, breadcrumbs: () => [{label: 'Clinic dashboard'}]},
+        meta: {clinicOnly: true},
+        children: [
+            {
+                path: '',
+                name: 'DashboardClinicTeam',
+                component: () => import('@/views/Clinic/ClinicDashboard.vue'),
+                meta: {breadcrumbs: () => [{label: 'Clinic dashboard'}]},
+            },
+            {
+                path: 'patients',
+                name: 'ClinicPatients',
+                component: () => import('@/views/Clinic/ClinicPatients.vue'),
+                meta: {breadcrumbs: () => [clinic, {label: 'Patients'}]},
+            },
+            {
+                path: 'patients/:id',
+                name: 'ClinicPatient',
+                component: () => import('@/views/Clinic/ClinicPatientView.vue'),
+                meta: {
+                    breadcrumbs: (route) => [clinic, patients, {label: petName(route.params.id as string) ?? 'Patient'}],
+                },
+            },
+        ],
     },
     {
         path: '/login',
