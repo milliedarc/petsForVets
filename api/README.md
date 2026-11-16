@@ -139,10 +139,10 @@ All except register/login/logout need the session cookie.
 ## Dev data
 
 Prescriptions are written by clinic staff, and the clinic side doesn't exist
-yet. To get sample prescriptions for the dev account's pets:
+yet. To give an account's pets some sample prescriptions:
 
 ```sh
-docker-compose exec -T db psql -U petsforvets < api/dev/seed_dev_data.sql
+docker-compose exec -T db psql -U petsforvets -v email=you@example.com < api/dev/seed_dev_data.sql
 ```
 
 ## Porting status

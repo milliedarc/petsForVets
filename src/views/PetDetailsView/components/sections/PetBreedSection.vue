@@ -5,8 +5,7 @@ import {computed} from "vue";
 
 const props = defineProps<{
   name: string,
-  petType: string,
-  breedsList: Breed[]
+  breedsList: Breed[]   // already filtered to the pet's species
 }>()
 
 const breedId = defineModel('breedId', {
@@ -15,21 +14,7 @@ const breedId = defineModel('breedId', {
 })
 
 const isValidSelectedBreed = computed<boolean>(() => {
-  for (const oneBreed of filteredBreedsList.value) {
-    if (oneBreed.id === breedId.value) {
-      return true
-    }
-  }
-  return false
-})
-
-const filteredBreedsList = computed<Breed[]>(() => {
-  if (props.breedsList === undefined) {
-    return []
-  }
-  return props.breedsList.filter((breed) => {
-    return breed.pet_type_id === props.petType;
-  })
+  return props.breedsList.some((breed) => breed.id === breedId.value);
 })
 
 </script>
@@ -46,10 +31,12 @@ const filteredBreedsList = computed<Breed[]>(() => {
 
         <FloatLabel variant="on">
           <Select v-model="breedId" inputId="breed"
-                  :options="filteredBreedsList"
+                  :options="props.breedsList"
                   optionLabel="name"
                   optionValue="id"
-                  editable
+                  filter
+                  filterPlaceholder="Search breeds"
+                  resetFilterOnHide
                   class="myInput"
                   :invalid="!isValidSelectedBreed"/>
           <label for="breed">Breed</label>
@@ -57,7 +44,7 @@ const filteredBreedsList = computed<Breed[]>(() => {
         <Message
             v-if="!isValidSelectedBreed" severity="error" size="small" variant="simple"
             aria-describedby="breedError">
-          Please choose a valid breed or select <span class="fw-bold">Cross / Mixed Breed</span> if unknown
+          Please choose a valid breed or select <span class="fw-bold">Cross / Mixed breed</span> if unknown
         </Message>
       </div>
     </div>
@@ -65,5 +52,10 @@ const filteredBreedsList = computed<Breed[]>(() => {
 </template>
 
 <style scoped>
+
+/* A non-editable Select has no input inside to give it a width. */
+.myInput {
+  width: 300px;
+}
 
 </style>

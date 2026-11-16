@@ -2,7 +2,7 @@
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 import type {Breed, Pet, Species} from "@/types/Pet";
 import {useRoute, useRouter} from "vue-router";
-import {onMounted, ref, computed} from "vue";
+import {onMounted, ref, computed, watch} from "vue";
 import {ApiError} from "@/api/client";
 import {createPet, deletePet, getPet, updatePet, type PetInput} from "@/api/pets";
 import {listBreeds, listSpecies} from "@/api/reference";
@@ -68,8 +68,34 @@ const canSave = computed<boolean>(() => {
       && !isSaving.value;
 })
 
+/** The pet's species id: implied for cats and dogs, chosen from a list otherwise. */
+const selectedSpeciesId = computed<string | undefined>(() => {
+  if (petType.value === PetTypeIds.catId) {
+    return findSpeciesByName('Cat');
+  }
+  if (petType.value === PetTypeIds.dogId) {
+    return findSpeciesByName('Dog');
+  }
+  return species.value || undefined;
+})
+
+/** Breeds of the selected species. Empty means the species has no breeds, so the question is hidden. */
+const breedsForSpecies = computed<Breed[]>(() => {
+  return breedsList.value.filter((breed) => breed.species_id === selectedSpeciesId.value);
+})
+
 const isNewPet = computed<boolean>(() => {
   return route.params.id === 'add'
+})
+
+// ********************** WATCHERS **************************
+
+// If the species changes (e.g. Rabbit -> Guinea pig), drop a breed that no
+// longer fits. The database would reject the mismatch anyway.
+watch(breedsForSpecies, (breeds) => {
+  if (breedId.value !== '' && !breeds.some((breed) => breed.id === breedId.value)) {
+    breedId.value = '';
+  }
 })
 
 // ********************** FUNCTIONS **************************
@@ -137,12 +163,7 @@ function resetOnClickPetType(): void {
 }
 
 async function savePet(): Promise<void> {
-  let speciesId: string | undefined = species.value;
-  if (petType.value === PetTypeIds.catId) {
-    speciesId = findSpeciesByName('Cat')
-  } else if (petType.value === PetTypeIds.dogId) {
-    speciesId = findSpeciesByName('Dog')
-  }
+  const speciesId = selectedSpeciesId.value;
   if (!speciesId) {
     toast.add({severity: 'error', summary: 'Error', detail: 'Please choose a species', life: 3000});
     return;
@@ -151,7 +172,7 @@ async function savePet(): Promise<void> {
   const input: PetInput = {
     name: name.value,
     species_id: speciesId,
-    breed_id: hasSingleSpecies.value && breedId.value !== '' ? breedId.value : null,
+    breed_id: breedId.value !== '' ? breedId.value : null,
     date_of_birth: dob.value ? toIsoDate(dob.value) : null,
     gender: gender.value,
     neutered: isNeutered.value,
@@ -233,10 +254,9 @@ onMounted(async () => {
                                :species-list="speciesList"
                                v-model:species="species"/>
 
-            <PetBreedSection v-if="petType === PetTypeIds.catId || petType === PetTypeIds.dogId"
+            <PetBreedSection v-if="breedsForSpecies.length > 0"
                              :name="name"
-                             :pet-type="petType"
-                             :breeds-list="breedsList"
+                             :breeds-list="breedsForSpecies"
                              v-model:breed-id="breedId"/>
 
             <PetAgeSection :name="name"
