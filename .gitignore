@@ -31,3 +31,6 @@ coverage
 
 # Local dev credentials
 .dev-login
+
+# Go API binary built by `npm run api`
+api/bin/

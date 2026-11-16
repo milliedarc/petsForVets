@@ -79,7 +79,7 @@ docker-compose exec db psql -U petsforvets -c "UPDATE users SET veterinary = tru
 | Command | What it does |
 |---|---|
 | `npm run dev` | API and frontend together, with log lines prefixed `[api]` / `[web]` |
-| `npm run api` | Just the Go API (`go run ./cmd/server` in `api/`) |
+| `npm run api` | Just the Go API (builds `api/bin/server`, then runs it) |
 | `npm run dev:web` | Just the Vite dev server |
 | `npm run build` | Type-check with `vue-tsc`, then build the frontend into `dist/` |
 | `npm run type-check` | Type-check only |

@@ -8,7 +8,7 @@
     "build": "vue-tsc --build && vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --build",
-    "api": "cd api && go run ./cmd/server",
+    "api": "cd api && go build -o bin/server ./cmd/server && exec ./bin/server",
     "dev:web": "vite"
   },
   "dependencies": {
