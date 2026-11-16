@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import MyAvatar from "@/components/MyAvatar.vue";
 import {useRouter} from "vue-router";
+import {PawPrint} from "@lucide/vue";
 
 const router = useRouter()
 
@@ -68,7 +69,7 @@ const items = ref([
 <template>
   <Menubar :model="items">
     <template #start>
-      <font-awesome-icon :icon="['fadr', 'paw']" class="fa-xl" style="--fa-secondary-color: #d6b6c2"/>
+      <PawPrint :size="24" color="#d6b6c2"/>
       <h5 class="mb-0 ms-2">Pets for Vets</h5>
     </template>
     <template #end>

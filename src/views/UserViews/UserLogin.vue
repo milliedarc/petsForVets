@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {pb} from "@/components/Pocketbase"
+import {PawPrint} from "@lucide/vue";
 
 const router = useRouter()
 
@@ -27,7 +28,7 @@ async function login(): Promise<void> {
     <div class="d-flex justify-content-center align-items-center vh-100 w-100">
       <div class="m-auto p-4 border rounded shadow-sm" style="width: 400px; background-color: white">
         <div class="d-flex justify-content-center align-items-center mb-2">
-          <font-awesome-icon :icon="['fadr', 'paw']" class="fa-4x" style="--fa-secondary-color: #d6b6c2"/>
+          <PawPrint :size="64" color="#d6b6c2"/>
         </div>
         <h3 class="text-center">Welcome back</h3>
         <form>

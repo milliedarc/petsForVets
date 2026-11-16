@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import PetTypeIds from "@/types/PetTypeIds";
+import {Cat, Dog, Rabbit, Turtle, CircleCheck} from "@lucide/vue";
 
 const emit = defineEmits(["petTypeClicked"]);
 
 const petTypes = [
   {
-    icon: ['fadl', 'cat'],
+    icon: Cat,
     title: 'Cat',
     id: PetTypeIds.catId,
   },
   {
-    icon: ['fadl', 'dog'],
+    icon: Dog,
     title: 'Dog',
     id: PetTypeIds.dogId,
   },
   {
-    icon: ['fadl', 'rabbit'],
+    icon: Rabbit,
     title: 'Small Animal',
     id: PetTypeIds.smallAnimalId,
   },
   {
-    icon: ['fadl', 'turtle'],
+    icon: Turtle,
     title: 'Reptile',
     id: PetTypeIds.reptileId,
   }
@@ -56,16 +57,11 @@ function clickPetType(petT): void {
               :class="{'icon-container':true, 'selected': isSelected(petT.id)}"
               style="display: flex; flex-direction: column">
 
-            <div v-if="isSelected(petT.id)"
-                 style="position: relative; top: -11px; left: 51px;">
-              <font-awesome-layers class="fa-xl">
-                <font-awesome-icon :icon="['fas', 'circle']" style="color: white"/>
-                <font-awesome-icon :icon="['fas', 'circle-check']"
-                                   style="color: seagreen"/>
-              </font-awesome-layers>
-            </div>
+            <span v-if="isSelected(petT.id)" class="selected-indicator">
+              <CircleCheck :size="24"/>
+            </span>
 
-            <font-awesome-icon :icon="petT.icon" size="5x"/>
+            <component :is="petT.icon" :size="80"/>
           </div>
           <div class="text-center mt-2"> {{ petT.title }}</div>
         </div>
@@ -106,5 +102,15 @@ function clickPetType(petT): void {
   border-color: seagreen;
   border-width: 4px;
   border-style: solid;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: -11px;
+  left: 51px;
+  display: flex;
+  color: seagreen;
+  background-color: white;
+  border-radius: 50%;
 }
 </style>
