@@ -11,6 +11,19 @@ export class ApiError extends Error {
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+/** Paths whose 401 means "wrong password" or "not signed in yet", not "your session ended". */
+const authPaths = ['/auth/login', '/auth/register', '/auth/me'];
+
+let onUnauthorized: (() => void) | null = null;
+
+/**
+ * Called when any other request gets a 401, i.e. the session expired while the
+ * app was open. Set once in main.ts (to send the user back to sign in).
+ */
+export function setUnauthorizedHandler(handler: () => void): void {
+    onUnauthorized = handler;
+}
+
 export async function api<T>(method: Method, path: string, body?: unknown): Promise<T> {
     const response = await fetch(`/api${path}`, {
         method,
@@ -23,6 +36,9 @@ export async function api<T>(method: Method, path: string, body?: unknown): Prom
         // isn't running (`npm run dev` starts it with Vite).
         if (response.status >= 502 && response.status <= 504) {
             throw new ApiError(response.status, "Can't reach the server. Is the API running? (npm run dev starts it)");
+        }
+        if (response.status === 401 && !authPaths.includes(path)) {
+            onUnauthorized?.();
         }
         // The API sends {"error": "..."}; fall back to the status text otherwise.
         const data = await response.json().catch(() => null);

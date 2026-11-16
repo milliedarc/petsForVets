@@ -6,8 +6,21 @@ import './assets/main.css'
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 
-import {router} from './router/router'
+import {loginRoute, router} from './router/router'
 import {PetsForVetsTheme} from './theme'
+import {setUnauthorizedHandler} from './api/client'
+import {useSession} from './stores/session'
+
+// If the session ends while the app is open (it expired, or the password was
+// changed in another tab), go to the sign-in page and come back here afterwards.
+setUnauthorizedHandler(() => {
+    const session = useSession();
+    if (!session.isLoggedIn.value) {
+        return;
+    }
+    session.clear();
+    router.push(loginRoute(router.currentRoute.value));
+});
 
 const app = createApp(App);
 

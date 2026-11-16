@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {login as apiLogin} from "@/api/auth";
+import {useRoute, useRouter} from "vue-router";
 import {ApiError} from "@/api/client";
+import {useSession} from "@/stores/session";
+import {safeRedirect} from "@/router/router";
 import AuthCard from "@/components/AuthCard.vue";
+
+const route = useRoute();
+const router = useRouter();
+const session = useSession();
 
 const email = ref<string>("");
 const password = ref<string>("");
@@ -13,9 +19,9 @@ async function login(): Promise<void> {
   loginError.value = '';
   isSubmitting.value = true;
   try {
-    await apiLogin(email.value, password.value);
-    // A full page load lets App.vue pick up the new session.
-    window.location.href = '/'
+    await session.login(email.value, password.value);
+    // Back to the page that sent us here (e.g. after a session expired), else home.
+    await router.replace(safeRedirect(route.query.redirect));
   } catch (error) {
     console.error(error);
     // A 401 means wrong credentials; anything else (server down, ...) gets its own message.

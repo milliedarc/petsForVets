@@ -3,10 +3,14 @@ import {computed, ref} from "vue";
 import {useToast} from "primevue/usetoast";
 import {errorMessage} from "@/api/client";
 import {changePassword} from "@/api/auth";
+import {useRouter} from "vue-router";
+import {useSession} from "@/stores/session";
 
 // ****************** CONSTS *********************
 
 const toast = useToast()
+const router = useRouter()
+const session = useSession()
 
 // ****************** REFS *********************
 
@@ -37,9 +41,10 @@ async function savePassword(): Promise<void> {
   isSaving.value = true;
   try {
     await changePassword(currentPassword.value, newPassword.value)
-    // The server has ended every session, including this one. A full page
-    // load (rather than router.push) also clears the navbar's user.
-    window.location.href = '/login'
+    // The server has ended every session, including this one.
+    session.clear();
+    toast.add({severity: 'success', summary: 'Password changed', detail: 'Please sign in with your new password.', life: 6000});
+    await router.push({name: 'UserLogin'});
   } catch (error) {
     toast.add({severity: 'error', summary: 'Password change failed', detail: errorMessage(error, 'Please try again'), life: 10_000});
     console.error(error);

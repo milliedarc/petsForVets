@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
 import AuthCard from "@/components/AuthCard.vue";
-import {register} from "@/api/auth";
+import {useRouter} from "vue-router";
+import {useSession} from "@/stores/session";
 import {errorMessage as apiErrorMessage} from "@/api/client";
+
+const router = useRouter();
+const session = useSession();
 
 const name = ref<string>("");
 const surname = ref<string>("");
@@ -36,9 +40,9 @@ async function registerUser(): Promise<void> {
   errorMessage.value = '';
   isSubmitting.value = true;
   try {
-    await register(email.value, password.value, name.value, surname.value);
-    // Registering also logs you in; a full page load lets App.vue pick up the session.
-    window.location.href = '/';
+    // Registering also signs you in.
+    await session.register(email.value, password.value, name.value, surname.value);
+    await router.replace('/');
   } catch (error) {
     errorMessage.value = apiErrorMessage(error, 'Registration failed, please try again.');
     console.error(error);

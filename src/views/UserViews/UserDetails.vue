@@ -1,20 +1,8 @@
 <script setup lang="ts">
-import type {User} from "@/types/User";
-import {onMounted, ref} from "vue";
-import {getCurrentUser} from "@/api/auth";
-import {errorMessage} from "@/api/client";
+import {useSession} from "@/stores/session";
 
-const user = ref<User>();
-const loadError = ref<string>('');
-
-onMounted(async () => {
-  try {
-    user.value = await getCurrentUser();
-  } catch (error) {
-    console.error(error);
-    loadError.value = errorMessage(error, 'Your details could not be loaded.');
-  }
-})
+// The router guard only shows this page to a signed-in user.
+const {user} = useSession();
 
 </script>
 
@@ -24,11 +12,7 @@ onMounted(async () => {
       <h1>Personal details</h1>
     </div>
 
-    <div v-if="loadError" class="state-panel" role="alert">
-      <p>{{ loadError }}</p>
-    </div>
-
-    <template v-else-if="user">
+    <template v-if="user">
       <Card class="mb-4">
         <template #title>Contact details</template>
         <template #content>

@@ -85,7 +85,7 @@ const breedsForSpecies = computed<Breed[]>(() => {
 })
 
 const isNewPet = computed<boolean>(() => {
-  return route.params.id === 'add'
+  return route.name === 'PetAdd'
 })
 
 // ********************** WATCHERS **************************

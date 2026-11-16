@@ -2,7 +2,7 @@
 import type {User} from "@/types/User";
 import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
-import {updateAppMode} from "@/api/auth";
+import {useSession} from "@/stores/session";
 import {useToast} from "primevue/usetoast";
 import {errorMessage} from "@/api/client";
 import type {MenuItem} from "primevue/menuitem";
@@ -20,13 +20,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'logout'): void
-  (e: 'appModeSwitched', newMode: string): void
 }>()
 
 // ****************** CONST *********************
 
 const router = useRouter();
 const toast = useToast();
+const session = useSession();
 
 // ****************** COMPUTED *********************
 
@@ -102,8 +102,8 @@ function goToUserDetails(): void {
 async function switchAppMode(): Promise<void> {
   const newMode = targetAppMode.value;
   try {
-    await updateAppMode(newMode);
-    window.location.href = newMode === 'clinicTeam' ? '/clinic' : '/'
+    await session.switchAppMode(newMode);
+    await router.push(newMode === 'clinicTeam' ? '/clinic' : '/');
   } catch (error) {
     console.error("Failed to switch app mode:", error);
     toast.add({severity: 'error', summary: 'Error', detail: errorMessage(error, 'Could not switch view'), life: 5000});
