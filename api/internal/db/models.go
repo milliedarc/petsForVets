@@ -76,7 +76,6 @@ type Prescription struct {
 
 type PrescriptionRequest struct {
 	ID              uuid.UUID
-	PetID           uuid.UUID
 	PrescriptionID  uuid.UUID
 	Status          string
 	Comments        string
@@ -84,6 +83,19 @@ type PrescriptionRequest struct {
 	ApprovedBy      *uuid.UUID
 	RejectedBy      *uuid.UUID
 	CreatedAt       time.Time
+}
+
+type PrescriptionRequestDetail struct {
+	ID              uuid.UUID
+	Status          string
+	Comments        string
+	RejectionReason string
+	CreatedAt       time.Time
+	PrescriptionID  uuid.UUID
+	Dosage          string
+	MedicineName    string
+	PetID           uuid.UUID
+	OwnerID         uuid.UUID
 }
 
 type Session struct {

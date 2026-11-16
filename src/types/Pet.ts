@@ -43,13 +43,3 @@ export interface Breed {
     pet_type_id: string;
     generic: boolean;
 }
-
-// ---------------------------------------------------------------------------
-// PocketBase shape, still used by the prescriptions pages.
-// Delete once those pages are ported to the Go API.
-// ---------------------------------------------------------------------------
-
-export interface LegacyPet {
-    id: string | undefined;
-    name: string;
-}

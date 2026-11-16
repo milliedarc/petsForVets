@@ -1,4 +1,4 @@
-import type {LegacyPet as Pet} from "@/types/Pet";
+// Shapes returned by the Go API (api/internal/httpapi/prescriptions.go).
 
 export interface Medicine {
     id: string;
@@ -7,11 +7,8 @@ export interface Medicine {
 }
 
 export interface Prescription {
-    id: string | undefined;
+    id: string;
     dosage: string;
     quantity: number;
-    expand: {
-        pet: Pet;
-        medicine: Medicine;
-    };
+    medicine: Medicine;
 }

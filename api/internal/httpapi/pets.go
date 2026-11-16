@@ -186,15 +186,19 @@ func writePetDBError(w http.ResponseWriter, r *http.Request, err error) {
 	serverError(w, r, err)
 }
 
-// petIDFromPath reads {id} from the URL. A malformed id can't match any pet,
-// so it's answered like any other unknown pet: 404.
-func petIDFromPath(w http.ResponseWriter, r *http.Request) (uuid.UUID, bool) {
+// uuidFromPath reads {id} from the URL. A malformed id can't match anything,
+// so it gets the same 404 as any other unknown id.
+func uuidFromPath(w http.ResponseWriter, r *http.Request, notFoundMessage string) (uuid.UUID, bool) {
 	id, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
-		writeError(w, http.StatusNotFound, "pet not found")
+		writeError(w, http.StatusNotFound, notFoundMessage)
 		return uuid.Nil, false
 	}
 	return id, true
+}
+
+func petIDFromPath(w http.ResponseWriter, r *http.Request) (uuid.UUID, bool) {
+	return uuidFromPath(w, r, "pet not found")
 }
 
 // GET /api/pets

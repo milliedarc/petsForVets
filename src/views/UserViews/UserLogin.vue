@@ -31,7 +31,7 @@ async function login(): Promise<void> {
           <PawPrint :size="64" color="#d6b6c2"/>
         </div>
         <h3 class="text-center">Welcome back</h3>
-        <form>
+        <form @submit.prevent="login">
           <div class="row mb-3 d-flex align-items-center">
             <label for="inputEmail">Email</label>
             <div class="col-sm-10 w-100">
@@ -64,7 +64,7 @@ async function login(): Promise<void> {
           </div>
           <div class="d-flex justify-content-center">
             <Button
-                @click.prevent="login"
+                type="submit"
                 severity="contrast"
                 aria-label="Login">
               <i class="pi pi-user"></i>Sign in

@@ -10,10 +10,11 @@ const emit = defineEmits([
   'cancelClicked'
 ])
 
-const prescriptionMedicine = props.prescriptionRequest.expand.prescription.expand.medicine.name;
+const prescriptionMedicine = computed<string>(() => props.prescriptionRequest.medicine_name);
 
 const createdAt = computed<string>(() => {
-  const date = new Date(props.prescriptionRequest.created.split(' ')[0]);
+  // created_at is a full timestamp with timezone, so new Date() reads it correctly.
+  const date = new Date(props.prescriptionRequest.created_at);
   const today = new Date();
   if (date.toLocaleDateString() === today.toLocaleDateString()) {
     return 'Requested today'

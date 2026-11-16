@@ -120,15 +120,32 @@ All except register/login/logout need the session cookie.
 | DELETE | `/api/pets/{id}` | → 204 |
 | GET | `/api/species` | all species |
 | GET | `/api/breeds` | all breeds, generic first |
+| PUT | `/api/auth/me/app-mode` | `{app_mode}`; `clinicTeam` only for vets (403 otherwise) |
+| POST | `/api/auth/change-password` | `{current_password, new_password}` → 204, logs out everywhere |
+| GET | `/api/pets/{id}/prescriptions` | a pet's repeat prescriptions |
+| GET | `/api/pets/{id}/prescription-requests` | a pet's requests, newest first |
+| POST | `/api/prescriptions/{id}/requests` | request a repeat → 201; 409 if one is already open |
+| DELETE | `/api/prescription-requests/{id}` | cancel → 204; 409 unless Pending |
+
+## Dev data
+
+Prescriptions are written by clinic staff, and the clinic side doesn't exist
+yet. To get sample prescriptions for the dev account's pets:
+
+```sh
+docker-compose exec -T db psql -U petsforvets < api/dev/seed_dev_data.sql
+```
 
 ## Porting status
 
+PocketBase is fully removed. Everything the app did before runs on this API.
+
 | Feature | Status |
 |---|---|
-| Login, logout, session check | ✅ Go API |
-| Dashboard pet list | ✅ Go API |
-| Pet details: create, view, edit, delete; species and breeds | ✅ Go API |
-| Register | API done; the page isn't wired up yet |
+| Login, logout, session check, registration | ✅ |
+| Change password, switch app mode | ✅ |
+| Dashboard; pet create, view, edit, delete; species and breeds | ✅ |
+| Prescriptions: view, request repeat, cancel | ✅ |
 | Pet avatars | ⏳ not ported (the upload section is hidden for now) |
-| Prescriptions + requests | ⏳ still PocketBase |
-| Switch app mode, change password, contact details | ⏳ still PocketBase |
+| Clinic team dashboard (approve/reject requests, write prescriptions) | 🆕 never existed; empty page |
+| Contact details, addresses, contact preferences | 🆕 never existed; placeholder pages |

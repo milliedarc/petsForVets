@@ -1,83 +1,95 @@
 <script setup lang="ts">
-import type {LegacyPet as Pet} from "@/types/Pet";
+import type {Pet} from "@/types/Pet";
 import type {Prescription} from "@/types/Prescription";
-import type {PrescriptionRequest} from "@/types/PrescriptionRequest";
-import {pb} from "@/components/Pocketbase"
+import {openRequestStatuses, type PrescriptionRequest} from "@/types/PrescriptionRequest";
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
+import {useToast} from "primevue/usetoast";
+import {ApiError} from "@/api/client";
+import {getPet} from "@/api/pets";
+import {cancelRequest, listPrescriptionRequests, listPrescriptions, requestRepeat} from "@/api/prescriptions";
 import PrescriptionCard from "@/views/PrescriptionsView/components/PrescriptionCard.vue";
 import PrescriptionRequestCard from "@/views/PrescriptionsView/components/PrescriptionRequestCard.vue";
 
 // *********************** CONSTS ***********************
 
 const route = useRoute()
+const toast = useToast()
+const petId = route.params.id as string
 
 // *********************** REFS ***********************
 
 const pet = ref<Pet>();
+const petNotFound = ref<boolean>(false)
 const prescriptions = ref<Prescription[]>([])
 const prescriptionRequests = ref<PrescriptionRequest[]>([])
 
 // *********************** FUNCTIONS ***********************
 
-async function fetchPetId(): Promise<void> {
-  pet.value = await pb.collection('pets').getOne<Pet>(route.params.id as string, {
-    expand: 'species,breed'
-  })
+function showError(error: unknown, fallback: string): void {
+  console.error(error);
+  const detail = error instanceof ApiError ? error.message : fallback;
+  toast.add({severity: 'error', summary: 'Error', detail, life: 5000});
 }
 
 async function fetchPrescriptionRequests(): Promise<void> {
-  const result = await pb.collection('prescription_requests').getList<PrescriptionRequest>(1, 100, {
-    expand: 'pet,prescription,prescription.medicine',
-    filter: pb.filter("pet = {:petId}", {petId: route.params.id})
-  })
-  prescriptionRequests.value = result.items;
-  console.log('prescriptionRequests: ', result)
+  prescriptionRequests.value = await listPrescriptionRequests(petId);
 }
 
 async function makePrescriptionRequest(prescription: Prescription): Promise<void> {
-  await pb.collection('prescription_requests').create({
-    pet: pet.value?.id,
-    prescription: prescription.id,
-    status: 'Pending',
-    // comments: ''
-  });
-  await fetchPrescriptionRequests()
+  try {
+    await requestRepeat(prescription.id);
+    await fetchPrescriptionRequests();
+  } catch (error) {
+    showError(error, 'Could not request a repeat prescription');
+  }
 }
 
 async function deletePrescriptionRequest(prescriptionRequest: PrescriptionRequest): Promise<void> {
-  await pb.collection('prescription_requests').delete(prescriptionRequest.id);
-  await fetchPrescriptionRequests()
+  try {
+    await cancelRequest(prescriptionRequest.id);
+    await fetchPrescriptionRequests();
+  } catch (error) {
+    showError(error, 'Could not cancel the request');
+  }
 }
 
+/** A prescription can't be requested again while a request for it is still open. */
 function isDisabledRequest(prescription: Prescription): boolean {
-  const foundPrescriptionRequest = prescriptionRequests.value.find((prescriptionRequest) => {
-    return prescriptionRequest.prescription === prescription.id;
-  })
-  if (foundPrescriptionRequest) {
-    return true;
-  }
-  return false;
+  return prescriptionRequests.value.some((prescriptionRequest) => {
+    return prescriptionRequest.prescription_id === prescription.id
+        && openRequestStatuses.includes(prescriptionRequest.status);
+  });
 }
 
 // *********************** LIFECYCLE HOOKS ***********************
 
 onMounted(async () => {
-  await fetchPetId()
-
-  const result = await pb.collection('prescriptions').getList<Prescription>(1, 100, {
-    expand: 'pet,medicine',
-    filter: pb.filter("pet = {:petId}", {petId: route.params.id})
-  })
-  prescriptions.value = result.items;
-  console.log('prescriptions: ', result)
-
-  await fetchPrescriptionRequests()
+  try {
+    const [loadedPet, loadedPrescriptions] = await Promise.all([
+      getPet(petId),
+      listPrescriptions(petId),
+      fetchPrescriptionRequests(),
+    ]);
+    pet.value = loadedPet;
+    prescriptions.value = loadedPrescriptions;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      petNotFound.value = true;
+    } else {
+      showError(error, 'Could not load prescriptions');
+    }
+  }
 })
 </script>
 
 <template>
-  <main class="container" v-if="pet">
+  <main class="container" v-if="petNotFound">
+    <section class="bg-body-tertiary p-5 rounded">
+      <h4>Pet not found</h4>
+    </section>
+  </main>
+  <main class="container" v-else-if="pet">
     <section class="bg-body-tertiary p-5 rounded">
       <div class="d-flex">
         <h1>{{ pet.name }}'s repeat prescriptions</h1>
