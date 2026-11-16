@@ -1,65 +1,71 @@
 <script setup lang="ts">
-import {useRouter} from "vue-router";
-import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
-
-const router = useRouter();
-
-function goToEditPassword(): void {
-  router.push({name: 'EditPassword'});
-}
-
 </script>
 
 <template>
-  <main class="container">
-    <div class="bg-body-tertiary p-5 rounded">
-      <h1 class="mb-4">Settings</h1>
-
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-
-            <div class="mt-2">
-              <div>
-                <h6 class="fw-bold">Manage password</h6>
-              </div>
-              <div class="mt-3">
-                <p>Keep your account secure by changing your password regularly.</p>
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <ButtonPencilEdit @click="goToEditPassword"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-
-            <div class="mt-2">
-              <div>
-                <h6 class="fw-bold">Contact preferences</h6>
-              </div>
-              <div class="mt-3">
-                <p>Choose how you would like the staff at your veterinary surgery to contact you, and regarding
-                  what.</p>
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <ButtonPencilEdit/>
-            </div>
-          </div>
-        </div>
-      </div>
-
+  <main class="page page--narrow">
+    <div class="page-header">
+      <h1>Settings</h1>
     </div>
+
+    <Card>
+      <template #content>
+        <div class="setting">
+          <div>
+            <h2 class="setting-title">Password</h2>
+            <p class="setting-text">Keep your account secure by changing your password regularly.</p>
+          </div>
+          <RouterLink :to="{name: 'EditPassword'}" custom v-slot="{navigate}">
+            <Button label="Change password" icon="pi pi-lock" severity="secondary" variant="outlined"
+                    @click="navigate"/>
+          </RouterLink>
+        </div>
+
+        <div class="setting">
+          <div>
+            <h2 class="setting-title">Contact preferences</h2>
+            <p class="setting-text">
+              Choose how the staff at your veterinary surgery contact you, and about what.
+            </p>
+          </div>
+          <Tag value="Coming soon" severity="secondary"/>
+        </div>
+      </template>
+    </Card>
   </main>
 </template>
 
 <style scoped>
+.setting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--p-content-border-color);
+}
 
+.setting:first-child {
+  padding-top: 0;
+}
+
+.setting:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.setting > div {
+  flex: 1 1 280px;
+}
+
+.setting-title {
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.setting-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--p-text-muted-color);
+}
 </style>

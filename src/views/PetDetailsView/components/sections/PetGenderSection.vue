@@ -12,36 +12,23 @@ const gender = defineModel('gender', {
   required: true
 })
 
+const options = [
+  {label: 'Male', value: 'male'},
+  {label: 'Female', value: 'female'},
+]
+
 </script>
 
 <template>
-  <section>
-    <div>
-      <p>What's
-        <PetNameFormatted :name="props.name"/>
-        <span>'s gender?</span>
-      </p>
-    </div>
-
-    <div class="d-flex gap-4">
-      <div class="d-flex align-items-center">
-        <RadioButton v-model="gender"
-                     inputId="male"
-                     name="gender"
-                     value="male"/>
-        <label class="ms-3" for="male">Male</label>
-      </div>
-      <div class="d-flex align-items-center">
-        <RadioButton v-model="gender"
-                     inputId="female"
-                     name="gender"
-                     value="female"/>
-        <label class="ms-3" for="female">Female</label>
-      </div>
-    </div>
+  <section class="question">
+    <span id="genderLabel" class="question-label">
+      What's
+      <PetNameFormatted :name="props.name"/>'s gender?
+    </span>
+    <SelectButton v-model="gender"
+                  :options="options"
+                  optionLabel="label"
+                  optionValue="value"
+                  aria-labelledby="genderLabel"/>
   </section>
 </template>
-
-<style scoped>
-
-</style>

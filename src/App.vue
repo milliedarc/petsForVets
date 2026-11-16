@@ -25,6 +25,12 @@ onBeforeMount(async () => {
     user.value = currentUser;
     if (currentUser.app_mode === 'clinicTeam') {
       await router.push("/clinic")
+    } else {
+      // Already signed in, so the sign-in and register pages have nothing to offer.
+      await router.isReady()
+      if (publicRouteNames.includes(router.currentRoute.value.name as string)) {
+        await router.replace("/")
+      }
     }
   } catch (error) {
     await router.isReady()
@@ -39,32 +45,21 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="user" class="card">
+  <header v-if="user" class="app-header">
     <MyNavbar :user="user" @logout="logOut"/>
-  </div>
+  </header>
 
   <RouterView v-if="showRouter"/>
 
   <!--  PrimeVue components to be used in other components -->
   <Toast/>
   <ConfirmDialog/>
-
 </template>
 
-<style>
-a {
-  text-decoration: none !important;
-}
-
-a:hover {
-  text-decoration: underline !important;
-}
-
-a:visited {
-  text-decoration: none !important;
-}
-
-a, a:visited {
-  color: rgb(132 63 97);
+<style scoped>
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 </style>

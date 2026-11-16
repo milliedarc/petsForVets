@@ -7,9 +7,9 @@ import PrescriptionsView from "@/views/PrescriptionsView/PrescriptionsView.vue";
 import UserSettings from "@/views/UserViews/UserSettings.vue";
 import UserDetails from "@/views/UserViews/UserDetails.vue";
 import EditPassword from "@/views/UserViews/EditPassword.vue";
-import EditContactDetails from "@/views/UserViews/EditContactDetails.vue";
 import UserRegistration from "@/views/UserViews/UserRegistration.vue";
 import DashboardClinicTeam from "@/views/DashboardClinicTeam.vue";
+import NotFound from "@/views/NotFound.vue";
 
 // TODO: optimise routes by nesting ?
 
@@ -23,11 +23,15 @@ const routes = [
     {path: '/user/settings', component: UserSettings, name: 'Settings'},
     {path: '/user/personal-details', component: UserDetails, name: 'UserDetails'},
     {path: '/user/change-password', component: EditPassword, name: 'EditPassword'},
-    {path: '/user/change-contact-details', component: EditContactDetails, name: 'EditContactDetails'}
-    //{ path: '/about', component: AboutView },
+    // Must stay last: anything that didn't match above.
+    {path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound'},
 ]
 
 export const router = createRouter({
     history: createWebHistory(),
     routes,
+    // Start each new page at the top, but restore the position on back/forward.
+    scrollBehavior(_to, _from, savedPosition) {
+        return savedPosition ?? {top: 0}
+    },
 })

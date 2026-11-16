@@ -1,73 +1,74 @@
 <script setup lang="ts">
-import type {PrescriptionRequest} from "@/types/PrescriptionRequest";
+import type {PrescriptionRequest, PrescriptionRequestStatus} from "@/types/PrescriptionRequest";
 import {computed} from "vue";
 
 const props = defineProps<{
   prescriptionRequest: PrescriptionRequest
 }>();
 
-const emit = defineEmits([
-  'cancelClicked'
-])
+const emit = defineEmits<{
+  (e: 'cancelClicked'): void
+}>()
 
-const prescriptionMedicine = computed<string>(() => props.prescriptionRequest.medicine_name);
+/** How each status looks, and what it means for the owner. */
+const statusInfo: Record<PrescriptionRequestStatus, { severity: string, icon: string, help: string }> = {
+  Pending: {severity: 'warn', icon: 'pi pi-clock', help: 'Waiting for the clinic to review.'},
+  Approved: {severity: 'info', icon: 'pi pi-check', help: 'Approved. The clinic is preparing it.'},
+  Ready: {severity: 'success', icon: 'pi pi-check-circle', help: 'Ready to collect from the clinic.'},
+  Rejected: {severity: 'danger', icon: 'pi pi-times-circle', help: 'The clinic could not approve this request.'},
+};
 
-const createdAt = computed<string>(() => {
+const status = computed(() => statusInfo[props.prescriptionRequest.status]);
+
+const requestedOn = computed<string>(() => {
   // created_at is a full timestamp with timezone, so new Date() reads it correctly.
   const date = new Date(props.prescriptionRequest.created_at);
-  const today = new Date();
-  if (date.toLocaleDateString() === today.toLocaleDateString()) {
-    return 'Requested today'
+  if (date.toDateString() === new Date().toDateString()) {
+    return 'Requested today';
   }
-  return 'Requested on ' + date.toLocaleDateString();
-})
-
-const headerBackgroundStyle = computed<string>(() => {
-  let colour = ''
-  if (props.prescriptionRequest.status === 'Pending') {
-    colour = '#f6c7a3'
-  } else if (props.prescriptionRequest.status === 'Approved') {
-    colour = '#fff3c3'
-  } else if (props.prescriptionRequest.status === 'Ready') {
-    colour = '#d5eccb'
-  } else if (props.prescriptionRequest.status === 'Rejected') {
-    colour = '#f3acac'
-  }
-  return `background-color: ${colour}`;
+  return 'Requested ' + date.toLocaleDateString(undefined, {day: 'numeric', month: 'short', year: 'numeric'});
 })
 
 </script>
 
 <template>
   <Card>
-    <template #header>
-      <div class="w-100 p-3 d-flex justify-content-between align-items-center"
-           :style="headerBackgroundStyle">
-        <div>
-          <h6 class="mb-0 fw-bold">{{ props.prescriptionRequest.status }}</h6>
-        </div>
-        <Button v-if="props.prescriptionRequest.status === 'Pending'"
-                @click="emit('cancelClicked')"
-                label="Cancel"
-                :aria-label="`Cancel prescription request of ${prescriptionMedicine}`"
-                icon="pi pi-times"
-                size="small"
-                severity="contrast"/>
-      </div>
-      <div v-if="props.prescriptionRequest.rejection_reason != ''" class="px-2 pt-2">
-        <Message severity="error" size="small" aria-label="Prescription rejection reason">
-          {{ props.prescriptionRequest.rejection_reason }}
-        </Message>
+    <template #title>
+      <div class="title-row">
+        <span>{{ props.prescriptionRequest.medicine_name }}</span>
+        <Tag :value="props.prescriptionRequest.status" :severity="status.severity" :icon="status.icon"/>
       </div>
     </template>
-    <template #title>{{ prescriptionMedicine }}</template>
-    <template #subtitle> {{ createdAt }}</template>
-    <template #footer>
-
+    <template #subtitle>
+      {{ requestedOn }}<span v-if="props.prescriptionRequest.dosage"> · {{ props.prescriptionRequest.dosage }}</span>
+    </template>
+    <template #content>
+      <p class="m-0 text-sm">{{ status.help }}</p>
+      <Message v-if="props.prescriptionRequest.rejection_reason"
+               severity="error" size="small" class="mt-2">
+        <span class="font-bold">Reason:</span> {{ props.prescriptionRequest.rejection_reason }}
+      </Message>
+      <p v-if="props.prescriptionRequest.comments" class="mt-2 mb-0 text-sm text-muted">
+        <span class="font-bold">Note:</span> {{ props.prescriptionRequest.comments }}
+      </p>
+    </template>
+    <template v-if="props.prescriptionRequest.status === 'Pending'" #footer>
+      <Button @click="emit('cancelClicked')"
+              label="Cancel request"
+              :aria-label="`Cancel prescription request of ${props.prescriptionRequest.medicine_name}`"
+              icon="pi pi-times"
+              size="small"
+              severity="secondary"
+              variant="text"/>
     </template>
   </Card>
 </template>
 
 <style scoped>
-
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
 </style>

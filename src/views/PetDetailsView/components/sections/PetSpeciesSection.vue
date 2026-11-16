@@ -15,57 +15,28 @@ const species = defineModel('species', {
   required: true
 })
 
-const filteredSpeciesList = computed<Species[]>(() => {
-  if (props.speciesList === undefined) {
-    return []
-  }
-  return props.speciesList.filter((species) => {
-    return props.petType === species.pet_type_id;
-  })
+/** Cats and dogs have a single species, so the question is only asked for other pet types. */
+const isAsked = computed<boolean>(() => {
+  return props.petType === PetTypeIds.smallAnimalId || props.petType === PetTypeIds.reptileId;
 })
 
-const isValidSelectedSpecies = computed<boolean>(() => {
-  for (const oneSpecies of filteredSpeciesList.value) {
-    if (oneSpecies.id === species.value) {
-      return true
-    }
-  }
-  return false
+const filteredSpeciesList = computed<Species[]>(() => {
+  return props.speciesList.filter((oneSpecies) => props.petType === oneSpecies.pet_type_id);
 })
 
 </script>
 
 <template>
-  <section>
-    <div v-if="props.petType === PetTypeIds.smallAnimalId || petType === PetTypeIds.reptileId">
-      <p>What species is
-        <PetNameFormatted :name="name"/>
-        <span>?</span>
-      </p>
-      <div class="mt-4">
-
-        <FloatLabel variant="on">
-          <Select v-model="species" inputId="species"
-                  :options="filteredSpeciesList"
-                  optionLabel="name"
-                  optionValue="id"
-                  editable
-                  class="myInput"
-                  :invalid="!isValidSelectedSpecies"
-          />
-          <label for="species">Species</label>
-        </FloatLabel>
-        <Message
-            v-if="!isValidSelectedSpecies" severity="error" size="small" variant="simple"
-            aria-describedby="speciesError">
-          Please choose a valid species from the list
-        </Message>
-      </div>
-    </div>
-
+  <section v-if="isAsked" class="question">
+    <label for="species" class="question-label">
+      What species is
+      <PetNameFormatted :name="name"/>?
+    </label>
+    <Select v-model="species" inputId="species"
+            :options="filteredSpeciesList"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Choose a species"
+            class="field-input"/>
   </section>
 </template>
-
-<style scoped>
-
-</style>

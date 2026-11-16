@@ -7,21 +7,29 @@ const props = defineProps<{
   pet: Pet
 }>();
 
-
 </script>
 
 <template>
-  <div>
-    <Avatar v-if="props.pet.avatar_url" :image="props.pet.avatar_url" size="xlarge" shape="circle"/>
-    <Avatar v-else style="background-color: #f0f0f0; color: #1a2551" shape="circle" size="xlarge">
-      <Cat v-if="props.pet.species.pet_type_id === PetTypeIds.catId"/>
-      <Dog v-else-if="props.pet.species.pet_type_id === PetTypeIds.dogId"/>
-      <Rabbit v-else-if="props.pet.species.pet_type_id === PetTypeIds.smallAnimalId"/>
-      <Turtle v-else/>
-    </Avatar>
-  </div>
+  <Avatar v-if="props.pet.avatar_url"
+          :image="props.pet.avatar_url"
+          :alt="`Photo of ${props.pet.name}`"
+          size="xlarge" shape="circle"
+          class="pet-icon"/>
+  <Avatar v-else shape="circle" size="xlarge" class="pet-icon pet-icon--placeholder" aria-hidden="true">
+    <Cat v-if="props.pet.species.pet_type_id === PetTypeIds.catId"/>
+    <Dog v-else-if="props.pet.species.pet_type_id === PetTypeIds.dogId"/>
+    <Rabbit v-else-if="props.pet.species.pet_type_id === PetTypeIds.smallAnimalId"/>
+    <Turtle v-else/>
+  </Avatar>
 </template>
 
 <style scoped>
+.pet-icon {
+  flex-shrink: 0;
+}
 
+.pet-icon--placeholder {
+  background: var(--pfv-accent-soft);
+  color: var(--p-primary-700);
+}
 </style>

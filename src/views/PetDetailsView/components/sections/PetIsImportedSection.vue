@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
-import {computed} from "vue";
 import countries from '@/types/countries.json'
 import type {Country} from "@/types/Country";
 
@@ -19,55 +18,37 @@ const importCountryCode = defineModel('importCountryCode', {
   required: false
 })
 
-
-const sortedCountries = computed<Country[]>(() => {
-  return countries.countries.toSorted(function (countryA: Country, countryB: Country) {
-    if (countryA.name < countryB.name) {
-      return -1;
-    }
-    if (countryA.name > countryB.name) {
-      return 1;
-    }
-    return 0;
-  });
-})
+// The list never changes, so sort it once rather than in a computed.
+const sortedCountries: Country[] = countries.countries.toSorted(
+    (countryA: Country, countryB: Country) => countryA.name.localeCompare(countryB.name)
+);
 
 </script>
 
 <template>
-  <section>
-    <div>
-      <p>Is
-        <PetNameFormatted :name="props.name"/>
-        <span> imported?</span>
-      </p>
+  <section class="question">
+    <span class="question-label">
+      Was
+      <PetNameFormatted :name="props.name"/>
+      imported from another country?
+    </span>
+    <div class="flex items-center gap-3">
+      <ToggleSwitch v-model="isImported" inputId="imported"/>
+      <label for="imported">{{ isImported ? 'Yes, imported' : 'No' }}</label>
     </div>
 
-    <div class="flex items-center gap-2">
-      <Checkbox v-model="isImported"
-                binary
-                inputId="imported" name="imported" value="true"/>
-      <label class="ms-3" for="imported">
-        Please tick this box if your pet is imported
-      </label>
-    </div>
-
-    <div class="mt-3" v-if="isImported">
-
-      <FloatLabel variant="on">
-        <Select v-model="importCountryCode"
-                :options="sortedCountries"
-                editable
-                inputId="country"
-                optionLabel="name"
-                optionValue="country_code"
-                class="myInput"/>
-        <label for="country">Select import country</label>
-      </FloatLabel>
+    <div v-if="isImported" class="mt-4">
+      <label for="country" class="sr-only">Country imported from</label>
+      <Select v-model="importCountryCode"
+              :options="sortedCountries"
+              inputId="country"
+              optionLabel="name"
+              optionValue="country_code"
+              placeholder="Country imported from"
+              filter
+              filterPlaceholder="Search countries"
+              resetFilterOnHide
+              class="field-input"/>
     </div>
   </section>
 </template>
-
-<style scoped>
-
-</style>

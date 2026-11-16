@@ -8,32 +8,23 @@ const props = defineProps<{
 
 const dateOfBirth = defineModel<Date | null>('dateOfBirth', {})
 
-const years = ref<string>('')
-const months = ref<string>('')
+const years = ref<number | null>(null)
+const months = ref<number | null>(null)
+const today = new Date()
 
 /**
- * Turns years and months into a date
+ * Turns an estimated age in years and months into a date of birth
+ * (the 1st of the month, since we only know the month).
  */
 function calculateBirthDate(): void {
-  const today = new Date();
-  const birthDate = new Date(today);
-
-  let yearsLocal = 0;
-  if (!isNaN(Number(years.value))) {
-    yearsLocal = Number(years.value);
+  if (years.value === null && months.value === null) {
+    return;
   }
-
-  let monthsLocal = 0;
-  if (!isNaN(Number(months.value))) {
-    monthsLocal = Number(months.value);
-  }
-
-  birthDate.setFullYear(birthDate.getFullYear() - yearsLocal);
-  birthDate.setMonth(birthDate.getMonth() - monthsLocal);
-
+  const birthDate = new Date();
   birthDate.setDate(1);
-
   birthDate.setHours(0, 0, 0, 0);
+  birthDate.setFullYear(birthDate.getFullYear() - (years.value ?? 0));
+  birthDate.setMonth(birthDate.getMonth() - (months.value ?? 0));
 
   dateOfBirth.value = birthDate;
 }
@@ -41,63 +32,65 @@ function calculateBirthDate(): void {
 </script>
 
 <template>
-  <section>
-    <div>
-      <p class="mb-1">How old is
-        <PetNameFormatted :name="props.name"/>
-        <span>?</span>
-      </p>
-    </div>
-    <div>
+  <section class="question">
+    <span class="question-label">
+      How old is
+      <PetNameFormatted :name="props.name"/>?
+    </span>
 
-      <Tabs value="dobDate" style="width: 350px">
-        <TabList>
-          <Tab value="dobDate">Date of birth</Tab>
-          <Tab value="dobAge">Age in years</Tab>
-        </TabList>
+    <Tabs value="dobDate" class="age-tabs">
+      <TabList>
+        <Tab value="dobDate">Date of birth</Tab>
+        <Tab value="dobAge">Estimated age</Tab>
+      </TabList>
 
-        <TabPanels>
-          <TabPanel value="dobDate">
-            <div class="d-flex">
-              <label for="dob" class="font-bold block mb-2"></label>
-              <DatePicker v-model="dateOfBirth"
-                          showIcon fluid
-                          iconDisplay="input"
-                          inputId="dob"
-                          class="myInput"
-                          dateFormat="dd/mm/yy"/>
-            </div>
-          </TabPanel>
+      <TabPanels>
+        <TabPanel value="dobDate">
+          <label for="dob" class="sr-only">Date of birth</label>
+          <DatePicker v-model="dateOfBirth"
+                      showIcon fluid
+                      iconDisplay="input"
+                      inputId="dob"
+                      :maxDate="today"
+                      placeholder="dd/mm/yyyy"
+                      dateFormat="dd/mm/yy"/>
+        </TabPanel>
 
-          <TabPanel value="dobAge">
-            <div class="d-flex gap-3">
-              <FloatLabel variant="on">
-                <InputText type="number" min="0" id="years" style="width: 150px"
-                           v-model="years"
-                           @blur="calculateBirthDate"
-                />
-                <label for="years">Years *</label>
-              </FloatLabel>
-              <FloatLabel variant="on">
-                <InputText type="number" min="0" id="months" style="width: 150px"
-                           v-model="months"
-                           @blur="calculateBirthDate"
-                />
-                <label for="months">Months *</label>
-              </FloatLabel>
-            </div>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-      <p class="fw-light" style="font-size: 0.8rem">
-        Don't worry if you don't know the exact date. Choose
-        <span class="fw-bold">Age in years</span>
-        instead and give us an estimate!
-      </p>
-    </div>
+        <TabPanel value="dobAge">
+          <div class="age-inputs">
+            <FloatLabel variant="on">
+              <InputNumber v-model="years" inputId="years" :min="0" :max="50" fluid
+                           @update:modelValue="calculateBirthDate"/>
+              <label for="years">Years</label>
+            </FloatLabel>
+            <FloatLabel variant="on">
+              <InputNumber v-model="months" inputId="months" :min="0" :max="11" fluid
+                           @update:modelValue="calculateBirthDate"/>
+              <label for="months">Months</label>
+            </FloatLabel>
+          </div>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
+    <small class="field-hint">
+      Don't know the exact date? Choose <span class="font-bold">Estimated age</span> and give us your best guess.
+    </small>
   </section>
 </template>
 
 <style scoped>
+.age-tabs {
+  max-width: var(--pfv-field-width);
+}
 
+.age-tabs :deep(.p-tabpanels) {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.age-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 </style>

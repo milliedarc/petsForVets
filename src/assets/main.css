@@ -1,0 +1,199 @@
+/*
+ * Global styles. Components are styled by the PrimeVue theme (src/theme.ts);
+ * this file holds the page shell, a few shared layout classes and a small set
+ * of utilities. Page-specific styling lives in each component's <style scoped>.
+ *
+ * Colours come from PrimeVue's CSS variables (--p-*), so they follow the theme.
+ */
+
+:root {
+    --pfv-page-bg: #f7f4f6;
+    --pfv-accent-soft: var(--p-primary-100);
+    --pfv-radius: 12px;
+    --pfv-gutter: 16px;
+    --pfv-field-width: 360px;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+}
+
+body {
+    background: var(--pfv-page-bg);
+    color: var(--p-text-color);
+    font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.375rem; }
+h3 { font-size: 1.125rem; }
+
+p {
+    margin: 0 0 1rem;
+}
+
+a, a:visited {
+    color: var(--p-primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- page shell */
+
+/** Main content area of a logged-in page. */
+.page {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 24px var(--pfv-gutter) 48px;
+}
+
+/** For forms and single-column pages. */
+.page--narrow {
+    max-width: 720px;
+}
+
+/** Title on the left, actions on the right; wraps on small screens. */
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+}
+
+/** "← Back to my pets" link above a page title. */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/** Centred placeholder for loading, empty and error states. */
+.state-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--p-text-muted-color);
+    background: var(--p-content-background);
+    border: 1px dashed var(--p-content-border-color);
+    border-radius: var(--pfv-radius);
+}
+
+.state-panel h2,
+.state-panel h3 {
+    color: var(--p-text-color);
+    margin: 0;
+}
+
+.state-panel p {
+    margin: 0;
+    max-width: 40ch;
+}
+
+/** Form inputs: full width on phones, capped on larger screens. */
+.field-input {
+    width: 100%;
+    max-width: var(--pfv-field-width);
+}
+
+/** Small validation/hint text under an input. */
+.field-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--p-text-muted-color);
+}
+
+.field-error {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--p-red-600);
+}
+
+/* ------------------------------------------------------------ question forms */
+
+/** One question of a step-by-step form ("What breed is Rex?"). */
+.question {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.question:first-child {
+    padding-top: 0;
+}
+
+.question:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.question-label {
+    display: block;
+    margin: 0 0 12px;
+    font-weight: 600;
+}
+
+/* ----------------------------------------------------------------- utilities */
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.font-bold { font-weight: 700; }
+.text-muted { color: var(--p-text-muted-color); }
+.text-sm { font-size: 0.875rem; }
+.m-0 { margin: 0; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-0 { margin-bottom: 0; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+
+/** Hidden visually but still read by screen readers. */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

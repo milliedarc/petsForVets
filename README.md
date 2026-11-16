@@ -5,7 +5,7 @@ each pet (species, breed, age, microchip, and so on) and request repeat
 prescriptions online, then follow each request from *Pending* to *Ready* (or
 see why it was rejected).
 
-**Stack:** Vue 3 + TypeScript (Vite, PrimeVue, Bootstrap) on the frontend, and a
+**Stack:** Vue 3 + TypeScript (Vite, PrimeVue) on the frontend, and a
 Go API on PostgreSQL with hand-written SQL on the backend.
 
 ## Architecture

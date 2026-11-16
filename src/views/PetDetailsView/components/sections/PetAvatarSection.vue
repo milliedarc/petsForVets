@@ -39,32 +39,28 @@ function deletePetAvatar(): void {
 
 </script>
 <template>
-  <section>
-    <div>
-      <p class="mb-0">Upload a picture of
-        <PetNameFormatted :name="props.name"/>
-        <span>:</span>
-      </p>
-      <p class="fw-light" style="font-size: 0.8rem">
-        You can skip this step and add it later.
-      </p>
-    </div>
+  <section class="question">
+    <span class="question-label">
+      Upload a picture of
+      <PetNameFormatted :name="props.name"/>
+    </span>
+    <small class="field-hint mb-4">You can skip this step and add it later.</small>
 
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex flex-column align-items-center">
+    <div>
+      <div>
+        <div class="flex flex-col items-center">
 
           <div v-if="!deleteAvatarFlag"
                style="position: relative">
             <img v-if="hasAvatarUrl"
                  :src="avatarUrl"
                  :alt="`${props.name}'s uploaded picture`"
-                 class="shadow-lg rounded mb-3"
+                 class="avatar-preview"
                  style="max-width: 240px"/>
             <img v-else-if="tempAvatarDisplay"
                  :src="tempAvatarDisplay"
                  :alt="`Selected avatar for ${props.name}`"
-                 class="shadow-lg rounded mb-3"
+                 class="avatar-preview"
                  style="max-width: 240px"/>
 
             <Button v-if="hasAvatarUrl || tempAvatarDisplay" icon="pi pi-times"
@@ -86,5 +82,9 @@ function deletePetAvatar(): void {
 </template>
 
 <style scoped>
-
+.avatar-preview {
+  border-radius: var(--pfv-radius);
+  margin-bottom: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
 </style>

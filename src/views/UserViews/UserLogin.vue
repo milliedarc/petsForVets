@@ -1,81 +1,59 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {useRouter} from "vue-router";
 import {login as apiLogin} from "@/api/auth";
-import {PawPrint} from "@lucide/vue";
-
-const router = useRouter()
+import {ApiError} from "@/api/client";
+import AuthCard from "@/components/AuthCard.vue";
 
 const email = ref<string>("");
 const password = ref<string>("");
-const hasLoginError = ref<boolean>(false);
+const loginError = ref<string>("");
+const isSubmitting = ref<boolean>(false);
 
 async function login(): Promise<void> {
+  loginError.value = '';
+  isSubmitting.value = true;
   try {
     await apiLogin(email.value, password.value);
-    hasLoginError.value = false;
+    // A full page load lets App.vue pick up the new session.
     window.location.href = '/'
   } catch (error) {
-    hasLoginError.value = true;
-    console.log(error);
+    console.error(error);
+    // A 401 means wrong credentials; anything else (server down, ...) gets its own message.
+    loginError.value = error instanceof ApiError && error.status !== 401
+        ? error.message
+        : 'Invalid email or password';
+    isSubmitting.value = false;
   }
 }
 
 </script>
 
 <template>
-  <div style="background-color: whitesmoke">
-    <div class="d-flex justify-content-center align-items-center vh-100 w-100">
-      <div class="m-auto p-4 border rounded shadow-sm" style="width: 400px; background-color: white">
-        <div class="d-flex justify-content-center align-items-center mb-2">
-          <PawPrint :size="64" color="#d6b6c2"/>
-        </div>
-        <h3 class="text-center">Welcome back</h3>
-        <form @submit.prevent="login">
-          <div class="row mb-3 d-flex align-items-center">
-            <label for="inputEmail">Email</label>
-            <div class="col-sm-10 w-100">
-              <InputText type="email" autofocus class="form-control" id="inputEmail" v-model="email"/>
-            </div>
-          </div>
-          <div class="row mb-4 d-flex align-items-center">
-            <label for="inputPassword">Password</label>
-            <div class="col-sm-10 w-100">
-              <Password fluid
-                        id="password"
-                        v-model="password"
-                        :feedback="false"
-                        toggleMask/>
-            </div>
-            <div>
-              <Message v-if="hasLoginError"
-                       severity="error"
-                       icon="pi pi-times-circle"
-                       class="mt-4"
-                       aria-describedby="loginError">
-                Invalid email or password
-              </Message>
-            </div>
-          </div>
-          <div class="text-center">
-            <p>Don't have an account?
-              <RouterLink to="/register">Register with us</RouterLink>
-            </p>
-          </div>
-          <div class="d-flex justify-content-center">
-            <Button
-                type="submit"
-                severity="contrast"
-                aria-label="Login">
-              <i class="pi pi-user"></i>Sign in
-            </Button>
-          </div>
-        </form>
+  <AuthCard title="Welcome back" subtitle="Sign in to manage your pets">
+    <form @submit.prevent="login">
+      <div class="auth-field">
+        <label for="email">Email</label>
+        <InputText id="email" type="email" v-model="email" autocomplete="email" autofocus required fluid/>
       </div>
-    </div>
-  </div>
+      <div class="auth-field">
+        <label for="password">Password</label>
+        <Password inputId="password"
+                  v-model="password"
+                  :feedback="false"
+                  :inputProps="{autocomplete: 'current-password', required: true}"
+                  toggleMask fluid/>
+      </div>
+
+      <Message v-if="loginError" severity="error" icon="pi pi-times-circle" role="alert">
+        {{ loginError }}
+      </Message>
+
+      <Button type="submit" label="Sign in" icon="pi pi-sign-in" :loading="isSubmitting" fluid/>
+
+      <p class="auth-footer">
+        Don't have an account?
+        <RouterLink :to="{name: 'UserRegistration'}">Register with us</RouterLink>
+      </p>
+    </form>
+  </AuthCard>
 </template>
-
-<style scoped>
-
-</style>

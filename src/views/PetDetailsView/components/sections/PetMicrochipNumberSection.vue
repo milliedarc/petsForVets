@@ -15,24 +15,19 @@ const microchipNumber = defineModel('microchipNumber', {
 </script>
 
 <template>
-  <section>
-    <div>
-      <p>What's
-        <PetNameFormatted :name="props.name"/>
-        <span>'s microchip number?</span>
-      </p>
-    </div>
-    <div>
-      <FloatLabel variant="on">
-        <InputText id="microchip"
-                   v-model="microchipNumber"
-                   class="myInput"/>
-        <label for="microchip">Microchip Number</label>
-      </FloatLabel>
-    </div>
+  <section class="question">
+    <label for="microchip" class="question-label">
+      What's
+      <PetNameFormatted :name="props.name"/>'s microchip number?
+    </label>
+    <InputText id="microchip"
+               v-model="microchipNumber"
+               inputmode="numeric"
+               autocomplete="off"
+               class="field-input"
+               aria-describedby="microchipHint"/>
+    <small id="microchipHint" class="field-hint">
+      Usually 15 digits. You'll find it on your pet's vaccination card or passport.
+    </small>
   </section>
 </template>
-
-<style scoped>
-
-</style>

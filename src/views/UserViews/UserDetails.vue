@@ -1,60 +1,79 @@
 <script setup lang="ts">
-import ButtonPencilEdit from "@/components/ButtonPencilEdit.vue";
-import {useRouter} from "vue-router";
+import type {User} from "@/types/User";
+import {onMounted, ref} from "vue";
+import {getCurrentUser} from "@/api/auth";
+import {errorMessage} from "@/api/client";
 
-const router = useRouter();
+const user = ref<User>();
+const loadError = ref<string>('');
 
-function goToContactDetails(): void {
-  router.push({name: "EditContactDetails"});
-}
+onMounted(async () => {
+  try {
+    user.value = await getCurrentUser();
+  } catch (error) {
+    console.error(error);
+    loadError.value = errorMessage(error, 'Your details could not be loaded.');
+  }
+})
 
 </script>
 
 <template>
-  <main class="container">
-    <div class="bg-body-tertiary p-5 rounded">
-      <h1 class="mb-4">Your details</h1>
-
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="mt-2">
-              <div>
-                <h6 class="fw-bold">Contact details</h6>
-              </div>
-              <div class="mt-3">
-                <p></p>
-              </div>
-            </div>
-            <div class="d-flex justify-content-center">
-              <ButtonPencilEdit @click="goToContactDetails"/>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="mt-2">
-              <div>
-                <h6 class="fw-bold">My addresses</h6>
-              </div>
-              <div class="mt-3">
-                <p></p>
-              </div>
-            </div>
-            <div class="d-flex justify-content-center">
-              <ButtonPencilEdit/>
-            </div>
-          </div>
-        </div>
-      </div>
-
+  <main class="page page--narrow">
+    <div class="page-header">
+      <h1>Personal details</h1>
     </div>
+
+    <div v-if="loadError" class="state-panel" role="alert">
+      <p>{{ loadError }}</p>
+    </div>
+
+    <template v-else-if="user">
+      <Card class="mb-4">
+        <template #title>Contact details</template>
+        <template #content>
+          <dl class="details">
+            <dt>Name</dt>
+            <dd>{{ [user.name, user.surname].filter(Boolean).join(' ') }}</dd>
+            <dt>Email</dt>
+            <dd>{{ user.email }}</dd>
+          </dl>
+          <p class="text-muted text-sm m-0 mt-4">
+            Changing your name or email isn't available online yet. Please contact the clinic if they need updating.
+          </p>
+        </template>
+      </Card>
+
+      <Card>
+        <template #title>
+          <div class="flex items-center justify-between gap-2">
+            My addresses
+            <Tag value="Coming soon" severity="secondary"/>
+          </div>
+        </template>
+        <template #content>
+          <p class="text-muted m-0">You'll soon be able to add your home address here.</p>
+        </template>
+      </Card>
+    </template>
   </main>
 </template>
 
 <style scoped>
+.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 24px;
+  margin: 0;
+}
 
+.details dt {
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+}
+
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
 </style>

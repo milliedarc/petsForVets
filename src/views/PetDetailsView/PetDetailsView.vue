@@ -3,7 +3,7 @@
 import type {Breed, Pet, Species} from "@/types/Pet";
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref, computed, watch} from "vue";
-import {ApiError} from "@/api/client";
+import {ApiError, errorMessage} from "@/api/client";
 import {createPet, deletePet, getPet, updatePet, type PetInput} from "@/api/pets";
 import {listBreeds, listSpecies} from "@/api/reference";
 import {parseIsoDate, toIsoDate} from "@/utils/dates";
@@ -117,16 +117,11 @@ async function fetchPet(id: string): Promise<void> {
   microchipNumber.value = pet.microchip_number
 }
 
-/** The API's error message if there is one, so server-side validation reaches the user. */
-function errorMessage(error: unknown, fallback: string): string {
-  return error instanceof ApiError ? error.message : fallback;
-}
-
 function confirmDelete(): void {
   confirm.require({
-    message: "Do you want to delete this pet's profile?",
-    header: 'Warning!',
-    icon: 'pi pi-info-circle',
+    message: `Delete ${petToEdit.value?.name}'s profile? Their prescriptions and requests will be deleted too. This can't be undone.`,
+    header: 'Delete pet profile',
+    icon: 'pi pi-exclamation-triangle',
     rejectLabel: 'Cancel',
     rejectProps: {
       label: 'Cancel',
@@ -137,6 +132,7 @@ function confirmDelete(): void {
       label: 'Delete',
       severity: 'danger'
     },
+    defaultFocus: 'reject',
     accept: async () => {
       if (!petToEdit.value) {
         return;
@@ -225,27 +221,38 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="container-fluid my-5">
-    <div class="row justify-content-center">
-      <div class="col-8">
+  <main class="page page--narrow">
+    <RouterLink to="/" class="back-link">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>My pets
+    </RouterLink>
 
-        <div v-if="!isLoading">
-          <div v-if="petNotFound">
-            <h4>Pet not found</h4>
-          </div>
-          <div v-else>
-            <div class="my-3">
-              <h4 v-if="petToEdit === undefined">Your new pet details</h4>
-              <h4 v-else>Edit pet details</h4>
-            </div>
+    <div v-if="isLoading" class="state-panel" aria-live="polite">
+      <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="5"/>
+      <span>Loading…</span>
+    </div>
 
+    <div v-else-if="petNotFound" class="state-panel">
+      <h2>Pet not found</h2>
+      <p>This pet doesn't exist, or it isn't on your account.</p>
+      <RouterLink to="/">Back to my pets</RouterLink>
+    </div>
+
+    <template v-else>
+      <div class="page-header">
+        <h1 v-if="isNewPet">Add a pet</h1>
+        <h1 v-else>Edit {{ petToEdit?.name }}'s details</h1>
+      </div>
+
+      <form @submit.prevent="savePet">
+        <Card>
+          <template #content>
             <PetNameSection v-model:name="name"/>
 
-            <section>
-              <p>
+            <section class="question">
+              <span class="question-label">
                 <PetNameFormatted :name="name"/>
                 is a:
-              </p>
+              </span>
               <PetTypes v-model="petType" @petTypeClicked="resetOnClickPetType"/>
             </section>
 
@@ -279,39 +286,74 @@ onMounted(async () => {
                                        v-model:microchip-number="microchipNumber"/>
 
             <!-- TODO: PetAvatarSection returns when avatar uploads are ported to the Go API -->
+          </template>
+        </Card>
 
-            <section>
-              <Button @click="savePet"
-                      :disabled="!canSave"
-                      class="myInput"
-                      :aria-label="`Save ${name}'s profile`">
-                <span v-if="isNewPet">Save pet</span>
-                <span v-else>Update pet details</span>
-              </Button>
-            </section>
-            <section>
-              <Button v-if="!isNewPet"
-                      @click="confirmDelete"
-                      label="Delete pet profile"
-                      variant="text" severity="danger"
-                      class="myInput"
-                      :aria-label="`Delete ${name}'s profile`"/>
-            </section>
-          </div>
+        <div class="form-actions">
+          <Button type="submit"
+                  :disabled="!canSave"
+                  :loading="isSaving"
+                  :label="isNewPet ? 'Save pet' : 'Save changes'"
+                  icon="pi pi-check"/>
+          <RouterLink to="/" custom v-slot="{navigate}">
+            <Button label="Cancel" severity="secondary" variant="outlined" @click="navigate"/>
+          </RouterLink>
+          <small v-if="!canSave && !isSaving" class="field-hint form-actions-hint">
+            Add a name and choose what type of pet this is to save.
+          </small>
         </div>
-      </div>
-    </div>
+      </form>
+
+      <Card v-if="!isNewPet" class="danger-zone">
+        <template #content>
+          <div class="danger-zone-body">
+            <div>
+              <h2 class="danger-zone-title">Delete this pet</h2>
+              <p class="m-0 text-muted text-sm">Removes the profile, prescriptions and requests for good.</p>
+            </div>
+            <Button @click="confirmDelete"
+                    label="Delete"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    variant="outlined"
+                    :aria-label="`Delete ${petToEdit?.name}'s profile`"/>
+          </div>
+        </template>
+      </Card>
+    </template>
   </main>
 </template>
 
 <style scoped>
-
-.myInput {
-  width: 300px;
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-section {
-  margin-top: 30px;
+.form-actions-hint {
+  flex-basis: 100%;
+  margin-top: 0;
 }
 
+.danger-zone {
+  margin-top: 40px;
+  border: 1px solid var(--p-red-200);
+  box-shadow: none;
+}
+
+.danger-zone-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.danger-zone-title {
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
 </style>

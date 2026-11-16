@@ -34,3 +34,8 @@ export async function api<T>(method: Method, path: string, body?: unknown): Prom
     }
     return response.json() as Promise<T>;
 }
+
+/** The API's error message if there is one (so server-side validation reaches the user), else the fallback. */
+export function errorMessage(error: unknown, fallback: string): string {
+    return error instanceof ApiError ? error.message : fallback;
+}

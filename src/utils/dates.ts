@@ -16,3 +16,36 @@ export function toIsoDate(date: Date): string {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
+
+/**
+ * A pet's age from its "YYYY-MM-DD" date of birth, e.g. "3 years, 2 months",
+ * "5 months" or "Under a month". Returns '' when the date isn't known.
+ */
+export function formatAge(dateOfBirth: string | null, today: Date = new Date()): string {
+    if (!dateOfBirth) {
+        return '';
+    }
+    const birthDate = parseIsoDate(dateOfBirth);
+
+    let totalMonths = (today.getFullYear() - birthDate.getFullYear()) * 12
+        + (today.getMonth() - birthDate.getMonth());
+    // The birthday hasn't come round yet this month.
+    if (today.getDate() < birthDate.getDate()) {
+        totalMonths--;
+    }
+    if (totalMonths < 1) {
+        return 'Under a month';
+    }
+
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+    const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
+
+    if (years === 0) {
+        return plural(months, 'month');
+    }
+    if (months === 0) {
+        return plural(years, 'year');
+    }
+    return `${plural(years, 'year')}, ${plural(months, 'month')}`;
+}

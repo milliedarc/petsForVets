@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
-import {PawPrint} from "@lucide/vue";
+import AuthCard from "@/components/AuthCard.vue";
 import {register} from "@/api/auth";
-import {ApiError} from "@/api/client";
+import {errorMessage as apiErrorMessage} from "@/api/client";
 
 const name = ref<string>("");
 const surname = ref<string>("");
@@ -40,9 +40,8 @@ async function registerUser(): Promise<void> {
     // Registering also logs you in; a full page load lets App.vue pick up the session.
     window.location.href = '/';
   } catch (error) {
-    errorMessage.value = error instanceof ApiError ? error.message : 'Registration failed, please try again.';
+    errorMessage.value = apiErrorMessage(error, 'Registration failed, please try again.');
     console.error(error);
-  } finally {
     isSubmitting.value = false;
   }
 }
@@ -50,86 +49,64 @@ async function registerUser(): Promise<void> {
 </script>
 
 <template>
-  <div style="background-color: whitesmoke">
-    <div class="d-flex justify-content-center align-items-center vh-100 w-100">
-      <div class="m-auto p-4 border rounded shadow-sm" style="width: 400px; background-color: white">
-        <div class="d-flex justify-content-center align-items-center mb-2">
-          <PawPrint :size="64" color="#d6b6c2"/>
+  <AuthCard title="Create your account" subtitle="Keep your pets' details in one place and request repeat prescriptions online.">
+    <form @submit.prevent="registerUser">
+      <div class="name-row">
+        <div class="auth-field">
+          <label for="inputName">First name</label>
+          <InputText id="inputName" v-model="name" autocomplete="given-name" autofocus required fluid/>
         </div>
-        <h3 class="text-center">Welcome</h3>
-        <div class="m-4">
-          <p>To register, please tell us your name, email address and a password.</p>
+        <div class="auth-field">
+          <label for="inputSurname">Surname</label>
+          <InputText id="inputSurname" v-model="surname" autocomplete="family-name" fluid/>
         </div>
-        <form @submit.prevent="registerUser">
-          <div class="row mb-4 d-flex align-items-center">
-            <div class="col-sm-10 w-100">
-              <FloatLabel variant="on">
-                <InputText autofocus class="form-control" id="inputName" v-model="name" autocomplete="given-name"/>
-                <label for="inputName">First name</label>
-              </FloatLabel>
-            </div>
-          </div>
-          <div class="row mb-4 d-flex align-items-center">
-            <div class="col-sm-10 w-100">
-              <FloatLabel variant="on">
-                <InputText class="form-control" id="inputSurname" v-model="surname" autocomplete="family-name"/>
-                <label for="inputSurname">Surname</label>
-              </FloatLabel>
-            </div>
-          </div>
-          <div class="row mb-4 d-flex align-items-center">
-            <div class="col-sm-10 w-100">
-              <FloatLabel variant="on">
-                <InputText type="email" class="form-control" id="inputEmail" v-model="email" autocomplete="email"/>
-                <label for="inputEmail">Email</label>
-              </FloatLabel>
-            </div>
-          </div>
-          <div class="row mb-4 d-flex align-items-center">
-            <div class="col-sm-10 w-100">
-              <FloatLabel variant="on">
-                <Password fluid
-                          inputId="password"
-                          v-model="password"
-                          :inputProps="{autocomplete: 'new-password'}"
-                          toggleMask/>
-                <label for="password">Password</label>
-              </FloatLabel>
-            </div>
-          </div>
-          <div class="row mb-4 d-flex align-items-center">
-            <div class="col-sm-10 w-100">
-              <FloatLabel variant="on">
-                <Password fluid
-                          inputId="passwordConfirm"
-                          v-model="passwordConfirm"
-                          :inputProps="{autocomplete: 'new-password'}"
-                          :feedback="false"
-                          toggleMask/>
-                <label for="passwordConfirm">Confirm password</label>
-              </FloatLabel>
-              <small v-if="passwordProblem" class="text-danger">{{ passwordProblem }}</small>
-            </div>
-          </div>
-
-          <Message v-if="errorMessage" severity="error" size="small" class="mb-3">{{ errorMessage }}</Message>
-
-          <div class="d-flex justify-content-center">
-            <Button type="submit" severity="contrast" :disabled="!canSubmit" aria-label="Create account">
-              Create account
-              <i class="pi pi-angle-double-right"></i>
-            </Button>
-          </div>
-          <div class="text-center mt-3">
-            Already have an account?
-            <RouterLink :to="{name: 'UserLogin'}">Sign in</RouterLink>
-          </div>
-        </form>
       </div>
-    </div>
-  </div>
+      <div class="auth-field">
+        <label for="inputEmail">Email</label>
+        <InputText type="email" id="inputEmail" v-model="email" autocomplete="email" required fluid/>
+      </div>
+      <div class="auth-field">
+        <label for="password">Password</label>
+        <Password inputId="password"
+                  v-model="password"
+                  :inputProps="{autocomplete: 'new-password', 'aria-describedby': 'passwordHint'}"
+                  toggleMask fluid/>
+        <small id="passwordHint" class="field-hint m-0">At least 8 characters.</small>
+      </div>
+      <div class="auth-field">
+        <label for="passwordConfirm">Confirm password</label>
+        <Password inputId="passwordConfirm"
+                  v-model="passwordConfirm"
+                  :inputProps="{autocomplete: 'new-password'}"
+                  :feedback="false"
+                  :invalid="passwordConfirm !== '' && password !== passwordConfirm"
+                  toggleMask fluid/>
+        <small v-if="passwordProblem" class="field-error m-0" role="alert">{{ passwordProblem }}</small>
+      </div>
+
+      <Message v-if="errorMessage" severity="error" role="alert">{{ errorMessage }}</Message>
+
+      <Button type="submit" label="Create account" icon="pi pi-arrow-right" iconPos="right"
+              :disabled="!canSubmit" :loading="isSubmitting" fluid/>
+
+      <p class="auth-footer">
+        Already have an account?
+        <RouterLink :to="{name: 'UserLogin'}">Sign in</RouterLink>
+      </p>
+    </form>
+  </AuthCard>
 </template>
 
 <style scoped>
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
+@media (max-width: 400px) {
+  .name-row {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

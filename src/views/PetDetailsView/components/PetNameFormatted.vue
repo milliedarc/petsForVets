@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import {computed} from "vue";
 
-const props = defineProps(['name'])
+const props = defineProps<{
+  name: string
+}>()
 
+/** The pet's name, or "your pet" while the name field is still empty. */
 const myPetName = computed<string>(() => {
-  if (props.name === '') {
-    return 'My Pet'
-  }
-  return props.name
+  return props.name.trim() === '' ? 'your pet' : props.name.trim()
 })
 
 </script>
 
 <template>
-  <span class="fw-bold">{{ myPetName }}</span>
+  <span class="pet-name">{{ myPetName }}</span>
 </template>
 
 <style scoped>
-
+.pet-name {
+  color: var(--p-primary-color);
+  font-weight: 700;
+}
 </style>

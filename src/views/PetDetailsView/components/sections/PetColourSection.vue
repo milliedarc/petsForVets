@@ -15,26 +15,14 @@ const colour = defineModel('colour', {
 </script>
 
 <template>
-  <section>
-    <div>
-      <p>What colour is
-        <PetNameFormatted :name="props.name"/>
-        <span>?</span>
-      </p>
-    </div>
-
-    <div>
-      <FloatLabel class="myInput"
-                  variant="on">
-        <InputText id="colour"
-                   v-model="colour"
-                   class="myInput"/>
-        <label for="colour">Colour</label>
-      </FloatLabel>
-    </div>
+  <section class="question">
+    <label for="colour" class="question-label">
+      What colour is
+      <PetNameFormatted :name="props.name"/>?
+    </label>
+    <InputText id="colour"
+               v-model="colour"
+               placeholder="e.g. Black and white"
+               class="field-input"/>
   </section>
 </template>
-
-<style scoped>
-
-</style>

@@ -22,6 +22,11 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         },
     },
+    // Pre-bundle the theme package (imported by src/theme.ts) at startup rather
+    // than discovering it mid-session, which forces a reload of the dev server.
+    optimizeDeps: {
+        include: ['@primeuix/themes'],
+    },
     server: {
         // Forward /api/* to the Go server, so the browser sees one origin
         // and the session cookie is sent automatically.

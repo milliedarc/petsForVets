@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {User} from "@/types/User";
-import {ref} from "vue";
+import {computed} from "vue";
 import MyAvatar from "@/components/MyAvatar.vue";
 import {useRouter} from "vue-router";
 import {PawPrint} from "@lucide/vue";
@@ -15,63 +15,30 @@ const props = defineProps<{
   user: User
 }>()
 
-const items = ref([
+/** Clinic staff working in the clinic view have a different home page. */
+const homePath = computed<string>(() => {
+  return props.user.app_mode === 'clinicTeam' ? '/clinic' : '/'
+})
+
+const items = computed(() => [
   {
-    label: 'Home',
+    label: props.user.app_mode === 'clinicTeam' ? 'Clinic' : 'My pets',
     icon: 'pi pi-home',
     command: () => {
-      router.push('/')
+      router.push(homePath.value)
     }
   }
-  // {
-  //   label: 'Features',
-  //   icon: 'pi pi-star'
-  // },
-  // {
-  //   label: 'Projects',
-  //   icon: 'pi pi-search',
-  //   items: [
-  //     {
-  //       label: 'Components',
-  //       icon: 'pi pi-bolt'
-  //     },
-  //     {
-  //       label: 'Blocks',
-  //       icon: 'pi pi-server'
-  //     },
-  //     {
-  //       label: 'UI Kit',
-  //       icon: 'pi pi-pencil'
-  //     },
-  //     {
-  //       label: 'Templates',
-  //       icon: 'pi pi-palette',
-  //       items: [
-  //         {
-  //           label: 'Apollo',
-  //           icon: 'pi pi-palette'
-  //         },
-  //         {
-  //           label: 'Ultima',
-  //           icon: 'pi pi-palette'
-  //         }
-  //       ]
-  //     }
-  //   ]
-  // },
-  // {
-  //   label: 'Contact',
-  //   icon: 'pi pi-envelope'
-  // }
 ]);
 
 </script>
 
 <template>
-  <Menubar :model="items">
+  <Menubar :model="items" class="navbar">
     <template #start>
-      <PawPrint :size="24" color="#d6b6c2"/>
-      <h5 class="mb-0 ms-2">Pets for Vets</h5>
+      <RouterLink :to="homePath" class="brand" aria-label="Pets for Vets home">
+        <PawPrint :size="26" aria-hidden="true"/>
+        <span class="brand-name">Pets for Vets</span>
+      </RouterLink>
     </template>
     <template #end>
       <MyAvatar
@@ -82,5 +49,27 @@ const items = ref([
 </template>
 
 <style scoped>
+.navbar {
+  border-radius: 0;
+  border-width: 0 0 1px 0;
+  padding: 8px var(--pfv-gutter);
+}
 
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  color: var(--p-primary-color);
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.brand-name {
+  font-weight: 800;
+  font-size: 1.125rem;
+  color: var(--p-text-color);
+}
 </style>
