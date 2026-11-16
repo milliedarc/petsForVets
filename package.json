@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently --names api,web --prefix-colors blue,green --kill-others-on-fail \"npm:api\" \"npm:dev:web\"",
     "build": "vue-tsc --build && vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --build",
-    "api": "cd api && go run ./cmd/server"
+    "api": "cd api && go run ./cmd/server",
+    "dev:web": "vite"
   },
   "dependencies": {
     "@lucide/vue": "^1.73.0",
@@ -25,6 +26,7 @@
     "@types/node": "^26.6.6",
     "@vitejs/plugin-vue": "^6.0.11",
     "@vue/tsconfig": "^0.9.1",
+    "concurrently": "^10.0.7",
     "typescript": "^6.0.3",
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.3.8",

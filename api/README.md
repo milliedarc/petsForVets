@@ -11,9 +11,14 @@ From the repository root:
 ```sh
 colima start              # Docker runtime, once per boot
 docker-compose up -d      # Postgres on localhost:5432
-npm run api               # API on localhost:8080 (applies migrations); keep it running
-npm run dev               # in another terminal: Vue on localhost:5173
+npm run dev               # API on :8080 and Vue on :5173 together; Ctrl+C stops both
 ```
+
+`npm run dev` uses [concurrently](https://www.npmjs.com/package/concurrently)
+to run `npm run api` (the Go server, which also applies migrations) and
+`npm run dev:web` (Vite) side by side, prefixing each log line with `[api]` or
+`[web]`. If the API fails to start (e.g. Postgres isn't up), both stop, and the
+reason is in the last `[api]` lines. You can still run either one on its own.
 
 Vite forwards every `/api/...` request to the Go server (see `server.proxy` in
 `vite.config.ts`). The browser only ever talks to one origin, so the session
@@ -22,7 +27,8 @@ cookie just works and there is no CORS setup.
 A dev account's login is in `.dev-login` at the repo root (git-ignored).
 
 If the app shows "Can't reach the server" (or Vite logs `http proxy error`), the
-API isn't running: start it with `npm run api`.
+API isn't running: you probably started Vite alone. Use `npm run dev`, or
+`npm run api` in another terminal.
 
 ## Layout
 
