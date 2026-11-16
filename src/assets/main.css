@@ -50,10 +50,6 @@ a, a:visited {
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
 /* ---------------------------------------------------------------- page shell */
 
 /** Main content area of a logged-in page. */
@@ -81,16 +77,6 @@ a:hover {
 
 .page-header h1 {
     margin: 0;
-}
-
-/** "← Back to my pets" link above a page title. */
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-weight: 600;
-    font-size: 0.9rem;
 }
 
 /** Centred placeholder for loading, empty and error states. */

@@ -2,6 +2,7 @@
 import type {Pet} from "@/types/Pet";
 // imports, const, models, props, emits, refs, computed, watchers, functions, hooks
 import {listPets} from "@/api/pets";
+import {rememberPetName} from "@/stores/petNames";
 import {errorMessage} from "@/api/client";
 import {onMounted, ref} from "vue";
 import DashboardPetCard from "@/components/DashboardPetCard.vue";
@@ -20,6 +21,7 @@ async function fetchPets(): Promise<void> {
   loadError.value = ''
   try {
     pets.value = await listPets();
+    pets.value.forEach(rememberPetName);
   } catch (error) {
     console.error("Error loading pets:", error);
     loadError.value = errorMessage(error, 'Your pets could not be loaded.');

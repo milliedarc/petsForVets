@@ -56,9 +56,6 @@ async function savePassword(): Promise<void> {
 
 <template>
   <main class="page page--narrow">
-    <RouterLink :to="{name: 'Settings'}" class="back-link">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>Settings
-    </RouterLink>
     <div class="page-header">
       <h1>Change password</h1>
     </div>

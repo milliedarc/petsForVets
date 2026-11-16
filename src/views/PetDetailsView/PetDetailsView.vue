@@ -6,6 +6,7 @@ import {onMounted, ref, computed, watch} from "vue";
 import {ApiError, errorMessage} from "@/api/client";
 import {createPet, deletePet, getPet, updatePet, type PetInput} from "@/api/pets";
 import {listBreeds, listSpecies} from "@/api/reference";
+import {rememberPetName} from "@/stores/petNames";
 import {parseIsoDate, toIsoDate} from "@/utils/dates";
 import PetNameFormatted from "@/views/PetDetailsView/components/PetNameFormatted.vue";
 import PetTypes from "@/views/PetDetailsView/components/PetTypes.vue";
@@ -103,6 +104,7 @@ watch(breedsForSpecies, (breeds) => {
 async function fetchPet(id: string): Promise<void> {
   const pet = await getPet(id)
   petToEdit.value = pet;
+  rememberPetName(pet);
 
   name.value = pet.name
   petType.value = pet.species.pet_type_id
@@ -118,18 +120,18 @@ async function fetchPet(id: string): Promise<void> {
 }
 
 function confirmDelete(): void {
+  const petName = petToEdit.value?.name;
   confirm.require({
-    message: `Delete ${petToEdit.value?.name}'s profile? Their prescriptions and requests will be deleted too. This can't be undone.`,
-    header: 'Delete pet profile',
-    icon: 'pi pi-exclamation-triangle',
-    rejectLabel: 'Cancel',
+    message: `${petName}'s prescriptions and requests will be removed along with their profile. Once removed, the profile can't be restored.`,
+    header: `Remove ${petName}'s profile?`,
+    icon: 'pi pi-info-circle',
     rejectProps: {
-      label: 'Cancel',
+      label: 'Keep profile',
       severity: 'secondary',
       outlined: true
     },
     acceptProps: {
-      label: 'Delete',
+      label: 'Remove profile',
       severity: 'danger'
     },
     defaultFocus: 'reject',
@@ -139,11 +141,11 @@ function confirmDelete(): void {
       }
       try {
         await deletePet(petToEdit.value.id);
-        toast.add({severity: 'info', summary: 'Confirmed', detail: 'Pet profile deleted', life: 3000});
+        toast.add({severity: 'info', summary: 'Profile removed', detail: `${petName}'s profile has been removed.`, life: 4000});
         await router.push('/');
       } catch (error) {
         console.error("Error deleting pet:", error);
-        toast.add({severity: 'error', summary: 'Error', detail: errorMessage(error, 'Pet could not be deleted'), life: 5000});
+        toast.add({severity: 'error', summary: 'Error', detail: errorMessage(error, 'The profile could not be removed. Please try again.'), life: 5000});
       }
     }
   });
@@ -222,9 +224,6 @@ onMounted(async () => {
 
 <template>
   <main class="page page--narrow">
-    <RouterLink to="/" class="back-link">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>My pets
-    </RouterLink>
 
     <div v-if="isLoading" class="state-panel" aria-live="polite">
       <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="5"/>
@@ -304,19 +303,20 @@ onMounted(async () => {
         </div>
       </form>
 
-      <Card v-if="!isNewPet" class="danger-zone">
+      <Card v-if="!isNewPet" class="remove-profile">
         <template #content>
-          <div class="danger-zone-body">
+          <div class="remove-profile-body">
             <div>
-              <h2 class="danger-zone-title">Delete this pet</h2>
-              <p class="m-0 text-muted text-sm">Removes the profile, prescriptions and requests for good.</p>
+              <h2 class="remove-profile-title">Remove {{ petToEdit?.name }}'s profile</h2>
+              <p class="m-0 text-muted text-sm">
+                If {{ petToEdit?.name }} is no longer with you, or was added by mistake, you can remove their profile.
+              </p>
             </div>
             <Button @click="confirmDelete"
-                    label="Delete"
-                    icon="pi pi-trash"
-                    severity="danger"
+                    label="Remove profile"
+                    severity="secondary"
                     variant="outlined"
-                    :aria-label="`Delete ${petToEdit?.name}'s profile`"/>
+                    :aria-label="`Remove ${petToEdit?.name}'s profile`"/>
           </div>
         </template>
       </Card>
@@ -338,13 +338,13 @@ onMounted(async () => {
   margin-top: 0;
 }
 
-.danger-zone {
+.remove-profile {
   margin-top: 40px;
-  border: 1px solid var(--p-red-200);
+  border: 1px solid var(--p-content-border-color);
   box-shadow: none;
 }
 
-.danger-zone-body {
+.remove-profile-body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -352,7 +352,7 @@ onMounted(async () => {
   gap: 12px;
 }
 
-.danger-zone-title {
+.remove-profile-title {
   font-size: 1rem;
   margin-bottom: 2px;
 }

@@ -11,6 +11,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppBreadcrumbs: typeof import('./src/components/AppBreadcrumbs.vue')['default']
+    AppSidebar: typeof import('./src/components/AppSidebar.vue')['default']
     AuthCard: typeof import('./src/components/AuthCard.vue')['default']
     Avatar: typeof import('primevue/avatar')['default']
     Button: typeof import('primevue/button')['default']
@@ -18,6 +20,7 @@ declare module 'vue' {
     ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     DashboardPetCard: typeof import('./src/components/DashboardPetCard.vue')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
+    Drawer: typeof import('primevue/drawer')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']

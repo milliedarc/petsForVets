@@ -8,6 +8,7 @@ import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
 import {ApiError, errorMessage} from "@/api/client";
 import {getPet} from "@/api/pets";
+import {rememberPetName} from "@/stores/petNames";
 import {cancelRequest, listPrescriptionRequests, listPrescriptions, requestRepeat} from "@/api/prescriptions";
 import PrescriptionCard from "@/views/PrescriptionsView/components/PrescriptionCard.vue";
 import PrescriptionRequestCard from "@/views/PrescriptionsView/components/PrescriptionRequestCard.vue";
@@ -51,6 +52,7 @@ async function loadPage(): Promise<void> {
       fetchPrescriptionRequests(),
     ]);
     pet.value = loadedPet;
+    rememberPetName(loadedPet);
     prescriptions.value = loadedPrescriptions;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
@@ -117,9 +119,6 @@ onMounted(loadPage)
 
 <template>
   <main class="page">
-    <RouterLink to="/" class="back-link">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>My pets
-    </RouterLink>
 
     <div v-if="isLoading" class="state-panel" aria-live="polite">
       <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="5"/>
